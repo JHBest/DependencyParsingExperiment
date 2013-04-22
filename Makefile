@@ -1,8 +1,8 @@
 CC=g++
-CFLAGS=-c -Wall -g
+CFLAGS=-c -Wall -g -rdynamic
 LDFLAGS=
 SOURCES=src/main.cpp src/DependencyPaser.cpp src/Environment.cpp src/Simulator.cpp src/WordAgent.cpp \
-		src/Model.cpp src/Predictor.cpp src/Trainer.cpp src/FeatureTemplate.cpp
+		src/Model.cpp src/Predictor.cpp src/Trainer.cpp src/FeatureTemplate.cpp src/Evaluation.cpp src/Test.cpp
 OBJECTS=$(patsubst src/%.cpp, obj/%.o, $(SOURCES))
 EXECUTABLE=bin/test
 

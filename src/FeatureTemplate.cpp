@@ -1,6 +1,12 @@
 #include "FeatureTemplate.hpp"
+#include <iostream>
 
 using namespace std;
+
+FeatureTemplate::FeatureTemplate()
+{
+    //mSF.resize(100000000);
+}
 
 bool FeatureTemplate::abstractFeature(const Sentence & sen,
 		int parent, int child, vector<string> & featVec)
@@ -9,6 +15,37 @@ bool FeatureTemplate::abstractFeature(const Sentence & sen,
 	p = parent;
 	c = child;
 	return _abstractFeature(featVec);
+}
+
+
+bool FeatureTemplate::abstractFeature(const int & senID, int pa, int pb,
+			std::vector<std::string> & featVec)
+{
+    int key = int(senID * 1e4 + pa * 1e2 + pb);
+    if(mSF.find(key) == mSF.end())
+    {
+                return false;
+        }
+    featVec = mSF[key];
+    //vector<string> tmp = mSF[key];
+
+
+    return true;
+}
+
+inline std::vector<std::string> FeatureTemplate::abstractFeature(const int & senID, int pa, int pb)
+{
+        int key = int(senID * 1e4 + pa * 1e2 + pb);
+
+        return mSF[key];
+}
+
+bool FeatureTemplate::insertFeatures(int v, std::vector<std::string> & f)
+{
+    //cout<<"insert "<<v<<", size "<<f.size()<<endl;
+    mSF.insert(make_pair(v,f));
+    //mSF[v] = f;
+    return true;
 }
 
 bool FeatureTemplate::_abstractFeature(vector<string> & featVec)
@@ -44,6 +81,14 @@ bool FeatureTemplate::_abstractFeature(vector<string> & featVec)
 	featVec.push_back(_crtPos(p) + "_" + _nextPos(p) + "_" + _crtPos(c) + "_" + _nextPos(c));
 	// p-pos-1,p-pos,c-pos,c-pos+1
 	featVec.push_back(_prePos(p) + "_" + _crtPos(p) + "_" + _crtPos(c) + "_" + _nextPos(c));
+	// p-word,c-pos
+	featVec.push_back(_crtWord(p) + "_" + _crtPos(c));
+	// p-pos,c-word
+	featVec.push_back(_crtPos(p) + "_" + _crtWord(c));
+	// p-word,p-pos
+	featVec.push_back(_crtWord(p) + "_" + _crtPos(p));
+	// c-word,c-pos
+	featVec.push_back(_crtWord(c) + "_" + _crtPos(c));
 	return true;
 }
 

@@ -2,6 +2,7 @@
 #include <cstring>
 
 #include "Predictor.hpp"
+#include <iostream>
 
 using namespace std;
 
@@ -10,7 +11,7 @@ Predictor::Predictor(Model * pm) : pModel(pm)
 }
 
 bool Predictor::_decode(
-		const double f[maxLen][maxLen][2][2], 
+		const double f[maxLen][maxLen][2][2],
 		int s, int t, int d, int c,
 		const vector<vector<double> > & g,
 		std::vector<int> & father)
@@ -71,24 +72,132 @@ double Predictor::_eisner(
 	return f[0][n-1][1][0];
 }
 
-bool Predictor::_buildGraph(const Sentence & sen, 
+bool Predictor::_buildGraph(const Sentence & sen,int senID,
 		vector<vector<double> > & graph)
-{	
+{
+    //double totaltime;
+    //clock_t start,finish;
+
+        vFeaID.clear();
 	graph.clear();
 	int n = sen.size();
+	//cout<<"n "<<n<<endl;
 	graph.resize(n, vector<double>(n, 0));
+	//double sum  = 0.0;
 	for(int i = 0; i < n; i++){
 		for(int j = 0; j < n; j++){
-			if(j == i) continue;
-			graph[i][j] = pModel->wordPairWeight(sen, i, j);
+            if(j == i) continue;
+            //start = clock();
+			graph[i][j] = pModel->wordPairWeight(sen, senID, i, j);
+			//graph[j][i] = pModel->wordPairWeight(sen, senID, j, i);
+
+			//graph[j][i] = graph[i][j];
+			//cout<<"i "<<i<<" "<<"j "<<j<<" "<<graph[i][j]<<" ";
+			//finish = clock();
+                        //totaltime=(double)(finish-start)/CLOCKS_PER_SEC;
+                        //sum += totaltime;
+                        //cout<<"build graph time is "<<totaltime<<endl;
 		}
 	}
+	//cout<<"time "<<sum<<endl;
+
+
+	//int a;
+	//cin>>a;
+
+
+	/*finish = clock();
+                totaltime=(double)(finish-start)/CLOCKS_PER_SEC;
+                cout<<"build graph time is "<<totaltime<<endl;
+                */
+
+                //cin>>a;
+
+
+	/*vector<int> sid = pModel->getSentenceFeature();
+	sort(sid.begin(),sid.end());
+	for(size_t i = 0; i < sid.size(); i++)
+	{
+	        cout<<sid[i]<<" ";
+        }
+        cout<<endl;
+        pModel->resetSentenceFeature();
+	int a;
+	*/
+	//cin>>a;
+
 	return true;
 }
 
-double Predictor::predict(const Sentence & sen, vector<int> & fa)
+bool Predictor::_buildGraph(const Sentence & sen,
+			std::vector<std::vector<double> > & graph)
+{
+       // double totaltime;
+       // clock_t start,finish;
+
+        vFeaID.clear();
+	graph.clear();
+	int n = sen.size();
+	//cout<<"n "<<n<<endl;
+	graph.resize(n, vector<double>(n, 0));
+	//double sum  = 0.0;
+	for(int i = 0; i < n; i++){
+		for(int j = 0; j < n; j++){
+            if(j == i) continue;
+            //start = clock();
+			graph[i][j] = pModel->wordPairWeight(sen, i, j);
+			//graph[j][i] = pModel->wordPairWeight(sen, senID, j, i);
+
+			//graph[j][i] = graph[i][j];
+			//cout<<"i "<<i<<" "<<"j "<<j<<" "<<graph[i][j]<<" ";
+			//finish = clock();
+                        //totaltime=(double)(finish-start)/CLOCKS_PER_SEC;
+                        //sum += totaltime;
+                        //cout<<"build graph time is "<<totaltime<<endl;
+		}
+	}
+
+	//cout<<"time "<<sum<<endl;
+
+
+	//int a;
+	//cin>>a;
+
+
+	/*finish = clock();
+                totaltime=(double)(finish-start)/CLOCKS_PER_SEC;
+                cout<<"build graph time is "<<totaltime<<endl;
+                */
+
+                //cin>>a;
+
+
+	/*vector<int> sid = pModel->getSentenceFeature();
+	sort(sid.begin(),sid.end());
+	for(size_t i = 0; i < sid.size(); i++)
+	{
+	        cout<<sid[i]<<" ";
+        }
+        cout<<endl;
+        pModel->resetSentenceFeature();
+	int a;
+	*/
+	//cin>>a;
+
+	return true;
+}
+
+double Predictor::predict(const Sentence & sen, int senID,vector<int> & fa)
 {
 	vector<vector<double> > graph;
+	_buildGraph(sen, senID, graph);
+	return _eisner(graph, fa);
+}
+
+double Predictor::predict(const Sentence & sen, std::vector<int> & fa)
+{
+        vector<vector<double> > graph;
 	_buildGraph(sen, graph);
 	return _eisner(graph, fa);
+
 }
