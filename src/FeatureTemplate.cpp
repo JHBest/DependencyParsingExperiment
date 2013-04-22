@@ -8,6 +8,7 @@ FeatureTemplate::FeatureTemplate()
     //mSF.resize(100000000);
 }
 
+//³éÈ¡ÌØÕ÷
 bool FeatureTemplate::abstractFeature(const Sentence & sen,
 		int parent, int child, vector<string> & featVec)
 {

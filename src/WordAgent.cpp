@@ -15,7 +15,9 @@
 using namespace std;
 
 
-
+/**
+ * 构造函数参数依次是ID，环境对象，模拟器对象、位置、类别、密度
+ */
 WordAgent::WordAgent(int id, Environment * environment,Simulator * simulator,
 		const pair<int, int> & pos, int cat, int con){
 	ID = id;
@@ -37,6 +39,7 @@ WordAgent::WordAgent(int id, Environment * environment,Simulator * simulator,
 	mapStatusToBehavior();
 }
 
+//相同特征覆盖
 bool WordAgent::addDomFeature(const vector<int> & feature)
 {
 	for(size_t i = 0; i < feature.size(); i++){
@@ -46,6 +49,7 @@ bool WordAgent::addDomFeature(const vector<int> & feature)
 	return true;
 }
 
+//相同特征没有去掉
 bool WordAgent::addRecFeature(const vector<int> & feature)
 {
 	for(size_t i = 0; i < feature.size(); i++){

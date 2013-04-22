@@ -91,7 +91,7 @@ bool Trainer::addBCells(const Sentence & sen, const vector<int> & fa)
 	vector<int> features;
 	for(size_t i = 1; i < sen.size(); i++){
 		int j = fa[i];
-		int bi = _buildBCell(sen[i].first);
+		int bi = _buildBCell(sen[i].first);//返回B词主体的位置
 		int bj = _buildBCell(sen[j].first);
 		pModel->getFeatureIDVec(sen, j, i, features);
 		BCells[bi].addRecFeature(features);
@@ -100,16 +100,17 @@ bool Trainer::addBCells(const Sentence & sen, const vector<int> & fa)
 	return true;
 }
 
+//构建词主体
 int Trainer::_buildBCell(const string & word)
 {
         if(wordID.find(word) == wordID.end()){
-		wordID[word] = BCells.size();
+		wordID[word] = BCells.size();//记录每个词在BCells中的位置
 		pair<int,int> pos = pEnv->getRandomPosition();
 		BCells.push_back(WordAgent(wordID[word], pEnv,simu,pos, BCELL,1));
 	}
 	int res = wordID[word];
 	if((int)wordFreq.size() <= res){
-		wordFreq.push_back(0);
+		wordFreq.push_back(0);//保持同步增长，wordFreq记录的每个词的个数，该代码可直接移动上面的if里面
 	}
 	wordFreq[res] ++;
 	return res;

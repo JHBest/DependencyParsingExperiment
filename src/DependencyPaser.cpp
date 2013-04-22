@@ -56,8 +56,8 @@ bool DependencyPaser::_readFileAddBCell(const char * file)
 			sen.push_back(make_pair("ROOT", "ORG"));
 			father.push_back(-1);
 			for(size_t i = 0; i < senes.size(); i++){
-				sen.push_back(make_pair(senes[i][1], senes[i][3]));
-				father.push_back(atoi(senes[i][6].c_str()));
+				sen.push_back(make_pair(senes[i][1], senes[i][3]));//第一个是词，第三个是词性
+				father.push_back(atoi(senes[i][6].c_str()));//取得父节点的序号
 			}
 			//cout<<"&";
 
