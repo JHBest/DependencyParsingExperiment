@@ -215,49 +215,49 @@ bool DependencyPaser::_readFileTrain(const char * file)
 	string line;
 	vector<vector<string> > senes;
 	pModel->initFeatureWeight();//初始化特征权重
-	for(size_t i = 0; i < LEARNTIMES; i++)
+	for(size_t i = 0; i < LEARNTIMES; i++)//迭代次数
 	{
-	        cout<<"Learning "<<i+1<<" times"<<endl;
-	        ifstream fin(file);
-	        //int num = 0;
-	        pTrainer->initSentences();
-	        //pSimu->init();
-	        int senID = 1;
-	        pEvaluation->printLine();
-                while(getline(fin, line)){
-                        if(line == ""){
-                                vector<int> father;
-                                Sentence sen;
-                                sen.push_back(make_pair("ROOT", "ORG"));
-                                father.push_back(-1);
-                                for(size_t i = 0; i < senes.size(); i++){
-                                        sen.push_back(make_pair(senes[i][1], senes[i][3]));
-                                        father.push_back(atoi(senes[i][6].c_str()));
-                                }
+		cout<<"Learning "<<i+1<<" times"<<endl;
+		ifstream fin(file);
+		//int num = 0;
+		pTrainer->initSentences();
+		//pSimu->init();
+		int senID = 1;
+		pEvaluation->printLine();
+		while(getline(fin, line)){
+			if(line == ""){
+				vector<int> father;
+				Sentence sen;
+				sen.push_back(make_pair("ROOT", "ORG"));
+				father.push_back(-1);
+				for(size_t i = 0; i < senes.size(); i++){
+					sen.push_back(make_pair(senes[i][1], senes[i][3]));
+					father.push_back(atoi(senes[i][6].c_str()));
+				}
 
+				//逐句训练
+				pTrainer->rfTrain(sen, senID, father);
 
-                                pTrainer->rfTrain(sen, senID, father);
-
-                                /*save feature weights*/
-                                //pTrainer->saveFeatureWeights();
-                                senes.clear();
-                                //num++;
-                                //if(num > 10)
-                               // break;
-                        }
-                        else{
-                                vector<string> item;
-                                string tmp;
-                                istringstream sin(line);
-                                while(sin >> tmp){
-                                        item.push_back(tmp);
-                                }
-                                senes.push_back(item);
-                        }
-                }
-                //cout<<"number of sentences is "<<num<<endl;
-                fin.close();
-                pTrainer->initSentenceID();
+				/*save feature weights*/
+				//pTrainer->saveFeatureWeights();
+				senes.clear();
+				//num++;
+				//if(num > 10)
+				// break;
+			}
+			else{
+				vector<string> item;
+				string tmp;
+				istringstream sin(line);
+				while(sin >> tmp){
+					item.push_back(tmp);
+				}
+				senes.push_back(item);
+			}
+		}
+		//cout<<"number of sentences is "<<num<<endl;
+		fin.close();
+		pTrainer->initSentenceID();
 
 	}
 

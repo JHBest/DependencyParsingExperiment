@@ -32,7 +32,7 @@ private:
 	Environment * env;
 	Simulator * simu;
 
-	std::queue<int> orders;
+	std::queue<int> orders;//×´Ì¬¶ÓÁÐ
 	double domAffinity;
 	double recAffinity;
 	double agAffinity;

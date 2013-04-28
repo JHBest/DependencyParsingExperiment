@@ -17,6 +17,7 @@ private:
 	Environment * env;
 
 	int times;
+	//vWordAgents是一个vector，模拟网格，每一个网格存放一个map
 	std::vector<std::map<int,WordAgent> > vWordAgents;
 	int rows, cols;
 	int agentId;

@@ -362,30 +362,30 @@ int Simulator::getAgNum()
 
 bool Simulator::run(const Sentence & sen, const std::vector<int> & fa)
 {
-        /*reset interating objects*/
+	/*reset interating objects*/
 	bool hasRun = true;
-	int size = 0;
+	int size = 0;//所有的主体数量
 	for(size_t i = 0; i < vWordAgents.size(); i++)
 	{
-	        size += vWordAgents[i].size();
+		size += vWordAgents[i].size();
 		//cout<<vWordAgents[i].size()<<" ";
-        }
-        cout<<endl<<"size of agents is "<<size<<endl;
+	}
+	cout<<endl<<"size of agents is "<<size<<endl;
 
 	clock_t start,finish;
-        double totaltime;
-        start = clock();
+	double totaltime;
+	start = clock();
 	bool fout = false;
 	env->setFeedbackFlag(false);
 	std::pair<Sentence, vector<int> > p;
-        p.first = sen;
-        p.second = fa;
+	p.first = sen;
+	p.second = fa;
 	while(hasRun){
-	        hasRun = false;
+		hasRun = false;
 
-                for(size_t i = 0; i < vWordAgents.size(); i++)
-                {
-			for(map<int,WordAgent>::iterator it = vWordAgents[i].begin(); it != vWordAgents[i].end(); it++)
+		for(size_t i = 0; i < vWordAgents.size(); i++)//遍历每一个网格
+		{
+			for(map<int,WordAgent>::iterator it = vWordAgents[i].begin(); it != vWordAgents[i].end(); it++)//遍历网格中map里的每一个主体
 			{
 				/*if(it->second.getCategory() == 2)
 				{
@@ -394,40 +394,43 @@ bool Simulator::run(const Sentence & sen, const std::vector<int> & fa)
 					cin>>a;
 
 				}
-				*/
-                                it->second.run();
-                                if(_getAgNum() == 0)
-                                {
-                                       fout = true;
-                                       cout<<"Ags are all killed!"<<endl;
-                                       break;
-                                }
+				 */
+				/**
+				 * 免疫机制核心部分
+				 */
+				it->second.run();
+				if(_getAgNum() == 0)
+				{
+					fout = true;
+					cout<<"Ags are all killed!"<<endl;
+					break;
+				}
 				if(!env->getFeedbackFlag())
 				{
-				        hasRun = true;
-                                }
-                                else
-                                {
-                                        //double acc = eva->evalute(p.first,0,p.second);
-                                        //cout<<"acc "<<acc<<endl;
-                                    fout = true;
-                                    break;
-                                }
+					hasRun = true;
+				}
+				else
+				{
+					//double acc = eva->evalute(p.first,0,p.second);
+					//cout<<"acc "<<acc<<endl;
+					fout = true;
+					break;
+				}
 			}
 			_release();
 			if(fout)
 			{
-                                hasRun = false;
-                                fout = false;
-                                break;
-                        }
+				hasRun = false;
+				fout = false;
+				break;
+			}
 		}
 		finish = clock();
-                totaltime = (double)(finish-start)/CLOCKS_PER_SEC;
-                if(totaltime > TIMETHRESHOLD)
-                {
-                        break;
-                }
+		totaltime = (double)(finish-start)/CLOCKS_PER_SEC;
+		if(totaltime > TIMETHRESHOLD)
+		{
+			break;
+		}
 	}
 
 
@@ -439,7 +442,9 @@ bool Simulator::run(const Sentence & sen, const std::vector<int> & fa)
 
 	return true;
 }
-
+/**
+ * 删除死亡的主体，但是 vWordAgents[i].erase(it++);//这能行吗
+ */
 bool Simulator::_release()
 {
         //cout<<"release ";
@@ -451,7 +456,7 @@ bool Simulator::_release()
                         if(it->second.getStatus() == DIE)
                         {
                                 //cout<<"d";
-                                vWordAgents[i].erase(it++);
+                                vWordAgents[i].erase(it++);//这能行吗
                                 //a++;
                         }
                         else

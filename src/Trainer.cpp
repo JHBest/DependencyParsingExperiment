@@ -25,7 +25,7 @@ Trainer::~Trainer()
 }
 
 /**
- * 逐句训练
+ * 逐句训练，好像senID没有实质性意义
  */
 bool Trainer::rfTrain(const Sentence & sen, const int senID,const vector<int> & fa)
 {

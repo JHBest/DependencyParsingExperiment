@@ -64,6 +64,9 @@ int WordAgent::getID()
 	return ID;
 }
 
+/**
+ * 免疫机制的核心部分
+ */
 bool WordAgent::run()
 {
         //cout<<"agent id "<<AgentID<<" ";
@@ -72,9 +75,9 @@ bool WordAgent::run()
 	//cout<<"size "<<orders.size();
         if(orders.size())
         {
-                int now = orders.front();
+                int now = orders.front();//取队列第一个值。
                 //cout<<"now is "<<now<<" ";
-                orders.pop();
+                orders.pop();//删除队列第一个
                 switch(now)
                 {
                         case MOVING:
@@ -109,17 +112,19 @@ bool WordAgent::run()
 
 bool WordAgent::_doMove()
 {
-        //cout<<"mo";
-        /*updating receptor*/
+	//cout<<"mo";
+	/*updating receptor*/
 
-        if(status != ACTIVE)
-        {
-                _mapStatusToBehavior();
-                return false;
-        }
+	if(status != ACTIVE)
+	{
+		_mapStatusToBehavior();
+		return false;
+	}
 	//updateSelf();
 	static const int dx[] = {0, 1, 1, 1, 0, -1, -1, -1};
 	static const int dy[] = {1, 1, 0, -1, -1, -1, 0, 1};
+
+	//选择相邻网格中主体最少的网格，如果有多个，则随机选择一个
 	int min = simu->agentCount(position);
 	vector<pair<int, int> > pos;
 	for(int k = 0; k < 8; k++){
@@ -143,10 +148,10 @@ bool WordAgent::_doMove()
 		return false;
 	}
 
-        pair<int, int> oldPos = position;
+	pair<int, int> oldPos = position;
 	//srand(time(NULL));
 	int p = rand() % pos.size();
-	position = pos[p];
+	position = pos[p];//设定新的位置
 
 	simu->addWordAgent(*this);
 	position = oldPos;
