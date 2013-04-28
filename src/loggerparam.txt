@@ -1,0 +1,7 @@
+#logger≤Œ ˝…Ë÷√
+#policy=none
+#policy=console
+#policy=file
+policy=both
+logfile=recordlog/logger.txt
+

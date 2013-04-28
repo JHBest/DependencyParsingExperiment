@@ -24,36 +24,31 @@ Trainer::~Trainer()
 	delete simu;
 }
 
+/**
+ * 逐句训练
+ */
 bool Trainer::rfTrain(const Sentence & sen, const int senID,const vector<int> & fa)
 {
-        pEnv->setSentence(sen);
-        pEnv->setSentenceID(senID);
-        pEnv->setFather(fa);
-        std::pair<Sentence, vector<int> > p;
-        p.first = sen;
-        p.second = fa;
-        vSen.push_back(p);
-        /*for(size_t i = 0; i < fa.size();i++)
-        {
-                cout<<fa[i]<<" ";
-        }
-        cout<<endl;
-        int a;
-        */
-        //cin>>a;
+	pEnv->setSentence(sen);
+	pEnv->setSentenceID(senID);
+	pEnv->setFather(fa);
+	std::pair<Sentence, vector<int> > p;
+	p.first = sen;
+	p.second = fa;
+	vSen.push_back(p);//每一个单元是句子的每一个词和每个词的父节点
 
-        _injectAntigen(sen, fa);
+	_injectAntigen(sen, fa);//注入抗原
 
-        cout<<"(s, "<<vSen.size()<<")";
-       // vector<double> oldfw = pModel->getFeatureWeight();
+	cout<<"(s, "<<vSen.size()<<")";
+	// vector<double> oldfw = pModel->getFeatureWeight();
 
 	if(simu->run(sen,fa))
-        {
+	{
 		vector<double> fw = pModel->getFeatureWeight();
 		pModel->accumulateFeatureWeight(fw);
-                //double acc = pEva->evalute(p.first,0,p.second);
-                //cout<<"acc "<<acc<<endl;
-/*                double sum = 0.0;
+		//double acc = pEva->evalute(p.first,0,p.second);
+		//cout<<"acc "<<acc<<endl;
+		/*                double sum = 0.0;
                 for(size_t i = 0; i < vSen.size(); i++)
                 {
                         cout<<"sen id "<<i+1;
@@ -79,40 +74,54 @@ bool Trainer::rfTrain(const Sentence & sen, const int senID,const vector<int> & 
                 }
                 f<<endl;
 
-*/
-                return true;
-        }
+		 */
+		return true;
+	}
 
 	return false;
 }
 
+/**
+ * 从句子里构建B细胞词,并抽取特征
+ */
 bool Trainer::addBCells(const Sentence & sen, const vector<int> & fa)
 {
 	vector<int> features;
 	for(size_t i = 1; i < sen.size(); i++){
 		int j = fa[i];
 		int bi = _buildBCell(sen[i].first);//返回B词主体的位置
-		int bj = _buildBCell(sen[j].first);
-		pModel->getFeatureIDVec(sen, j, i, features);
-		BCells[bi].addRecFeature(features);
-		BCells[bj].addDomFeature(features);
+		int bj = _buildBCell(sen[j].first);//父节点词的位置
+		pModel->getFeatureIDVec(sen, j, i, features);//抽取特征
+		BCells[bi].addRecFeature(features);//把特征作为子节点的依赖方特征
+		BCells[bj].addDomFeature(features);//把特征作为父节点的支配方特征
 	}
 	return true;
 }
 
 //构建词主体
+/**
+ * wordID是map，键为词，值为词在BCells中的位置索引，该位置索引也作为该词的编号
+ * wordFreq的位置索引和BCells的位置索引描述的都是同一个词词频和词主体信息
+ */
 int Trainer::_buildBCell(const string & word)
 {
-        if(wordID.find(word) == wordID.end()){
+    if(wordID.find(word) == wordID.end()){
 		wordID[word] = BCells.size();//记录每个词在BCells中的位置
-		pair<int,int> pos = pEnv->getRandomPosition();
-		BCells.push_back(WordAgent(wordID[word], pEnv,simu,pos, BCELL,1));
+		pair<int,int> pos = pEnv->getRandomPosition();//网格中随机分配一个位置
+		BCells.push_back(WordAgent(wordID[word], pEnv,simu,pos, BCELL,1));//相同的B细胞开始都在一个位置
+
+		wordFreq.push_back(1);//保持同步增长，wordFreq记录的每个词的个数，该代码可直接移动上面的if里面
 	}
-	int res = wordID[word];
-	if((int)wordFreq.size() <= res){
-		wordFreq.push_back(0);//保持同步增长，wordFreq记录的每个词的个数，该代码可直接移动上面的if里面
-	}
-	wordFreq[res] ++;
+//	int res = wordID[word];
+//	if((int)wordFreq.size() <= res){
+//		wordFreq.push_back(0);//保持同步增长，wordFreq记录的每个词的个数，该代码可直接移动上面的if里面
+//	}
+//	wordFreq[res] ++;
+    else{
+
+    	int res = wordID[word];
+    	wordFreq[res] ++;
+    }
 	return res;
 }
 
@@ -126,7 +135,7 @@ bool Trainer::constructBcellNet()
 	        //cout<<"id is "<<BCells[i].getID()<< " ";
 	        //BCells[i].setStatus(ACTIVE);
 	        //BCells[i].setCategory(BCELL);
-		for(size_t j = 0; j < 2; j++)
+		for(size_t j = 0; j < 2; j++)//每个B细胞加入两个，且位置一样
 		simu->addWordAgent(BCells[i]);
 		//pEnv->increaseBcellNum();
 	}
@@ -136,10 +145,14 @@ bool Trainer::constructBcellNet()
 	return true;
 }
 
+/**
+ * 构造抗原词主体添加到Antigens里面，wordID在_buildBCell中已载入了词
+ * 这是为何呢，增加两个，指针往前移两个，再删掉最后一个？？？？
+ */
 bool Trainer::_buildAntigen(const Sentence & sen,int child,const std::string & word, int parent,const std::string & fword)
 {
         Antigens.push_back(WordAgent(wordID[word],pEnv,simu,pEnv->getRandomPosition(), ANTIGEN,1));
-        Antigens.push_back(WordAgent(wordID[fword],pEnv,simu,pEnv->getRandomPosition(), ANTIGEN,1));
+        Antigens.push_back(WordAgent(wordID[fword],pEnv,simu,pEnv->getRandomPosition(), ANTIGEN,1));//构造函数的调用形式
         vector<int> features;
         pModel->getFeatureIDVec(sen, parent, child, features);
         //cout<<"feature size "<<features.size()<<endl;
@@ -176,12 +189,12 @@ bool Trainer::_addAntigen()
                 //pEnv->setAntigenQuantity((int)Antigens.size());
                 int pos = -1;
                 cout<<"Size of antigens is "<<Antigens.size()<<endl;
-                simu->_setAgNum((int)Antigens.size());
+                simu->_setAgNum((int)Antigens.size());//设置抗原数量
                 for(size_t p = 0; p < Antigens.size(); p++)
                 {
                         pos = p%positions.size();
-                        Antigens[p].setPosition(positions[pos]);
-                        simu->addWordAgent(Antigens[p]);
+                        Antigens[p].setPosition(positions[pos]);//重新修改了抗原的位置
+                        simu->addWordAgent(Antigens[p]);//抗原词主体加到模拟器里面
                 }
         }
 
@@ -190,22 +203,27 @@ bool Trainer::_addAntigen()
         return true;
 }
 
+/**
+ * 构造抗原并注入
+ */
 bool Trainer::_injectAntigen(const Sentence & sen, const std::vector<int> & fa)
 {
 	for(size_t i = 1; i < sen.size(); i++)
 	{
 		//int i = 3;
 		int j = fa[i];
-		_buildAntigen(sen,i,sen[i].first,j,sen[j].first);
+		_buildAntigen(sen,i,sen[i].first,j,sen[j].first);//构造抗原
 		/*clone antigens*/
-		cloneAntigens();
+		cloneAntigens();//克隆抗原
 	}
 
 	_addAntigen();
 
 	return true;
 }
-
+/**
+ * 注入的抗原克隆ROWS * COLS个，位置相同
+ */
 bool Trainer::cloneAntigens()
 {
         //cout<<"clone antigens"<<endl;

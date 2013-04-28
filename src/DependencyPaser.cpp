@@ -37,6 +37,9 @@ bool DependencyPaser::saveModel(const char * file)
 	return true;
 }
 
+/**
+ * 从训练树库里读取依存树，构建B细胞词
+ */
 bool DependencyPaser::_readFileAddBCell(const char * file)
 {
 	//cout<<file<<endl;
@@ -53,7 +56,7 @@ bool DependencyPaser::_readFileAddBCell(const char * file)
 		//	cout<<"*";
 			vector<int> father;
 			Sentence sen;
-			sen.push_back(make_pair("ROOT", "ORG"));
+			sen.push_back(make_pair("ROOT", "ORG"));//第0个是root
 			father.push_back(-1);
 			for(size_t i = 0; i < senes.size(); i++){
 				sen.push_back(make_pair(senes[i][1], senes[i][3]));//第一个是词，第三个是词性
@@ -61,7 +64,7 @@ bool DependencyPaser::_readFileAddBCell(const char * file)
 			}
 			//cout<<"&";
 
-			pTrainer->addBCells(sen, father);
+			pTrainer->addBCells(sen, father);//词、词性、父节点，作为参数
 //			pModel->getAllFeatures(sen, senes, senID);
 			cout<<"."<<senID<<" ";
 			senes.clear();
@@ -203,13 +206,15 @@ bool DependencyPaser::_readFileTrain(const char * trainFile,const char * testFil
 
         return true;
 }
-
+/**
+ *file是用作训练语料的依存树库文件
+ */
 bool DependencyPaser::_readFileTrain(const char * file)
 {
-	pTrainer->constructBcellNet();
+	pTrainer->constructBcellNet();//构造B细胞网络
 	string line;
 	vector<vector<string> > senes;
-	pModel->initFeatureWeight();
+	pModel->initFeatureWeight();//初始化特征权重
 	for(size_t i = 0; i < LEARNTIMES; i++)
 	{
 	        cout<<"Learning "<<i+1<<" times"<<endl;
@@ -269,7 +274,7 @@ bool DependencyPaser::trainFile(const char * file)
 
 
 	cout<<"Online learning...";
-	_readFileTrain(file);
+	_readFileTrain(file);//读取依存树库，逐句训练
 	cout<<"Online learning finished!"<<endl;
 
 	return true;

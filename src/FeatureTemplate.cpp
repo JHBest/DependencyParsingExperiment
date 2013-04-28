@@ -49,6 +49,9 @@ bool FeatureTemplate::insertFeatures(int v, std::vector<std::string> & f)
     return true;
 }
 
+/**
+ *需要改造
+ */
 bool FeatureTemplate::_abstractFeature(vector<string> & featVec)
 {
 	featVec.clear();

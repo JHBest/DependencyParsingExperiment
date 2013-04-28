@@ -25,6 +25,10 @@ bool Simulator::resetAgents()
 	vWordAgents.resize(rows * cols, map<int,WordAgent>());
 	return true;
 }
+
+/**
+ * 根据行和列计算vector的下标
+ */
 int Simulator::_calcSub(const pair<int, int> & pos) const
 {
 	return pos.first * cols + pos.second;
@@ -47,9 +51,13 @@ bool Simulator::_isSame(const std::vector<int> & s, const std::vector<int> & d)
         return true;
 }
 
+/**
+ * ？？？
+ * 不能是引用吧，如果是引用，所有相同B细胞的状态就相同了
+ */
 bool Simulator::addWordAgent(WordAgent & pWordAgent)
 {
-        if(pWordAgent.getAgentID() == 0)
+        if(pWordAgent.getAgentID() == 0)//表示第一次加入到simulator里
         {
                 if(pWordAgent.getCategory() == ANTIGEN)
                 {
@@ -57,13 +65,14 @@ bool Simulator::addWordAgent(WordAgent & pWordAgent)
                 }
                 agentId++;
                 pWordAgent.setAgentID(agentId);
+                //vWordAgents是一个vector，模拟网格，每一个网格存放一个map
                 vWordAgents[_calcSub(pWordAgent.getPosition())].insert(map<int,WordAgent>::value_type(agentId,pWordAgent));
         }
         else
         {
                 //cout<<pWordAgent.getAgentID()<<" ";
 		agentId++;
-		//pWordAgent.setAgentID(agentId);
+		//pWordAgent.setAgentID(agentId);//因为传递的是对象的引用，所以下次传递时，还是原来那个对象，agentID已经有值了
 
                bool f = vWordAgents[_calcSub(pWordAgent.getPosition())].insert(map<int,WordAgent>::value_type(agentId,pWordAgent)).second;
 	       //if(f)

@@ -13,9 +13,8 @@
 #include <io.h>
 #include <fstream>
 #include <sstream>
-#include <vector>
-
 #include <iomanip.h>
+#include <vector>
 using namespace std;
 
 class Tools {
@@ -61,7 +60,12 @@ public:
 	static bool dirExists(const char* dirname){
         int code = chdir(dirname);
         if(code == 0){
-            chdir("..");
+            string namestr(dirname);
+            vector<string> path;
+            split(namestr,"/",path);
+            for(size_t i = 0;i < path.size();i ++){
+                chdir("..");
+            }
             return true;
         }
         return false;
@@ -88,9 +92,6 @@ public:
         }
 	}
 
-    /**
-     * 路径分隔符用/表示或者\\表示
-     */
     static void createDirsBeforeCheck(const char* dirname){
        string dirpath(dirname);
        char *delema = "/";
@@ -123,21 +124,19 @@ public:
     }
 
     static void split(string str, char* delema,vector<string> & v_elem){
-         char  line[1024]= {};
-         strncpy(line,str.c_str(),str.length());
-         char * p = strtok(line,delema);
-         while(p != NULL)
-         {
-             //printf("%s\t",p);
-             if(p != "")
-             {
-                 v_elem.push_back(p);
-                 p = strtok(NULL,delema);
-             }
-         }
-     }
-
-
+        char  line[1024]= {};
+        strncpy(line,str.c_str(),str.length());
+        char * p = strtok(line,delema);
+        while(p != NULL)
+        {
+            //printf("%s\t",p);
+            if(p != "")
+            {
+                v_elem.push_back(p);
+                p = strtok(NULL,delema);
+            }
+        }
+    }
     static bool strToBool(string str){
         if(str == "true"){
         	return true;

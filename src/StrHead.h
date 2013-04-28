@@ -56,7 +56,6 @@ public:
 		return newHead;
 
 	}
-
 	string toString(){
 	    string strv = "";
 	    strv = strv + "[" + Tools::timeToStr(time(NULL))+"] " + head;

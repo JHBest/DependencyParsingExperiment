@@ -1,41 +1,47 @@
 #include "Logger.h"
+#include "RunParameter.h"
 
-
-    Logger::~Logger(){
-            (*this)<<"\n\n["<<Tools::timeToStr(time(NULL))<<"] end log\n\n";
-            for(int i = 0;i < outsize;i ++){
-                ofstream *filelogger = dynamic_cast< ofstream* >(outs[i]);
-                if(filelogger){
-                    filelogger->close();
-                }
-            }
-
+void Logger::initParam(){
+    ifstream in("loggerparam.txt", ios::in);
+    string readStr;
+    while(!in.eof()){
+        getline(in, readStr);
+        if(readStr.length() <= 0 || readStr.find_first_of("#") == 0){
+            continue;
         }
-
-void Logger::initialize(){
-
-            string policy = RunParameter::instance.getParameter("policy");
-
-        	if(policy == "both"){
-        	    outsize = 2;
-        	    outs[0] = &cout;
-        	    initDir(RunParameter::instance.getParameter("logfile"));
-        	    fileouter.open(RunParameter::instance.getParameter("logfile").c_str(),ios::app);
-        	    outs[1] = &fileouter;
-        	}else if(policy == "file"){
-                outsize = 1;
-                initDir(RunParameter::instance.getParameter("logfile"));
-        	    fileouter.open(RunParameter::instance.getParameter("logfile").c_str(),ios::app);
-                outs[0] = &fileouter;
-        	}else if(policy == "console"){
-        	    outsize = 1;
-        	    outs[0] = &cout;
-        	}else if(policy == "none"){
-        	    outsize = 0;
-        	}
-
-        	(*this)<<"\n\n["<<Tools::timeToStr(time(NULL))<<"] begin log\n\n";
-
+        vector<string> pvs;
+        Tools::split(readStr,"=",pvs);
+        paramMap[pvs[0]]=pvs[1];
+    }
+    in.close();
 }
+
+string Logger::getParameter(string paramName){
+	return paramMap[paramName];
+}
+
+void Logger::initPolicy(){
+	string policy = this->getParameter("policy");
+//	string policy = RunParameter::instance.getParameter("policy");
+
+	if(policy == "both"){
+	    outsize = 2;
+	    outs[0] = &cout;
+	    initDir(this->getParameter("logfile"));
+	    fileouter.open(this->getParameter("logfile").c_str(),ios::app);
+	    outs[1] = &fileouter;
+	}else if(policy == "file"){
+        outsize = 1;
+        initDir(this->getParameter("logfile"));
+	    fileouter.open(this->getParameter("logfile").c_str(),ios::app);
+        outs[0] = &fileouter;
+	}else if(policy == "console"){
+	    outsize = 1;
+	    outs[0] = &cout;
+	}else if(policy == "none"){
+	    outsize = 0;
+	}
+}
+
 
 Logger Logger::logger;

@@ -10,6 +10,8 @@
 #include <iostream>
 #include "Tools.h"
 
+
+
 RunParameter::RunParameter() {
 	// TODO Auto-generated constructor stub
 	loadParam();
@@ -24,11 +26,11 @@ string RunParameter::getParameter(string paramName){
 }
 
 void RunParameter::loadParam(){
-    ifstream in("param.txt", ios::in);
+    ifstream in("systemparam.txt", ios::in);
 	string readStr;
 	while(!in.eof()){
 		getline(in, readStr);
-		cout<<readStr<<endl;
+//		cout<<readStr<<endl;
 		if(readStr.length() <= 0 || readStr.find_first_of("#") == 0){
 			continue;
 		}
@@ -41,4 +43,3 @@ void RunParameter::loadParam(){
 
 
 RunParameter RunParameter::instance;
-

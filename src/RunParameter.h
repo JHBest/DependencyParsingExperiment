@@ -10,7 +10,6 @@
 
 #include <string>
 #include <map>
-
 using namespace std;
 class RunParameter {
 public:
@@ -21,8 +20,8 @@ public:
 
 	static RunParameter instance;
 
-private:
 
+private:
     RunParameter();
 	map<string,string> paramMap;
 

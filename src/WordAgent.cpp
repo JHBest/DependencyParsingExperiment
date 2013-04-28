@@ -39,7 +39,7 @@ WordAgent::WordAgent(int id, Environment * environment,Simulator * simulator,
 	mapStatusToBehavior();
 }
 
-//相同特征覆盖
+//相同特征覆盖，支配方特征
 bool WordAgent::addDomFeature(const vector<int> & feature)
 {
 	for(size_t i = 0; i < feature.size(); i++){
@@ -49,7 +49,8 @@ bool WordAgent::addDomFeature(const vector<int> & feature)
 	return true;
 }
 
-//相同特征没有去掉
+//相同特征没有去掉，依赖方特征
+//这里有点问题
 bool WordAgent::addRecFeature(const vector<int> & feature)
 {
 	for(size_t i = 0; i < feature.size(); i++){
@@ -894,6 +895,9 @@ bool WordAgent::setDomReceptor(std::map<int, double> & rec)
         return true;
 }
 
+/**
+ * 没考虑重复的特征
+ */
 bool WordAgent::setRecReceptor(std::vector<int> & rec)
 {
         for(size_t i = 0; i < rec.size(); i++)

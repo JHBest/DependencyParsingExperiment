@@ -51,7 +51,9 @@ double Model::wordPairWeight(const Sentence & sen,int p, int c)
 
 	return sumFeatureWeight(featVec);
 }
-
+/**
+ * 抽取依存对的特征，并把特征添加到fMap里
+ */
 bool Model::getFeatureIDVec(const Sentence & sen, int p, int c,
 		vector<int> & featIDVec)
 {
@@ -115,6 +117,9 @@ inline int Model::_getFeatureID(const string & feat)
 	//return 0;
 }
 
+/**
+ * 给每一个特征生成一个编号，所有特征都存放在fMap里，并返回特征的编号
+ */
 int Model::addFeature(const string & feat)
 {
 	if(fMap.find(feat) == fMap.end()){
@@ -181,6 +186,7 @@ bool Model::getAllFeatures(const Sentence & sen, std::vector<std::vector<std::st
     return true;
 }
 
+//初始化特征权重，有待修改
 int Model::initFeatureWeight()
 {
 	fWeight.resize((int)fMap.size());

@@ -8,16 +8,23 @@
 #include <time.h>
 #include "Tools.h"
 #include "StrHead.h"
-#include "RunParameter.h"
+#include <map.h>
 using namespace std;
 
 class Logger
 {
     public:
 
-        void initialize();
+        virtual ~Logger(){
+            (*this)<<"\n\n["<<Tools::timeToStr(time(NULL))<<"] end log\n\n";
+            for(int i = 0;i < outsize;i ++){
+                ofstream *filelogger = dynamic_cast< ofstream* >(outs[i]);
+                if(filelogger){
+                    filelogger->close();
+                }
+            }
 
-        virtual ~Logger();
+        }
 
         void log(char* msg){
             for(int i = 0;i < outsize;i ++){
@@ -57,7 +64,6 @@ class Logger
 
         void log(StrHead str){
 			if(outsize > 0){
-
 			    string strv = str.toString();
 
                 for(int i = 0;i < outsize;i ++){
@@ -122,7 +128,20 @@ class Logger
         ofstream fileouter;
 
         ostream *outs[2];
-        Logger(){}
+
+        map<string,string> paramMap;
+
+        void initParam();
+
+        string getParameter(string paramName);
+
+        void initPolicy();
+
+        Logger(){
+        	initParam();
+        	initPolicy();
+        	(*this)<<"\n\n["<<Tools::timeToStr(time(NULL))<<"] begin log\n\n";
+        }
 
         void initDir(string filename){
             int index = filename.rfind("/");

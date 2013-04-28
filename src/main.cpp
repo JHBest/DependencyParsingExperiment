@@ -1,21 +1,20 @@
 #include <iostream>
-
-#include <cassert>
-
-#include "DependencyPaser.hpp"
-#include "Test.hpp"
-#include <fstream>
-#include <sstream>
-#include <math.h>
-#include <cstdlib>
+#include "RunParameter.h"
+#include "Logger.h"
+#include "StrHead.h"
 
 using namespace std;
-//improved by yangjinfeng
 
-int main(int argc, char * argv[])
+int main()
 {
-	srand(NULL);
-	testParsing();
+    string runortest = RunParameter::instance.getParameter("policy");
+    cout<<runortest;
+    Logger::logger<<StrHead::header + runortest+"\n";
+    Logger::logger<<StrHead::header<<123<<" sss "<<true<<"\n";
+//
+//    Logger::logger<<StrHead::header + " recruit "+12+" and "+22+"\n";
 
-	return 0;
+
+
+    return 0;
 }
