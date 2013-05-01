@@ -245,6 +245,9 @@ void Model::resetSentenceFeature()
         sentenceFeature.clear();
 }
 
+/**
+ *特征权重累加
+ */
 void Model::accumulateFeatureWeight(vector<double> & fw)
 {
 	if(accFeatureWeight.size() != fw.size())

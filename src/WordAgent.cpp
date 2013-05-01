@@ -643,6 +643,9 @@ std::vector<int> WordAgent::getRecReceptor() const
 	return recFeature;
 }
 
+/**
+ * 选择有利的突变，计算预测结果
+ */
 bool WordAgent::_select()
 {
        // cout<<"se";
@@ -1129,6 +1132,9 @@ void    WordAgent::mapStatusToBehavior()
 	}
 }
 
+/**
+ * 计算反馈信息，也就是预测结果是否变好了
+ */
 bool WordAgent::calFeedback()
 {
         feedback = env->gainFeedback(this,sen,father);

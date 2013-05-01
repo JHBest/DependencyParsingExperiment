@@ -60,6 +60,9 @@ double Evaluation::calSRM(const std::vector<int> & newLabel,const std::vector<in
 	return srm;
 }
 
+/**
+ * standard为句子中每个词的标准父节点，计算了两次
+ */
 pair<int, double>  Evaluation::calFeedback(const Sentence & sen, WordAgent * wa, const vector<int> & standard)
 {
 	vector<double> tmp = pModel->getFeatureWeight();
@@ -73,7 +76,11 @@ pair<int, double>  Evaluation::calFeedback(const Sentence & sen, WordAgent * wa,
 
 	double ma = calAccuracy(father, standard);
 	cout<<endl<<"ma is "<<ma<<endl;
-	*/
+	 */
+
+	/**
+	 * father是预测出来的每个词的父节点
+	 */
 	double value = pPredictor->predict(sen,father);
 	double accuracy = calAccuracy(father, standard);
 	//double srm = calSRM(father, standard);
@@ -84,7 +91,7 @@ pair<int, double>  Evaluation::calFeedback(const Sentence & sen, WordAgent * wa,
 
 	ma = calAccuracy(father, standard);
 	cout<<endl<<"ma is "<<ma<<endl;
-	*/
+	 */
 	pair<int,double> p;
 	/*if(accuracy == AFFINITYMATURE)
 	{
@@ -92,7 +99,7 @@ pair<int, double>  Evaluation::calFeedback(const Sentence & sen, WordAgent * wa,
 		p.second = accuracy;
 		return p;
 	}
-	*/
+	 */
 
 	map<int, double> tmpDomFeature = wa->getTmpReceptor();
 	pModel->updateFeatureWeight(tmpDomFeature);
@@ -113,26 +120,26 @@ pair<int, double>  Evaluation::calFeedback(const Sentence & sen, WordAgent * wa,
 
 	mutatefather.clear();
 	//double v = pPredictor->predict(sen,senID,mutatefather);
-	*/
+	 */
 
 	//cout<<"differ is "<<differ<<endl;
 
 	if(differ_acc > 0)
-	//if(differ_srm > SRMTHRESHOLD)
-	//if((mutatesrm > SRMTHRESHOLD) && (differ_srm > 0.0))
+		//if(differ_srm > SRMTHRESHOLD)
+		//if((mutatesrm > SRMTHRESHOLD) && (differ_srm > 0.0))
 	{
-	        p.first = 1;
-                p.second = mutateaccuracy;
+		p.first = 1;
+		p.second = mutateaccuracy;
 		//cout<<"srm "<<srm<<" ; "<<"msrm "<<mutatesrm<<endl;
-                cout<<".";
-                //cout<<"mutated id "<<endl;
-                cout<<endl;
-                //cout<<endl<<"id is "<<wa->getID()<<", ";
-                //cout<<"mst vs mmst : ("<<value<<" : "<<mutatevalue<<") ; ";
-                cout<<"accuracy vs maccuracy : ("<<accuracy<<" : "<<mutateaccuracy<<") ;"<<endl;
+		cout<<".";
+		//cout<<"mutated id "<<endl;
+		cout<<endl;
+		//cout<<endl<<"id is "<<wa->getID()<<", ";
+		//cout<<"mst vs mmst : ("<<value<<" : "<<mutatevalue<<") ; ";
+		cout<<"accuracy vs maccuracy : ("<<accuracy<<" : "<<mutateaccuracy<<") ;"<<endl;
 
-                return p;
-        }
+		return p;
+	}
 
 	p.first = -1;
 	p.second = 0.0;

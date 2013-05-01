@@ -165,7 +165,9 @@ bool Environment::update(WordAgent * pWordAgent)
 
 	return true;
 }
-
+/**
+ * father是标准的父节点
+ */
 std::pair<int, double> Environment::gainFeedback(WordAgent * pWordAgent, const Sentence & sentence, const  std::vector<int> & father)
 {
                 vector<int> fa = father;
