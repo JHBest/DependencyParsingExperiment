@@ -37,6 +37,47 @@ bool DependencyPaser::saveModel(const char * file)
 	return true;
 }
 
+
+/**
+ * 从训练树库里读取依存树，构建B细胞词
+ * add by yangjinfeng
+ */
+bool DependencyPaser::initBCell(const char * file)
+{
+	ifstream fin(file);
+	string line;
+	vector<vector<string> > senes;
+	while(getline(fin, line)){
+		if(line == ""){
+			vector<int> father;
+			Sentence sen;
+			sen.push_back(make_pair("ROOT", "ORG"));//第0个是root
+			father.push_back(-1);
+			for(size_t i = 0; i < senes.size(); i++){
+				sen.push_back(make_pair(senes[i][1], senes[i][3]));//第一个是词，第三个是词性
+				father.push_back(atoi(senes[i][6].c_str()));//取得父节点的序号
+			}
+
+			pTrainer->initBCells(sen, father);//词、词性、父节点，作为参数
+			senes.clear();
+		}
+		else{
+			vector<string> item;
+			string tmp;
+			istringstream sin(line);
+			while(sin >> tmp){
+				item.push_back(tmp);
+			}
+
+			senes.push_back(item);
+		}
+
+	}
+
+	pTrainer->reduceWordFreq();//词频缩减
+	return true;
+}
+
 /**
  * 从训练树库里读取依存树，构建B细胞词
  */
@@ -279,6 +320,22 @@ bool DependencyPaser::trainFile(const char * file)
 
 	return true;
 }
+
+
+bool DependencyPaser::train(const char * file){
+	cout<<"Initilizing B cell Network...";
+	initBCell(file);
+	cout<<"Initilizing finished!"<<endl;
+
+
+	cout<<"Online learning...";
+	_readFileTrain(file);//读取依存树库，逐句训练
+	cout<<"Online learning finished!"<<endl;
+
+	return true;
+
+}
+
 
 bool DependencyPaser::predictFile(const char * testFile, const char * outFile)
 {

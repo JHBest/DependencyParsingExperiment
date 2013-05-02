@@ -15,6 +15,55 @@
 using namespace std;
 
 
+
+//add by yangjinfeng
+WordAgent::WordAgent(WordInfo& wordinfo,
+			Environment * environment,
+			Simulator * simulator,
+			const std::pair<int, int> & pos,
+			int cat,
+			int con){
+
+	this->wordinfo = wordinfo;
+	env = environment;
+	position = pos;
+
+	category = cat;
+	concentration = con;
+	status = ACTIVE;
+
+	simu = simulator;
+
+	mapStatusToBehavior();
+
+
+}
+//add by yangjinfeng
+void WordAgent::addIdiotopeDependentFeature(const vector<int> & feature){
+	for(size_t i = 0; i < feature.size(); i++){
+		idiotopeDependentFeature.insert(feature[i]);
+	}
+}
+//add by yangjinfeng
+void WordAgent::addParatopeParentFeature(const vector<int> & feature){
+	for(size_t i = 0; i < feature.size(); i++){
+		paratopeParentFeature.insert(feature[i]);
+	}
+}
+
+
+
+
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+
 /**
  * 构造函数参数依次是ID，环境对象，模拟器对象、位置、类别、密度
  */
@@ -38,6 +87,9 @@ WordAgent::WordAgent(int id, Environment * environment,Simulator * simulator,
 
 	mapStatusToBehavior();
 }
+
+
+
 
 //相同特征覆盖，支配方特征
 bool WordAgent::addDomFeature(const vector<int> & feature)

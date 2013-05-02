@@ -8,9 +8,9 @@
 #include <set>
 
 #include "Environment.hpp"
-
 #include "Simulator.hpp"
-
+#include "WordInfo.h"
+using namespace std;
 
 //class Environment;
 class Simulator;
@@ -18,10 +18,19 @@ class Simulator;
 
 class WordAgent{
 private:
-        int AgentID;
+
+	//add by yangjinfeng
+	WordInfo wordinfo;
+	//add by yangjinfeng
+	set<int> idiotopeDependentFeature;
+	//add by yangjinfeng
+	set<int> paratopeParentFeature;
+	pair<int, int> position;
+
+
+    int AgentID;
 	int ID;
 	int AGID;
-	std::pair<int, int> position;
 	std::map<int, double> domFeature;
 	std::map<int, double> tmpFeature;
 	std::vector<int> recFeature;
@@ -57,6 +66,21 @@ public:
 			Simulator * simulator,
 			const std::pair<int, int> & pos, int cat, int con);
         /*running agent*/
+	//add by yangjinfeng
+	WordAgent(WordInfo& wordinfo,
+			Environment * environment,
+			Simulator * simulator,
+			const std::pair<int, int> & pos,
+			int cat,
+			int con);
+	WordInfo& getWordInfo(){
+		return wordinfo;
+	}
+	//add by yangjinfeng
+	void addIdiotopeDependentFeature(const vector<int> & feature);
+	//add by yangjinfeng
+	void addParatopeParentFeature(const vector<int> & feature);
+
 	bool run();
 
 	/*operation on id*/

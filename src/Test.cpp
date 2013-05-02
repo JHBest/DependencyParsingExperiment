@@ -71,7 +71,9 @@ void testWordAgentInit()
 void testTrain()
 {
         DependencyPaser dp;
-        dp.trainFile("./data/english_train-copy.conll");
+//        dp.trainFile("./data/english_train-copy.conll");
+        //add by yangjinfeng
+        dp.train("./data/english_train-copy.conll");
         dp.predictFile("./data/english_test.conll","./result/result.conll");
 }
 

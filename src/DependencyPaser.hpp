@@ -23,6 +23,11 @@ private:
 public:
 	DependencyPaser();
 	~DependencyPaser();
+	/**
+	 * add by yangjinfeng
+	 */
+	bool train(const char * file);
+
 	bool loadModel(const char * file);
 	bool saveModel(const char * file);
 	bool trainFile(const char * file);
@@ -34,6 +39,7 @@ public:
 
 	void parsing(const char * trainFile,const char * testFile, const char * outFile, const char * evaluateFile);
 private:
+	bool initBCell(const char * file);
 	bool _readFileAddBCell(const char * file);
 	bool _readFileTrain(const char * trainFile,const char * testFile, const char * outFile, const char * evaluateFile);
 	bool _readFileTrain(const char * file);
