@@ -122,7 +122,7 @@ int Trainer::_buildBCell(const string & word)
     	int res = wordID[word];
     	wordFreq[res] ++;
     }
-	return res;
+	return wordID[word];
 }
 
 bool Trainer::constructBcellNet()

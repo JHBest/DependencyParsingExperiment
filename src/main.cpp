@@ -7,7 +7,8 @@ using namespace std;
 
 int main()
 {
-    string runortest = RunParameter::instance.getParameter("policy");
+	cout<<"123"<<endl;;
+    string runortest = RunParameter::instance.getParameter("COLS");
     cout<<runortest;
     Logger::logger<<StrHead::header + runortest+"\n";
     Logger::logger<<StrHead::header<<123<<" sss "<<true<<"\n";
