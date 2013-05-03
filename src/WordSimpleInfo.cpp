@@ -11,7 +11,7 @@ WordSimpleInfo::WordSimpleInfo() {
 	// TODO Auto-generated constructor stub
 
 }
-WordSimpleInfo::WordSimpleInfo(string& word, string& pos){
+WordSimpleInfo::WordSimpleInfo(const string& word, const string& pos){
 	this->word = word;
 	this->pos = pos;
 }

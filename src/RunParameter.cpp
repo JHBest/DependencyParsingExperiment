@@ -21,7 +21,7 @@ RunParameter::~RunParameter() {
 	// TODO Auto-generated destructor stub
 }
 
-string RunParameter::getParameter(string paramName){
+ParameterValue& RunParameter::getParameter(string paramName){
 	return paramMap[paramName];
 }
 
@@ -36,7 +36,19 @@ void RunParameter::loadParam(){
 		}
 		vector<string> pvs;
 		Tools::split(readStr,"=",pvs);
-		paramMap[pvs[0]]=pvs[1];
+		vector<string> vt;
+		Tools::split(pvs[1],",",vt);
+		ParameterValue value;
+		value.setName(pvs[0]);
+		if(vt[1] == "int"){
+			value.setIntValue(atoi(vt[0].c_str()));
+		}else if(vt[1] == "double"){
+			value.setDoubleValue(atof(vt[0].c_str()));
+		}else if(vt[1] == "string"){
+			value.setStringValue(vt[0]);
+		}
+
+		paramMap[pvs[0]]=value;
 	}
 	in.close();
 }

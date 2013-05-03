@@ -7,12 +7,12 @@
 
 #ifndef WORDSIMPLEINFO_H_
 #define WORDSIMPLEINFO_H_
-#include "WordInfo.h"
-
+#include <string>
+using namespace std;
 class WordSimpleInfo {
 public:
 	WordSimpleInfo();
-	WordSimpleInfo(string& word, string& pos);
+	WordSimpleInfo(const string& word, const string& pos);
 	virtual ~WordSimpleInfo();
     string getPos() const
     {
@@ -24,20 +24,17 @@ public:
         return word;
     }
 
-    void setPos(string pos)
+    void setPos(const string& pos)
     {
         this->pos = pos;
     }
 
-    void setWord(string word)
+    void setWord(const string& word)
     {
         this->word = word;
     }
 
-    WordInfo& createWordInfo(){
-    	return WordInfo(word,pos);
-    }
-    bool operator< (const WordInfo& wi) const;
+    bool operator< (const WordSimpleInfo& wi) const;
 
 private:
 	string word;

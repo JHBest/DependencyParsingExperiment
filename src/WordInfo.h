@@ -11,13 +11,15 @@
 #include <string>
 #include <vector>
 #include <set>
+#include "WordSimpleInfo.h"
 
 using namespace std;
 
 class WordInfo {
 public:
 	WordInfo();
-	WordInfo(string& word, string& pos);
+	WordInfo(const string& word, const string& pos);
+	WordInfo(const WordSimpleInfo& wsi);
 	virtual ~WordInfo();
 
 	void addParent(WordInfo& wordinfo);
@@ -38,12 +40,12 @@ public:
         return word;
     }
 
-    void setPos(string pos)
+    void setPos(const string& pos)
     {
         this->pos = pos;
     }
 
-    void setWord(string word)
+    void setWord(const string& word)
     {
         this->word = word;
     }
@@ -72,7 +74,7 @@ public:
 private:
 	string word;
 	string pos;
-	int freq = 1;
+	int freq;
 
 	set<WordInfo> parents;
 	set<WordInfo> children;

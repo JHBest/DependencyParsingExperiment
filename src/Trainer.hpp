@@ -7,6 +7,8 @@
 #include "FeatureTemplate.hpp"
 #include "WordAgent.hpp"
 #include "Simulator.hpp"
+#include "WordSimpleInfo.h"
+#include "WordInfo.h"
 
 class Trainer{
 private:

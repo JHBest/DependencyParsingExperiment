@@ -53,17 +53,19 @@ void Trainer::buildBCell(const Sentence & sen,int current,int father)
     if(wordinfoID.find(currentwordinfo) == wordinfoID.end()){
     	wordinfoID[currentwordinfo] = BCellAgents.size();//记录每个词在BCells中的位置
 		pair<int,int> pos = pEnv->getRandomPosition();//网格中随机分配一个位置
-		BCellAgents.push_back(WordAgent(currentwordinfo.createWordInfo(), pEnv,simu,pos, BCELL,1));//相同的B细胞开始都在一个位置
+		WordInfo wi(currentwordinfo);
+		BCellAgents.push_back(WordAgent(wi, pEnv,simu,pos, BCELL,1));//相同的B细胞开始都在一个位置
 	}else{
 		BCellAgents[wordinfoID[currentwordinfo]].getWordInfo().addFreq();
     }
     int currentindex = wordinfoID[currentwordinfo];
 
-    WordInfo parentwordinfo(sen[father].first,sen[father].second);
+    WordSimpleInfo parentwordinfo(sen[father].first,sen[father].second);
     if(wordinfoID.find(parentwordinfo) == wordinfoID.end()){
      	wordinfoID[parentwordinfo] = BCellAgents.size();//记录每个词在BCells中的位置
  		pair<int,int> pos = pEnv->getRandomPosition();//网格中随机分配一个位置
- 		BCellAgents.push_back(WordAgent(parentwordinfo.createWordInfo(), pEnv,simu,pos, BCELL,1));//相同的B细胞开始都在一个位置
+ 		WordInfo wi(parentwordinfo);
+ 		BCellAgents.push_back(WordAgent(wi, pEnv,simu,pos, BCELL,1));//相同的B细胞开始都在一个位置
  	}
     int parentindex = wordinfoID[parentwordinfo];
 

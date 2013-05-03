@@ -10,20 +10,22 @@
 
 #include <string>
 #include <map>
+#include "ParameterValue.h"
+
 using namespace std;
 class RunParameter {
 public:
 
 	virtual ~RunParameter();
 
-	string getParameter(string paramName);
+	ParameterValue& getParameter(string paramName);
 
 	static RunParameter instance;
 
 
 private:
     RunParameter();
-	map<string,string> paramMap;
+	map<string,ParameterValue> paramMap;
 
 	void loadParam();
 };

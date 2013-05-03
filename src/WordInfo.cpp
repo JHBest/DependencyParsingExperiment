@@ -11,16 +11,23 @@
 
 WordInfo::WordInfo() {
 	// TODO Auto-generated constructor stub
-
+	freq = 1;
 }
 
 WordInfo::~WordInfo() {
 	// TODO Auto-generated destructor stub
 }
 
-WordInfo::WordInfo(string& word, string& pos){
+WordInfo::WordInfo(const string& word, const string& pos){
 	this->word = word;
 	this->pos = pos;
+	freq = 1;
+}
+WordInfo::WordInfo(const WordSimpleInfo& wsi){
+	this->word = wsi.getWord();
+	this->pos = wsi.getPos();
+	freq = 1;
+
 }
 
 bool WordInfo::operator< (const WordInfo& wi) const{
@@ -47,9 +54,9 @@ bool WordInfo::hasChild(WordInfo& wordinfo){
 }
 
 void WordInfo::reduceFreq(){
-	int max_freq = atoi(RunParameter.instance.getParameter("MAX_FREQ"));
-	int min_freq = atoi(RunParameter.instance.getParameter("MIN_FREQ"));
-	int reduce_rate = atoi(RunParameter.instance.getParameter("REDUCE_RATE"));
+	int max_freq = RunParameter::instance.getParameter("MAX_FREQ").getIntValue();
+	int min_freq = RunParameter::instance.getParameter("MIN_FREQ").getIntValue();
+	int reduce_rate = RunParameter::instance.getParameter("REDUCE_RATE").getIntValue();
 	int reduce_result = freq / reduce_rate;
 	if(reduce_result > max_freq){
 		reduce_result = max_freq;
