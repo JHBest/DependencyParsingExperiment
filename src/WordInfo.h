@@ -54,10 +54,11 @@ public:
     	return this->word + "_" + this->pos;
     }
 
-    string toStringID(){
-    	string id = this->word + "_" + this->pos+"_";
-    	return Tools::appendIntToStr(id,this->num);
-    }
+//    string toStringID(){
+//    	string id = this->word + "_" + this->pos+"_";
+//    	id = Tools::appendIntToStr(id,this->num);
+//    	return Tools::appendIntToStr(id,this->num);
+//    }
 
     int getParentCount() const{
     	return parents.size();
@@ -74,12 +75,7 @@ public:
     	return freq;
     }
 
-    void setNum(int num){
-    	this->num = num;
-    }
-    int getNum(){
-    	return num;
-    }
+
 
     void reduceFreq();
 

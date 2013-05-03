@@ -81,6 +81,16 @@ public:
 	WordInfo& getWordInfo(){
 		return wordinfo;
 	}
+
+	void setNum(int num){
+	    	this->num = num;
+	 }
+	 int getNum()const{
+	    	return num;
+	 }
+
+	//add by yangjinfeng
+	string toStringID();
 	//add by yangjinfeng
 	void addIdiotopeDependentFeature(const vector<int> & feature);
 	//add by yangjinfeng

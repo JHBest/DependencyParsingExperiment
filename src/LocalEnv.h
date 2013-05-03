@@ -12,6 +12,7 @@
 #include <vector>
 #include "WordInfo.h"
 #include "WordAgent.hpp"
+#include <string>
 
 using namespace std;
 
@@ -20,9 +21,24 @@ public:
 	LocalEnv();
 	virtual ~LocalEnv();
 
+	void addAgent(WordAgent& wordAgent);
+
+	void removeAgent(WordAgent& wordAgent);
+
+	int getAgentCount();
+
+	WordAgent& getWordAgent(string agentID);
+
+	void getAllAgentIDs(vector<string>& ids);
+
+	void interact(WordAgent& wordAgent);
+
+
+
 
 private:
-	map<WordInfo,vector<WordAgent> > localunit;
+	map<string,WordAgent> localunit;
+	map<int,WordAgent>::iterator pointer;
 };
 
 #endif /* LOCALENV_H_ */

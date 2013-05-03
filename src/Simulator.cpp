@@ -26,7 +26,7 @@ bool Simulator::resetAgents()
 //
 	//modified by yangjinfeng
 	wordAgentGrid.clear();
-	wordAgentGrid.resize(rows * cols, std::vector<WordAgent>());
+	wordAgentGrid.resize(rows * cols, LocalEnv());
 	return true;
 }
 
@@ -45,10 +45,22 @@ bool Simulator::addWordAgent(WordAgent & pWordAgent)
 	//wordAgentGrid是一个vector，模拟网格，每一个网格存放一个map
 	int index = _calcSub(pWordAgent.getPosition());
 //	wordAgentGrid[index].push_back(pWordAgent);
-	wordAgentGrid[index][pWordAgent.getWordInfo().toStringID()]=pWordAgent;
+	wordAgentGrid[index].addAgent(pWordAgent);
 
 //	wordAgentGrid[_calcSub(pWordAgent.getPosition())].insert(map<WordInfo,WordAgent>::value_type(pWordAgent.getWordInfo(),pWordAgent));
 	return true;
+}
+
+void Simulator::moveAgent(WordAgent& agent,int fromPos,int toPos){
+	if(agent.getCategory() == ANTIGEN){
+		agent.antigenWeaken();
+		if(agent.getLifetime() < 0){
+			wordAgentGrid[fromPos].removeAgent(agent);
+		}
+	}else{
+		wordAgentGrid[toPos].addAgent(agent);
+		wordAgentGrid[fromPos].removeAgent(agent);
+	}
 }
 
 
@@ -72,17 +84,21 @@ bool Simulator::immuneResponse(){
 //	std::pair<Sentence, vector<int> > p;
 //	p.first = sen;
 //	p.second = fa;
+	vector<string> agentIDs;
 	while(hasRun){
 		hasRun = false;
 
 		for(size_t i = 0; i < wordAgentGrid.size(); i++)//遍历每一个网格
 		{
-			for(map<int,WordAgent>::iterator it = vWordAgents[i].begin(); it != vWordAgents[i].end(); it++)//遍历网格中map里的每一个主体
+			agentIDs.clear();
+			wordAgentGrid[i].getAllAgentIDs(agentIDs);
+			for(size_t ii = 0;ii < agentIDs.size();ii ++)//遍历网格中map里的每一个主体
 			{
 				/**
 				 * 免疫机制核心部分,主体根据状态采取的活动
 				 */
-				it->second.run();
+				wordAgentGrid[i].getWordAgent(agentIDs[ii]).runImmune();
+//				it->second.run();
 				if(_getAgNum() == 0)//如果抗原已消灭
 				{
 					fout = true;
@@ -128,7 +144,10 @@ bool Simulator::immuneResponse(){
 	return true;
 }
 
-
+bool Simulator::interactLocal(WordAgent & wa) {
+	int index = _calcSub(wa.getPosition());
+	wordAgentGrid[index].interact(wa);
+}
 
 
 /**

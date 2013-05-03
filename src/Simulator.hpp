@@ -8,6 +8,7 @@
 #include "Environment.hpp"
 #include "Evaluation.hpp"
 #include "WordInfo.h"
+#include "LocalEnv.h"
 
 class Environment;
 class Evaluation;
@@ -19,7 +20,7 @@ private:
 
 	int times;
 	//add by yangjifneng,wordAgentGrid是一个vector，模拟网格，每一个网格存放一个map
-	std::vector<std::map<std::string,WordAgent> > wordAgentGrid;
+	std::vector<LocalEnv> wordAgentGrid;
 //	std::vector<std::vector<WordAgent> > wordAgentGrid;
 
 	//vWordAgents是一个vector，模拟网格，每一个网格存放一个map
@@ -41,6 +42,11 @@ public:
 
 	//add by yangjinfeng
 	bool immuneResponse();
+	//add by yangjinfeng
+	void moveAgent(WordAgent& agent,int fromPos,int toPos);
+	//add by yangjinfeng
+	bool interactLocal(WordAgent & wa) ;
+
 
 	bool deleteWordAgent(WordAgent & pWordAgent);
 	bool run(const Sentence & sen, const std::vector<int> & fa);

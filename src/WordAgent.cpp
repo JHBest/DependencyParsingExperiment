@@ -38,6 +38,13 @@ WordAgent::WordAgent(WordInfo& wordinfo,
 
 
 }
+
+
+string WordAgent::toStringID(){
+	string id = wordinfo.toString()+"_";
+	id = Tools::appendIntToStr(id,this->category)+"_";
+	return Tools::appendIntToStr(id,this->num);
+}
 //add by yangjinfeng
 void WordAgent::addIdiotopeDependentFeature(const vector<int> & feature){
 	for(size_t i = 0; i < feature.size(); i++){
@@ -126,11 +133,9 @@ bool WordAgent::runImmune()
 	return hasRun;
 }
 
-//add by yangjinfeng
+//add by yangjinfeng,随机移动，不考虑密度，如果考虑密度，有可能减慢移动
 bool WordAgent::doMove()
 {
-	//cout<<"mo";
-	/*updating receptor*/
 
 	if(status != ACTIVE)
 	{
@@ -138,42 +143,21 @@ bool WordAgent::doMove()
 		return false;
 	}
 	//updateSelf();
-	static const int dx[] = {0, 1, 1, 1, 0, -1, -1, -1};
-	static const int dy[] = {1, 1, 0, -1, -1, -1, 0, 1};
+	static const int dx[] = {0, 1, 1, 1, 0, -1, -1, -1,0};
+	static const int dy[] = {1, 1, 0, -1, -1, -1, 0, 1,0};
 
-	//选择相邻网格中主体最少的网格，如果有多个，则随机选择一个
-	int min = simu->agentCount(position);
-	vector<pair<int, int> > pos;
-	for(int k = 0; k < 8; k++){
-		int x = position.first + dx[k];
-		int y = position.second + dy[k];
-		pair<int, int> newPos = make_pair(x, y);
-		if(env->xInRange(x) && env->yInRange(y)){
-			if(simu->agentCount(newPos) < min){
-				min = simu->agentCount(newPos);
-				pos.clear();
-			}
-			if(simu->agentCount(newPos) == min){
-				pos.push_back(newPos);
-			}
-		}
-	}
-
-	orders.push(INTERACTING);
-	if(min == simu->agentCount(position)){
-
-		return false;
-	}
+	int direction = rand() % 9;
+	int ROW = RunParameter::instance.getParameter("ROWS").getIntValue();
+	int COL = RunParameter::instance.getParameter("COLS").getIntValue();
+	int newrow = (position.first + dx[direction] + ROW) % ROW;
+	int newcol = (position.second + dy[direction] + COL) % COL;
 
 	pair<int, int> oldPos = position;
-	//srand(time(NULL));
-	int p = rand() % pos.size();
-	position = pos[p];//设定新的位置
+	position = make_pair(newrow, newcol);
 
-	simu->addWordAgent(*this);
-	position = oldPos;
-	//cout<<"move";
-	simu->deleteWordAgent(*this);
+	orders.push(INTERACTING);
+	simu->moveAgent(*this,oldPos,position);
+
 	return true;
 }
 
@@ -189,7 +173,7 @@ bool WordAgent::interact()
 	{
 		return false;
 	}
-	simu->interact(*this);
+	simu->interactLocal(*this);
 	//cout<<"oin";
 	return true;
 }

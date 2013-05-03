@@ -103,7 +103,7 @@ void Trainer::distributeBCells(){
 		int wordfreq = BCellAgents[i].getWordInfo().getFreq();
 		for(size_t j = 0; j < wordfreq; j++){//每个B细胞加入的个数为wordfreq
 			WordAgent bagent = BCellAgents[i];//复制一个
-			bagent.getWordInfo().setNum(j);
+			bagent.setNum(j);
 			simu->addWordAgent(bagent);
 			bcellcount ++;
 		}
@@ -190,7 +190,7 @@ bool Trainer::addAntigenToSimulator()
 		for(size_t i = 0;i < antigenAgents.size();i ++){
 			for(int j = 0;j < antigencount;j ++){
 				WordAgent ag = antigenAgents[i];
-				ag.getWordInfo().setNum(j);
+				ag.setNum(j);
 				simu->addWordAgent(ag);//抗原词主体加到模拟器里面
 			}
 		}
