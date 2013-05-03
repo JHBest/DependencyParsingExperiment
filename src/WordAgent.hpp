@@ -26,6 +26,10 @@ private:
 	//add by yangjinfeng
 	set<int> paratopeParentFeature;
 	pair<int, int> position;
+	//仅用于抗原，指抗原的生命期限
+	int lifetime;
+	//仅用于B细胞
+	int activeLevel;
 
 
     int AgentID;
@@ -47,6 +51,7 @@ private:
 	double agAffinity;
 	double mutatedAffinity;
 	int status;
+	/*词主体类型、抗原、B细胞*/
 	int category;
 	double stimulus;
 	double suppression;
@@ -81,6 +86,23 @@ public:
 	//add by yangjinfeng
 	void addParatopeParentFeature(const vector<int> & feature);
 
+	//add by yangjinfeng
+	void setLifetime(int lifetime);
+	//add by yangjinfeng
+	int getLifetime();
+	//add by yangjinfeng
+	void antigenWeaken();
+	//add by yangjinfeng
+	void setActiveLevel(int activelevel);
+	//add by yangjinfeng
+	int WordAgent::getActiveLevel();
+	//add by yangjinfeng
+	void WordAgent::acitvationWeaken();
+	//add by yangjinfeng
+	bool hasActivation();
+	//add by yangjinfeng
+	bool runImmune();
+
 	bool run();
 
 	/*operation on id*/
@@ -109,7 +131,7 @@ public:
 
 	/*operation on position*/
 	std::pair<int, int> getPosition() const;
-	void setPosition(std::pair<int,int> p);
+	void setPosition(const std::pair<int,int>& p);
 
 	/*operation on receptor*/
 	std::map<int, double>   getDomReceptor();
@@ -173,6 +195,15 @@ public:
 
 private:
         /*Behaviors*/
+	bool doMove();
+	bool interact();
+	bool mutate();
+	bool select();
+	bool clone();
+	bool regulate();
+	bool die();
+
+
 	bool _doMove();
 	bool _interact();
 	bool _mutate();

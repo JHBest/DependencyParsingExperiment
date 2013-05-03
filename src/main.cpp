@@ -31,7 +31,7 @@ int main()
 //	wordinfos[wi1] = 1;
 //	cout<<wordinfos[wi2]<<endl;
 
-	Logger::logger<<StrHead::header + RunParameter::instance.getParameter("MAX_FREQ").getIntValue()+"\n";
+	Logger::logger<<StrHead::header + RunParameter::instance.getParameter("MUTATEPRO").getDoubleValue()+"\n";
 
     return 0;
 }

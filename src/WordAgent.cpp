@@ -54,10 +54,534 @@ void WordAgent::addParatopeParentFeature(const vector<int> & feature){
 
 
 
+void WordAgent::setLifetime(int lifetime){
+	this->lifetime = lifetime;
+}
+
+int WordAgent::getLifetime(){
+	return lifetime;
+}
+
+void WordAgent::antigenWeaken(){
+	lifetime --;
+}
+
+void WordAgent::setActiveLevel(int activelevel){
+	this->activeLevel = activelevel;
+}
+int WordAgent::getActiveLevel(){
+	return activeLevel;
+}
+void WordAgent::acitvationWeaken(){
+	activeLevel --;
+}
+bool WordAgent::hasActivation(){
+	return activeLevel > 0;
+}
+
+
+/**
+ * 免疫机制的核心部分
+ */
+bool WordAgent::runImmune()
+{
+        //cout<<"agent id "<<AgentID<<" ";
+        //cout<<"run ";
+	bool hasRun = false;
+	//cout<<"size "<<orders.size();
+        if(orders.size())
+        {
+                int now = orders.front();//取队列第一个值。
+                //cout<<"now is "<<now<<" ";
+                orders.pop();//删除队列第一个
+                switch(now)
+                {
+                        case MOVING:
+                                doMove();
+                                break;
+                        case INTERACTING:
+                                interact();
+                                break;
+                        case MUTATING:
+                                mutate();
+                                break;
+                        case SELECTING:
+                                select();
+                                break;
+                        case CLONING:
+                                _clone();
+                                break;
+                        case REGULATING:
+                                _regulate();
+                                break;
+                        case DYING:
+                                _die();
+                                break;
+                        default:
+                                assert(0);
+                }
+                hasRun = true;
+        }
+        //cout<<"orun "<<endl;
+	return hasRun;
+}
+
+//add by yangjinfeng
+bool WordAgent::doMove()
+{
+	//cout<<"mo";
+	/*updating receptor*/
+
+	if(status != ACTIVE)
+	{
+		_mapStatusToBehavior();
+		return false;
+	}
+	//updateSelf();
+	static const int dx[] = {0, 1, 1, 1, 0, -1, -1, -1};
+	static const int dy[] = {1, 1, 0, -1, -1, -1, 0, 1};
+
+	//选择相邻网格中主体最少的网格，如果有多个，则随机选择一个
+	int min = simu->agentCount(position);
+	vector<pair<int, int> > pos;
+	for(int k = 0; k < 8; k++){
+		int x = position.first + dx[k];
+		int y = position.second + dy[k];
+		pair<int, int> newPos = make_pair(x, y);
+		if(env->xInRange(x) && env->yInRange(y)){
+			if(simu->agentCount(newPos) < min){
+				min = simu->agentCount(newPos);
+				pos.clear();
+			}
+			if(simu->agentCount(newPos) == min){
+				pos.push_back(newPos);
+			}
+		}
+	}
+
+	orders.push(INTERACTING);
+	if(min == simu->agentCount(position)){
+
+		return false;
+	}
+
+	pair<int, int> oldPos = position;
+	//srand(time(NULL));
+	int p = rand() % pos.size();
+	position = pos[p];//设定新的位置
+
+	simu->addWordAgent(*this);
+	position = oldPos;
+	//cout<<"move";
+	simu->deleteWordAgent(*this);
+	return true;
+}
+
+bool WordAgent::interact()
+{
+	/*interaction between word-agents:
+	(1) Antigens and B cells;
+	(2) B cells
+	*/
+	//cout<<"in ";
+	updateSelf();
+	if(status != ACTIVE)
+	{
+		return false;
+	}
+	simu->interact(*this);
+	//cout<<"oin";
+	return true;
+}
+
+bool WordAgent::mutate()
+{
+        //cout<<"mu";
+	if(status == MATCH)
+	{
+	        tmpFeature = domFeature;
+		/*multi-point mutation*/
+		double mutatedProb = 0.0;
+		//srand(time(NULL));
+		mutatePosition.clear();
+
+		for(size_t i = 0; i < agFeature.size(); i++)
+		{
+		    /*producting mutated probability*/
+		    int r = rand()%1000;
+		    //cout<<r<<" ";
+		    mutatedProb = (double)r/1000.0;
+
+		    if((mutatedProb < MUTATEPRO) /*&& (domFeature[agFeature[i]] == 0.0)
+			    */)
+		    {
+		//	    cout<<r<<" ";
+		            mutatePosition.push_back(agFeature[i]);
+		    }
+		}
+		//cout<<endl;
+
+		if((int)mutatePosition.size() > 0)
+		{
+		        //double deta = BETA*exp(-agAffinity);
+		        double sum = 0.0;
+			//double d = deta/(double)mutatePosition.size();
+                        /*for(size_t j = 0; j < mutatePosition.size(); j++)
+                        {
+				if(domFeature[mutatePosition[j]] == 0.0)
+				{
+                                tmpFeature[mutatePosition[j]] = domFeature[mutatePosition[j]] + deta;
+                                sum += deta;
+				}
+				else
+				{
+					tmpFeature[mutatePosition[j]] = domFeature[mutatePosition[j]]*(1.0+0.1);
+					sum += domFeature[mutatePosition[j]]*0.1;
+				}
+
+                        }
+			*/
+			/*for(size_t j = 0; j < mutatePosition.size(); j++)
+			{
+				if(domFeature[mutatePosition[j]] == 0.0)
+				{
+					int d = rand();
+					d = d%(int)1e9;
+					double s = (double)d/1e10;
+					//d = d%s;
+					//d = d/(double)1e15;
+					//double d = rand()%1000000/1000000000000000;
+					tmpFeature[mutatePosition[j]] = domFeature[mutatePosition[j]]+s;
+					sum += d;
+				}
+				else
+				{
+					tmpFeature[mutatePosition[j]] = domFeature[mutatePosition[j]]*(1.0 + 0.003);
+					sum += domFeature[mutatePosition[j]]*0.003;
+				}
+
+
+			}
+			*/
+			/*
+			for(size_t j = 0; j < mutatePosition.size(); j++)
+			{
+				if(agAffinity == 0.0)
+				{
+
+
+					int d = 1;
+					double deta = (double)d/(double)10;
+					tmpFeature[mutatePosition[j]] = deta;
+					sum += deta;
+				}
+				else
+				{
+		//			cout<<"%";
+					if(domFeature[mutatePosition[j]] ==  0.0)
+					{
+						double lamda =0.1;
+						double alpha = 10.0;
+
+						int y = (int)(agAffinity);
+						double deta = lamda*exp(-agAffinity*alpha);
+						tmpFeature[mutatePosition[j]] = deta;
+			//			cout<<"% "<<deta<<" %";
+						sum += deta;
+					}
+					else
+					{
+		//				cout<<"*"<<domFeature[mutatePosition[j]];
+			//			cout<<" ag "<<agAffinity<<"$";
+						int a;
+			//			cin>>a;
+						double deta  = (domFeature[mutatePosition[j]])/agAffinity;
+						deta = exp(-agAffinity)*deta;
+						tmpFeature[mutatePosition[j]] = domFeature[mutatePosition[j]] + deta;
+						//cout<<"&"<<deta<<"&";
+						sum += deta;
+					}
+				}
+			}
+			*/
+			if(agAffinity == 0.0)
+			{
+				//cout<<"size "<<mutatePosition.size()<<endl;
+				for(size_t j = 0; j < mutatePosition.size();j++)
+				{
+					//int d = rand()%5;
+					int d = 1;
+					double deta = 1e-1;
+					tmpFeature[mutatePosition[j]] = deta;
+					//cout<<"&"<<deta<<"&";
+					sum += deta;
+				}
+			}
+			else
+			{
+				//double lamda = 0;
+				double alpha = 1e20;
+
+				//double increament = lamda*exp(-agAffinity*alpha);
+				//cout<<"i: "<<increament<<" ";
+				//double deta = increament/(double)mutatePosition.size();
+				//cout<<"deta: "<<deta;
+				/*double min = 1.0;
+				for(size_t m = 0 ;m < mutatePosition.size();m++)
+				{
+					if(domFeature[mutatePosition[m]] < min)
+					{
+						min = domFeature[mutatePosition[m]];
+					}
+
+				}
+				*/
+				//cout<<"size "<<mutatePosition.size()<<endl;
+				for(size_t j = 0; j < mutatePosition.size(); j++)
+				{
+					//double deta = (domFeature[mutatePosition[j]]/agAffinity)*(1.0/(agAffinity*alpha));
+					//cout<<"aff "<<agAffinity<<",";
+					//cout<<"*"<<deta<<"*";
+					double deta = 1e-1;
+					if(domFeature[mutatePosition[j]] != 0.0)
+					{
+
+						deta = domFeature[mutatePosition[j]]*1e-5;
+						tmpFeature[mutatePosition[j]] = domFeature[mutatePosition[j]] + deta;
+						sum += deta;
+					}
+					else
+					{
+						//int d = rand()%5;
+						//double deta = (double)d/1e5;
+						//double deta = 0.1;
+						tmpFeature[mutatePosition[j]] = deta;
+						sum += deta;
+					}
+
+			//		cout<<"tmp: "<<tmpFeature[mutatePosition[j]]<<" ";
+				}
+				//sum += increament;
+			}
+
+                        /*calculating difference of affinity after mutation*/
+                        mutatedAffinity = agAffinity + sum;
+                        setStatus(MUTATE);
+		}
+	}
+
+	mapStatusToBehavior();
+	//cout<<"omu";
+
+	return true;
+}
+
+/**
+ * 选择有利的突变，计算预测结果
+ */
+bool WordAgent::select()
+{
+       // cout<<"se";
+	simu->select(*this);
+	//cout<<"ose";
+	return true;
+}
+
+bool WordAgent::_calFeedback(WordAgent & wordAgent)
+{
+	/*calculating feedback based on mutated receptors*/
+	feedback = env->gainFeedback(&wordAgent,wordAgent.getSentence(),wordAgent.getFather());
+	if(feedback.first > 0)
+	{
+	       // cout<<"**ag number is "<<env->getAntigenNum()<<endl;
+	        //env->setFeedback(true);
+	        if((wordAgent.getSentenceID() == env->getSentenceID()) && (feedback.second > ACCURACYTHRESHOLD))
+	        {
+                        env->setFeedbackFlag(true);
+
+	        }
+	        //cout<<"sentence "<<wordAgent.getSentenceID()<<" positive feedback by memory or antibody! ";
+
+
+                return true;
+	}
+	//cout<<"negative feedback ";
+	return false;
+}
+
+bool WordAgent::clone()
+{
+	/*cloning by idiotype immune network and adaptive immune as equa:
+
+	*/
+	if(status == MATURE)
+	{
+	        //cout<<"cl ";
+	        //cout<<"id is "<<ID<<endl;
+	      //  int a;
+
+
+		if(!_getRegulation())
+		{
+			std::cerr<<"Gain regulation failed!"<<std::endl;
+		}
+
+		//cout<<"affinity is "<<agAffinity<<endl;
+		//double alpha = mutatedAffinity;
+		//int con = _calConcentration();
+//		int N = (int)(alpha + stimulus - suppression) * con;
+		//cout<<"clone number is "<<N<<endl;
+
+		int N = 0;
+		if(stimulus > suppression)
+		{
+			N +=1;
+		}
+		else if (stimulus < suppression)
+		{
+			double diff = suppression - stimulus;
+
+			if(diff > mutatedAffinity)
+				N -=2;
+			else
+				N -=1;
+		}
+
+
+		//double beta = exp(GAMMA*mutatedAffinity + stimulus - suppression);
+		//double sum = GAMMA*mutatedAffinity + stimulus - suppression;
+
+		/*int N;
+		if(sum > 0.0)
+		{
+			N = (int)log(sum);
+		}
+		else
+		{
+			N = 0;
+		}
+		*/
+		//double beta = log(GAMMA*mutatedAffinity + stimulus - suppression);
+		//cin>>a;
+		//int N = (int)beta;
+
+		if(N > 0)
+		{
+		        //vector<WordAgent> v;
+		        //int agentNum = env->getAntigenNum() + env->getBcellNum();
+		        //cout<<"agentNum is "<<agentNum<<endl;
+		        //cout<<"clone "<<N<<endl;
+			//cout<<"st "<<stimulus<<", sp "<<suppression<<endl;
+			//cout<<"ma "<<mutatedAffinity<<endl;
+			//Memory B cells
+			WordAgent wa(ID,env,simu,position,MEMORYBCELL,1);
+			wa.setAgentID(AgentID);
+			wa.setAgReceptor(agFeature);
+			wa.setAffinity(mutatedAffinity);
+			wa.mapStatusToBehavior();
 
 
 
 
+			//srand((unsigned)time(NULL));
+		/*	int a;
+			cin>>a;
+			cout<<"clone";
+		*/	for(int i = 0; i < N; i++)
+			{
+			        simu->addWordAgent(*this);
+			}
+		//	cin>>a;
+		//	setStatus(DIE);
+
+		}
+		else
+		{
+			int M = -N;
+			if(M > 1)
+			simu->regulateByDelete(*this,N);
+		//	setStatus(ACTIVE);
+		}
+
+		//setStatus(DIE);
+	}
+
+	//cout<<"cl";
+        setStatus(ACTIVE);
+	mapStatusToBehavior();
+	//cout<<"ocl";
+	//cout<<"clone over";
+	/*finish = clock();
+                totaltime=(double)(finish-start)/CLOCKS_PER_SEC;
+                cout<<"clone time is "<<totaltime<<endl;
+                */
+
+	return true;
+}
+
+bool WordAgent::regulate()
+{
+
+	/*regulating by idiotype immune network of B cells as equa:
+	N = concentration + stimulus - suppression
+	*/
+	//cout<<"regulating ";
+	//cout<<"re ";
+	if((category == BCELL))
+	{
+                //cout<<"re ";
+                if(!_getRegulation())
+                {
+                        std::cerr<<"Gain regulation failed!"<<std::endl;
+                }
+
+
+                int con = _calConcentration();
+		//cout<<"stimu is "<<stimulus<<", supress is "<<suppression<<endl;
+                int N = con * (int)(stimulus - suppression);
+		//cout<<"number of agents added/deleted is "<<N<<endl;
+                //int num = env->getAntigenNum() + env->getBcellNum();
+                //cout<<"agent num is "<<num<<" before regulation."<<endl;
+                if(N > 0)
+                {
+                        /*cloning (stimulus)*/
+                        for(int i = 0; i < N; i++)
+                        {
+                                /*new agent by cloning: status is ACTIVE*/
+                                simu->addWordAgent(*this);
+                        }
+
+                }
+                else if(N < 0)
+                {
+                       // cout<<"reg delete ";
+                        std::vector<WordAgent> nearAgents;
+                        int M = -N;
+                        simu->regulateByDelete(*this,M);
+                }
+
+                setStatus(ACTIVE);
+                mapStatusToBehavior();
+	}
+
+	return true;
+}
+
+bool WordAgent::die()
+{
+	//cout<<"die";
+	/*if(category == BCELL)
+	{
+	        cout<<"B cells die ";
+        }
+	*/
+        if(simu->deleteWordAgent(*this))
+        {
+		//cout<<"die over";
+                return true;
+        }
+	return false;
+}
 
 /////////////////////////////////////////////////////////////////////////////
 

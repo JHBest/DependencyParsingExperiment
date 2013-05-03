@@ -7,6 +7,7 @@
 #include "Sentence.hpp"
 #include "Environment.hpp"
 #include "Evaluation.hpp"
+#include "WordInfo.h"
 
 class Environment;
 class Evaluation;
@@ -17,6 +18,10 @@ private:
 	Environment * env;
 
 	int times;
+	//add by yangjifneng,wordAgentGrid是一个vector，模拟网格，每一个网格存放一个map
+	std::vector<std::map<std::string,WordAgent> > wordAgentGrid;
+//	std::vector<std::vector<WordAgent> > wordAgentGrid;
+
 	//vWordAgents是一个vector，模拟网格，每一个网格存放一个map
 	std::vector<std::map<int,WordAgent> > vWordAgents;
 	int rows, cols;
@@ -25,10 +30,18 @@ private:
 	std::vector<double> historyAccuracy;
 	std::vector<double> tmpFW;
 public:
-        Evaluation * eva;
+    Evaluation * eva;
 	Simulator(Environment * environment,Evaluation * evaluation);
+
+//	bool Simulator::addBCellWordAgent(WordAgent & pWordAgent)
+
 	bool resetAgents();
+	//add by yangjinfeng
 	bool addWordAgent(WordAgent & pWordAgent);
+
+	//add by yangjinfeng
+	bool immuneResponse();
+
 	bool deleteWordAgent(WordAgent & pWordAgent);
 	bool run(const Sentence & sen, const std::vector<int> & fa);
 	bool interact(WordAgent & wa) ;

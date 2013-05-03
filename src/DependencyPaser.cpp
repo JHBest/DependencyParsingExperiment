@@ -36,7 +36,22 @@ bool DependencyPaser::saveModel(const char * file)
 {
 	return true;
 }
+/**
+ * add by yangjinfeng
+ */
+bool DependencyPaser::train(const char * file){
+	cout<<"Initilizing B cell Network...";
+	initBCell(file);
+	cout<<"Initilizing finished!"<<endl;
 
+
+	cout<<"Online learning...";
+	_readFileTrain(file);//¶ÁÈ¡ÒÀ´æÊ÷¿â£¬Öğ¾äÑµÁ·
+	cout<<"Online learning finished!"<<endl;
+
+	return true;
+
+}
 
 /**
  * ´ÓÑµÁ·Ê÷¿âÀï¶ÁÈ¡ÒÀ´æÊ÷£¬¹¹½¨BÏ¸°û´Ê
@@ -77,6 +92,71 @@ bool DependencyPaser::initBCell(const char * file)
 	pTrainer->reduceWordFreq();//´ÊÆµËõ¼õ
 	return true;
 }
+
+/**
+ *fileÊÇÓÃ×÷ÑµÁ·ÓïÁÏµÄÒÀ´æÊ÷¿âÎÄ¼ş
+ *add by yangjinfeng
+ */
+bool DependencyPaser::trainFromFile(const char * file)
+{
+	pTrainer->distributeBCells();//¹¹ÔìBÏ¸°ûÍøÂç
+	string line;
+	vector<vector<string> > senes;
+	pModel->initFeatureWeight();//³õÊ¼»¯ÌØÕ÷È¨ÖØ
+	for(size_t i = 0; i < LEARNTIMES; i++)//µü´ú´ÎÊı
+	{
+		cout<<"Learning "<<i+1<<" times"<<endl;
+		ifstream fin(file);
+		//int num = 0;
+		pTrainer->initSentences();
+		//pSimu->init();
+		int senID = 1;
+		pEvaluation->printLine();
+		while(getline(fin, line)){
+			if(line == ""){
+				vector<int> father;
+				Sentence sen;
+				sen.push_back(make_pair("ROOT", "ORG"));
+				father.push_back(-1);
+				for(size_t i = 0; i < senes.size(); i++){
+					sen.push_back(make_pair(senes[i][1], senes[i][3]));
+					father.push_back(atoi(senes[i][6].c_str()));
+				}
+
+				//Öğ¾äÑµÁ·
+				pTrainer->rfTrain(sen, senID, father);
+
+				/*save feature weights*/
+				//pTrainer->saveFeatureWeights();
+				senes.clear();
+				//num++;
+				//if(num > 10)
+				// break;
+			}
+			else{
+				vector<string> item;
+				string tmp;
+				istringstream sin(line);
+				while(sin >> tmp){
+					item.push_back(tmp);
+				}
+				senes.push_back(item);
+			}
+		}
+		//cout<<"number of sentences is "<<num<<endl;
+		fin.close();
+		pTrainer->initSentenceID();
+
+	}
+
+
+
+
+	return true;
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * ´ÓÑµÁ·Ê÷¿âÀï¶ÁÈ¡ÒÀ´æÊ÷£¬¹¹½¨BÏ¸°û´Ê
@@ -322,19 +402,7 @@ bool DependencyPaser::trainFile(const char * file)
 }
 
 
-bool DependencyPaser::train(const char * file){
-	cout<<"Initilizing B cell Network...";
-	initBCell(file);
-	cout<<"Initilizing finished!"<<endl;
 
-
-	cout<<"Online learning...";
-	_readFileTrain(file);//¶ÁÈ¡ÒÀ´æÊ÷¿â£¬Öğ¾äÑµÁ·
-	cout<<"Online learning finished!"<<endl;
-
-	return true;
-
-}
 
 
 bool DependencyPaser::predictFile(const char * testFile, const char * outFile)

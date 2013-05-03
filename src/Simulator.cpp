@@ -9,9 +9,9 @@ using namespace std;
 
 Simulator::Simulator(Environment * environment,Evaluation * evaluation)
 {
-        rows = ROWS;
-        cols = COLS;
-        agentId = 0;
+	rows = ROWS;
+	cols = COLS;
+	agentId = 0;
 	env = environment;
 	times = 1;
 	resetAgents();
@@ -21,10 +21,115 @@ Simulator::Simulator(Environment * environment,Evaluation * evaluation)
 }
 bool Simulator::resetAgents()
 {
-        vWordAgents.clear();
-	vWordAgents.resize(rows * cols, map<int,WordAgent>());
+//	vWordAgents.clear();
+//	vWordAgents.resize(rows * cols, map<int,WordAgent>());
+//
+	//modified by yangjinfeng
+	wordAgentGrid.clear();
+	wordAgentGrid.resize(rows * cols, std::vector<WordAgent>());
 	return true;
 }
+
+
+/**
+ * modified by yangjinfeng
+ */
+bool Simulator::addWordAgent(WordAgent & pWordAgent)
+{
+	if(pWordAgent.getCategory() == ANTIGEN)
+	{
+		agNum++;
+	}
+	pair<int,int> pos = env->getRandomPosition();//网格中随机分配一个位置
+	pWordAgent.setPosition(pos);
+	//wordAgentGrid是一个vector，模拟网格，每一个网格存放一个map
+	int index = _calcSub(pWordAgent.getPosition());
+//	wordAgentGrid[index].push_back(pWordAgent);
+	wordAgentGrid[index][pWordAgent.getWordInfo().toStringID()]=pWordAgent;
+
+//	wordAgentGrid[_calcSub(pWordAgent.getPosition())].insert(map<WordInfo,WordAgent>::value_type(pWordAgent.getWordInfo(),pWordAgent));
+	return true;
+}
+
+
+
+bool Simulator::immuneResponse(){
+	/*reset interating objects*/
+	bool hasRun = true;
+//	int size = 0;//所有的主体数量
+//	for(size_t i = 0; i < vWordAgents.size(); i++)
+//	{
+//		size += vWordAgents[i].size();
+//		//cout<<vWordAgents[i].size()<<" ";
+//	}
+//	cout<<endl<<"size of agents is "<<size<<endl;
+
+	clock_t start,finish;
+	double totaltime;
+	start = clock();
+	bool fout = false;
+	env->setFeedbackFlag(false);
+//	std::pair<Sentence, vector<int> > p;
+//	p.first = sen;
+//	p.second = fa;
+	while(hasRun){
+		hasRun = false;
+
+		for(size_t i = 0; i < wordAgentGrid.size(); i++)//遍历每一个网格
+		{
+			for(map<int,WordAgent>::iterator it = vWordAgents[i].begin(); it != vWordAgents[i].end(); it++)//遍历网格中map里的每一个主体
+			{
+				/**
+				 * 免疫机制核心部分,主体根据状态采取的活动
+				 */
+				it->second.run();
+				if(_getAgNum() == 0)//如果抗原已消灭
+				{
+					fout = true;
+					cout<<"Ags are all killed!"<<endl;
+					break;
+				}
+
+				if(!env->getFeedbackFlag())
+				{
+					hasRun = true;
+				}
+				else//如果系统得到正反馈
+				{
+					//double acc = eva->evalute(p.first,0,p.second);
+					//cout<<"acc "<<acc<<endl;
+					fout = true;
+					break;
+				}
+			}
+			_release();
+			if(fout)
+			{
+				hasRun = false;
+				fout = false;
+				break;
+			}
+		}
+		finish = clock();
+		totaltime = (double)(finish-start)/CLOCKS_PER_SEC;
+		if(totaltime > TIMETHRESHOLD)//如果时间超过设定阈值，也终止。
+		{
+			break;
+		}
+	}
+
+
+	/*remove antigen*/
+	_removeAg();
+	_resetStatus();
+	//int a;
+	//cin>>a;
+
+	return true;
+}
+
+
+
 
 /**
  * 根据行和列计算vector的下标
@@ -33,6 +138,10 @@ int Simulator::_calcSub(const pair<int, int> & pos) const
 {
 	return pos.first * cols + pos.second;
 }
+
+//////////////////////////////////////////////////////////////////////////////////////////
+
+
 
 bool Simulator::_isSame(const std::vector<int> & s, const std::vector<int> & d)
 {
@@ -55,31 +164,31 @@ bool Simulator::_isSame(const std::vector<int> & s, const std::vector<int> & d)
  * ？？？
  * 不能是引用吧，如果是引用，所有相同B细胞的状态就相同了
  */
-bool Simulator::addWordAgent(WordAgent & pWordAgent)
-{
-        if(pWordAgent.getAgentID() == 0)//表示第一次加入到simulator里
-        {
-                if(pWordAgent.getCategory() == ANTIGEN)
-                {
-                        agNum++;
-                }
-                agentId++;
-                pWordAgent.setAgentID(agentId);
-                //vWordAgents是一个vector，模拟网格，每一个网格存放一个map
-                vWordAgents[_calcSub(pWordAgent.getPosition())].insert(map<int,WordAgent>::value_type(agentId,pWordAgent));
-        }
-        else
-        {
-                //cout<<pWordAgent.getAgentID()<<" ";
-		agentId++;
-		//pWordAgent.setAgentID(agentId);//因为传递的是对象的引用，所以下次传递时，还是原来那个对象，agentID已经有值了
-
-               bool f = vWordAgents[_calcSub(pWordAgent.getPosition())].insert(map<int,WordAgent>::value_type(agentId,pWordAgent)).second;
-	       //if(f)
-		//cout<<"+";
-        }
-	return true;
-}
+//bool Simulator::addWordAgent(WordAgent & pWordAgent)
+//{
+//        if(pWordAgent.getAgentID() == 0)//表示第一次加入到simulator里
+//        {
+//                if(pWordAgent.getCategory() == ANTIGEN)
+//                {
+//                        agNum++;
+//                }
+//                agentId++;
+//                pWordAgent.setAgentID(agentId);
+//                //vWordAgents是一个vector，模拟网格，每一个网格存放一个map
+//                vWordAgents[_calcSub(pWordAgent.getPosition())].insert(map<int,WordAgent>::value_type(agentId,pWordAgent));
+//        }
+//        else
+//        {
+//                //cout<<pWordAgent.getAgentID()<<" ";
+//		agentId++;
+//		//pWordAgent.setAgentID(agentId);//因为传递的是对象的引用，所以下次传递时，还是原来那个对象，agentID已经有值了
+//
+//               bool f = vWordAgents[_calcSub(pWordAgent.getPosition())].insert(map<int,WordAgent>::value_type(agentId,pWordAgent)).second;
+//	       //if(f)
+//		//cout<<"+";
+//        }
+//	return true;
+//}
 
 bool Simulator::deleteWordAgent(WordAgent & pWordAgent)
 {
@@ -359,6 +468,9 @@ int Simulator::getAgNum()
 {
         return agNum;
 }
+
+
+
 
 /**
  * 模拟器运行，输入的句子好像没有用

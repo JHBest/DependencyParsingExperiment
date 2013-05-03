@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
+#include "Logger.h"
 
 
 using namespace std;
@@ -27,7 +28,7 @@ Trainer::~Trainer()
 
 
 /**
- * 从句子里构建B细胞词,并抽取特征
+ * add by yangjinfeng 从句子里构建B细胞词,并抽取特征
  */
 bool Trainer::initBCells(const Sentence & sen, const vector<int> & fa)
 {
@@ -41,7 +42,7 @@ bool Trainer::initBCells(const Sentence & sen, const vector<int> & fa)
 
 
 //构建词主体
-/**
+/**add by yangjinfeng
  * wordID是map，键为词，值为词在BCells中的位置索引，该位置索引也作为该词的编号
  * wordFreq的位置索引和BCells的位置索引描述的都是同一个词词频和词主体信息
  * current 是当前词的位置
@@ -92,20 +93,114 @@ void Trainer::reduceWordFreq(){
 
 
 
+void Trainer::distributeBCells(){
+	Logger::logger<<StrHead::header + "distribute B cells randomly according B cell frequncy" +"\n";
+	Logger::logger<<StrHead::header + "number of B cell type is "+BCellAgents.size() +"\n";
+	int bcellcount = 0;
+	for(size_t i = 0; i < BCellAgents.size(); i++)
+	{
+
+		int wordfreq = BCellAgents[i].getWordInfo().getFreq();
+		for(size_t j = 0; j < wordfreq; j++){//每个B细胞加入的个数为wordfreq
+			WordAgent bagent = BCellAgents[i];//复制一个
+			bagent.getWordInfo().setNum(j);
+			simu->addWordAgent(bagent);
+			bcellcount ++;
+		}
+	}
+
+//	BCells.clear();
+	Logger::logger<<StrHead::header + "number of B cell is "+bcellcount +"\n";
+	Logger::logger<<StrHead::header + "distribution of b cells finished"+"\n";
+	return true;
+}
 
 
 
+/**
+ * add by yangjinfeng
+ */
+bool Trainer::trainBySentence(const Sentence & sen, const vector<int> & fa)
+{
+	Logger::logger<<StrHead::header + "train the model with sentence one by one\n";
+
+	pEnv->setSentence(sen);
+	pEnv->setFather(fa);
+	std::pair<Sentence, vector<int> > p;
+	p.first = sen;
+	p.second = fa;
+	vSen.push_back(p);//每一个单元是句子的每一个词和每个词的父节点
+
+	injectAntigen(sen, fa);//注入抗原
+
+	Logger::logger<<StrHead::header + "after antigen injection, immune response come to start\n";
+	if(simu->run(sen,fa))
+	{
+		vector<double> fw = pModel->getFeatureWeight();
+		pModel->accumulateFeatureWeight(fw);
+		return true;
+	}
+
+	return false;
+}
 
 
+/**
+ * add by yangjinfeng 构造抗原并注入
+ */
+bool Trainer::injectAntigen(const Sentence & sen, const std::vector<int> & fa)
+{
+	Logger::logger<<StrHead::header + "construct antigen and inject to simulator\n";
+	for(size_t i = 1; i < sen.size(); i++)
+	{
+		int j = fa[i];
+		buildAntigen(sen,i,j);//构造抗原
+	}
+
+	addAntigenToSimulator();
+
+	return true;
+}
 
 
+/**
+ * add by yangjinfeng
+ * 构造抗原词主体添加到antigenAgents里面，
+ */
+bool Trainer::buildAntigen(const Sentence & sen,int child,const int parent)
+{
+	WordInfo wi(sen[i].first,sen[i].second);
+	WordAgent antigenagent(wi,pEnv,simu,pEnv->getRandomPosition(), ANTIGEN,1);
+	vector<int> features;
+	pModel->getFeatureIDVec(sen, parent, child, features);
+	antigenagent.addIdiotopeDependentFeature(features);
+	antigenAgents.push_back(antigenagent);
+
+	return true;
+}
 
 
+bool Trainer::addAntigenToSimulator()
+{
+	Logger::logger<<StrHead::header + "add antigen to simulator\n";
+	int antigencount = RunParameter::instance.getParameter("ANTIGEN_COUNT").getIntValue();
 
+	if(antigenAgents.size() > 0)
+	{
+		for(size_t i = 0;i < antigenAgents.size();i ++){
+			for(int j = 0;j < antigencount;j ++){
+				WordAgent ag = antigenAgents[i];
+				ag.getWordInfo().setNum(j);
+				simu->addWordAgent(ag);//抗原词主体加到模拟器里面
+			}
+		}
+	}
 
+	Antigens.clear();
 
+	return true;
 
-
+}
 
 
 
@@ -258,11 +353,7 @@ bool Trainer::_buildAntigen(const Sentence & sen,int child,const std::string & w
 	return true;
 }
 
-bool Trainer::_addAntigenToSimulator(const Sentence & sen, const std::vector<int> & fa)
-{
 
-	return true;
-}
 
 bool Trainer::_addAntigen()
 {
