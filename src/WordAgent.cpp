@@ -73,10 +73,19 @@ int WordAgent::getLifetime(){
 
 void WordAgent::antigenWeaken(){
 	lifetime --;
+	if(lifetime < 0){
+		setActiveLevel(0);
+	}
 }
 
 void WordAgent::setActiveLevel(int activelevel){
 	this->activeLevel = activelevel;
+	if(activelevel > 0){
+		int lifetime = RunParameter::instance.getParameter("ANTIGEN_LIFETIME").getIntValue();
+		setLifetime(lifetime);
+	}else{
+		setLifetime(0);
+	}
 }
 int WordAgent::getActiveLevel(){
 	return activeLevel;
@@ -88,7 +97,9 @@ bool WordAgent::hasActivation(){
 	return activeLevel > 0;
 }
 
-
+void WordAgent::addBehavior(int behavior){
+	orders.push(behavior);
+}
 /**
  * 免疫机制的核心部分
  */
@@ -112,7 +123,8 @@ bool WordAgent::runImmune()
                                 interact();
                                 break;
                         case MUTATING:
-                                mutate();
+//                                mutate();
+								newMutate();
                                 break;
                         case SELECTING:
                                 select();
@@ -568,6 +580,73 @@ bool WordAgent::die()
         }
 	return false;
 }
+
+//add by yangjinfeng
+set<int>& WordAgent::getIdiotopeDependentFeature(){
+	return idiotopeDependentFeature;
+}
+//add by yangjinfeng
+set<int>& WordAgent::getParatopeParentFeature(){
+	return paratopeParentFeature;
+}
+
+
+//add by yangjinfeng
+double WordAgent::calAffinity(WordAgent& agent){
+	vector<int> matchedFeature;
+	matchFeatureRecptor(agent,matchedFeature);
+	return simu->model->calAffinity(matchedFeature);
+}
+//add by yangjinfeng
+double WordAgent::calAffinity(vector<int>& matchedFeature){
+	return simu->model->calAffinity(matchedFeature);
+}
+/**
+ * 当前主体的paratope和参数主体的idiotope匹配
+ */
+void WordAgent::matchFeatureRecptor(WordAgent& agent,vector<int>& matchedFeature){
+	set<int>::iterator it = agent.getIdiotopeDependentFeature().begin();
+	set<int>& paratope = this->getParatopeParentFeature();
+	for(;it != agent.getIdiotopeDependentFeature().end();it ++){
+		if(paratope.find(*it) != paratope.end()){
+			matchedFeature.push_back(*it);
+		}
+	}
+}
+
+/**
+ * 当前主体的paratope和参数主体的idiotope匹配
+ */
+void WordAgent::setMatchedFeatureRecptor(vector<int>& matchedFeature){
+	matchedparatopeFeature.clear();
+	for(size_t i = 0;i < matchedFeature.size();i ++){
+		matchedparatopeFeature[matchedFeature[i]] = vector<double>();
+	}
+}
+
+void WordAgent::newMutate(){
+
+	double f = 1.0;//待计算
+	double affinity = 1.0;
+	double alpha = 1.0 / (RunParameter::instance.getParameter("BETA").getIntValue() * 1.0);
+	alpha = alpha * exp(-1 * f) * exp(-1 * affinity);
+
+	int k = RunParameter::instance.getParameter("K").getIntValue();
+	double mutatePro = RunParameter::instance.getParameter("MUTATEPRO").getDoubleValue();
+	for(int i = 0;i < k;i ++){
+		for(map<int,vector<double> >::iterator it = matchedparatopeFeature.begin();it != matchedparatopeFeature.end();it ++){
+			double mutateDelta = 0;
+			if(Tools::uniformRand() < mutatePro){//如果符合突变的几率
+				double weight = simu->model->getSingleFeatureWeight(it->first);
+				double finalalpha = alpha *  exp(-1 * weight);
+				mutateDelta = finalalpha * Tools::normalRand2();
+			}
+			it->second.push_back(mutateDelta);
+		}
+	}
+
+}
+
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -1645,24 +1724,24 @@ double WordAgent::calAffinity( std::map<int,double> & bRec, int & matchSize)
 
 void    WordAgent::mapStatusToBehavior()
 {
-        while(orders.size())
-        {
-                orders.pop();
-        }
-        //cout<<"size "<<orders.size()<<" ";
-        if(category == ANTIGEN)
+	while(orders.size())
+	{
+		orders.pop();
+	}
+	//cout<<"size "<<orders.size()<<" ";
+	if(category == ANTIGEN)
 	{
 		/*selecting behavior according to status of antigen*/
 		switch(status)
 		{
-			case ACTIVE:
-				orders.push(MOVING);
-				break;
-			case DIE:
-				orders.push(DYING);
-				break;
-			default:
-				assert(0);
+		case ACTIVE:
+			orders.push(MOVING);
+			break;
+		case DIE:
+			orders.push(DYING);
+			break;
+		default:
+			assert(0);
 		}
 	}
 	else
@@ -1670,26 +1749,26 @@ void    WordAgent::mapStatusToBehavior()
 		/*selecting behavior according to status of B cell*/
 		switch(status)
 		{
-			case ACTIVE:
-                                orders.push(MOVING);
-				break;
-			case MATCH:
-				orders.push(MUTATING);
-				break;
-			case MUTATE:
-				orders.push(SELECTING);
-				break;
-			case MATURE:
-				orders.push(CLONING);
-				break;
-			case DIE:
-				orders.push(DYING);
-				break;
-                        case REGULATE:
-				orders.push(REGULATING);
-				break;
-			default:
-				assert(0);
+		case ACTIVE:
+			orders.push(MOVING);
+			break;
+		case MATCH:
+			orders.push(MUTATING);
+			break;
+		case MUTATE:
+			orders.push(SELECTING);
+			break;
+		case MATURE:
+			orders.push(CLONING);
+			break;
+		case DIE:
+			orders.push(DYING);
+			break;
+		case REGULATE:
+			orders.push(REGULATING);
+			break;
+		default:
+			assert(0);
 		}
 	}
 }

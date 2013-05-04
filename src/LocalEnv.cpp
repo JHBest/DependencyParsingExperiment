@@ -7,6 +7,8 @@
 
 #include "LocalEnv.h"
 #include "Parameter.hpp"
+#include "Logger.h"
+#include "RunParameter.h"
 
 LocalEnv::LocalEnv() {
 	// TODO Auto-generated constructor stub
@@ -44,34 +46,92 @@ void LocalEnv::getAllAgentIDs(vector<string>& ids){
  * 交互之后，突变、选择一起完成
  */
 void LocalEnv::interact(WordAgent& wordAgent){
+	Logger::logger<<"词主体在局部环境交互"<<"\n";
 	if(wordAgent.getCategory() == BCELL){
-		if(wordAgent.hasActivation()){//有激活值，既可以和抗原反应，也可以和B细胞反应
-			double maxaffinity = 0;
-			map<string,WordAgent>::iterator it = localunit.begin();
-			WordAgent& maxaffinityagent = it->second;
-			for(;it != localunit.end();it ++){
-				WordAgent& agent = it->second;
-				if(agent.getCategory() == BCELL){
+		double maxaffinity = 0;
+		map<string,WordAgent>::iterator it = localunit.begin();
+		WordAgent& maxAffinityAgent = it->second;
+		for(;it != localunit.end();it ++){
+			WordAgent& agent = it->second;
+			if( agent.getCategory() == BCELL && agent.getStatus() == ACTIVE){//是B细胞
+				if(wordAgent.hasActivation()){//有激活值，既可以和抗原反应，也可以和B细胞反应
 					//如果agent是wordAgent的父节点
 					if(wordAgent.getWordInfo().hasParent(agent.getWordInfo())){
-//						doubel aff =
+						double aff = agent.calAffinity(wordAgent);//wordAgent作为抗原，agent作为B细胞
+						if(aff > maxaffinity){
+							maxaffinity = aff;
+							maxAffinityAgent = agent;
+						}
 					}
-
-				}else if(agent.getCategory() == ANTIGEN){
-
 				}
-			}
-		}else{//没有激活值，只能和抗原反应
-			for(map<string,WordAgent>::iterator it = localunit.begin();it != localunit.end();it ++){
-				WordAgent& agent = it->second;
-				if(agent.getCategory() == ANTIGEN){
-
+			}else{//是抗原
+				if(agent.getStatus() == ACTIVE){
+					vector<int> matchedFeature;
+					wordAgent.matchFeatureRecptor(agent,matchedFeature);
+					if(matchedFeature.size() == agent.getIdiotopeDependentFeature().size()){//若成立，表示B细胞的paratope完全包含抗原的idiotope
+						double aff = wordAgent.calAffinity(matchedFeature);
+						if(aff > maxaffinity){
+							maxaffinity = aff;
+							maxAffinityAgent = agent;
+						}
+					}
 				}
-			}
 
+			}
 		}
 
-	}else if(wordAgent.getCategory() == ANTIGEN){
+		if(maxaffinity > 0){
+			vector<int> matchedFeature;
+			if(maxAffinityAgent.getCategory() == BCELL){//wordAgent作为抗原
+				maxAffinityAgent.matchFeatureRecptor(wordAgent,matchedFeature);
+				maxAffinityAgent.setMatchedFeatureRecptor(matchedFeature);
+				maxAffinityAgent.setStatus(MATCH);
+				maxAffinityAgent.mapStatusToBehavior();
+				maxAffinityAgent.setActiveLevel(wordAgent.getActiveLevel() - 1);
 
+				wordAgent.setActiveLevel(0);
+				wordAgent.setStatus(ACTIVE);
+				wordAgent.mapStatusToBehavior();
+			}else{
+				wordAgent.matchFeatureRecptor(maxAffinityAgent,matchedFeature);
+				wordAgent.setMatchedFeatureRecptor(matchedFeature);
+				wordAgent.setStatus(MATCH);
+				wordAgent.mapStatusToBehavior();
+
+				maxAffinityAgent.setStatus(DIE);
+				maxAffinityAgent.mapStatusToBehavior();
+			}
+		}
+
+	}else if(wordAgent.getCategory() == ANTIGEN){//如果主体是抗原
+		double maxaffinity = 0;
+		map<string,WordAgent>::iterator it = localunit.begin();
+		WordAgent& maxAffinityAgent = it->second;
+		for(;it != localunit.end();it ++){
+			WordAgent& agent = it->second;
+			if(agent.getCategory() == BCELL && agent.getStatus() == ACTIVE){
+				vector<int> matchedFeature;
+				agent.matchFeatureRecptor(wordAgent,matchedFeature);
+				if(matchedFeature.size() == wordAgent.getIdiotopeDependentFeature().size()){//若成立，表示B细胞的paratope完全包含抗原的idiotope
+					double aff = wordAgent.calAffinity(matchedFeature);
+					if(aff > maxaffinity){
+						maxaffinity = aff;
+						maxAffinityAgent = agent;
+					}
+				}
+
+			}
+		}
+		if(maxaffinity > 0){
+			vector<int> matchedFeature;
+			maxAffinityAgent.matchFeatureRecptor(wordAgent,matchedFeature);
+			maxAffinityAgent.setMatchedFeatureRecptor(matchedFeature);
+			maxAffinityAgent.setStatus(MATCH);
+			maxAffinityAgent.setActiveLevel(RunParameter::instance.getParameter("K").getIntValue());
+			maxAffinityAgent.mapStatusToBehavior();
+
+			wordAgent.setStatus(DIE);
+			wordAgent.mapStatusToBehavior();
+		}
 	}
 }

@@ -1,6 +1,8 @@
 #include "Model.hpp"
 #include <iostream>
 #include <algorithm>
+#include "RunParameter.h"
+#include "Tools.h"
 
 Model::Model()
 {
@@ -12,6 +14,41 @@ Model::~Model()
 {
         f.close();
 }
+
+//yangjinfeng 初始化特征权重，有待修改
+int Model::initFeatureWeight()
+{
+	fWeight.resize((int)fMap.size());
+	double alpha = 1.0 / (RunParameter::instance.getParameter("BETA").getIntValue() * 1.0);
+	for(size_t i = 0; i < fWeight.size(); i++)
+	{
+	        fWeight[i] = alpha * Tools::normalRand2();
+     }
+	return (int)fWeight.size();
+}
+
+/**
+ * add by yangjinfeng
+ */
+double Model::calAffinity(vector<int>& matchedFeature){
+	double affinity = 0;
+	for(size_t i = 0;i < matchedFeature.size();i ++){
+		affinity = affinity + fWeight[matchedFeature[i]];
+	}
+	return affinity;
+}
+
+double Model::getSingleFeatureWeight(int featureID){
+	return fWeight[featureID];
+}
+
+
+////////////////////////////////////
+
+
+
+
+
 double Model::wordPairWeight(const Sentence & sen, int senID,int p, int c)
 {
 
@@ -188,17 +225,7 @@ bool Model::getAllFeatures(const Sentence & sen, std::vector<std::vector<std::st
     return true;
 }
 
-//yangjinfeng 初始化特征权重，有待修改
-int Model::initFeatureWeight()
-{
-	fWeight.resize((int)fMap.size());
-	double alpha = 1.0 / (RunParameter::instance.getParameter("BETA").getIntValue() * 1.0);
-	for(size_t i = 0; i < fWeight.size(); i++)
-	{
-	        fWeight[i] = alpha * Tools::normalRand2();
-     }
-	return (int)fWeight.size();
-}
+
 
 vector<double> Model::getFeatureWeight()
 {

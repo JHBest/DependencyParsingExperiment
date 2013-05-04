@@ -145,6 +145,7 @@ public:
     	return false;
     }
 
+//srand((unsigned) time(NULL));
     static double normalRand(){
     	static double V1, V2, S;
     	static int phase = 0;
@@ -178,6 +179,10 @@ public:
     		}
     	}
     	return result;
+    }
+
+    static double uniformRand(){
+	    return (rand()%1000)/1000.0;
     }
 };
 

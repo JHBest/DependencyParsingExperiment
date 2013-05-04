@@ -9,11 +9,13 @@
 #include "Evaluation.hpp"
 #include "WordInfo.h"
 #include "LocalEnv.h"
+#include "Model.hpp"
 
 class Environment;
 class Evaluation;
 class WordAgent;
 class LocalEnv;
+class Model;
 
 class Simulator{
 private:
@@ -33,7 +35,10 @@ private:
 	std::vector<double> tmpFW;
 public:
     Evaluation * eva;
-	Simulator(Environment * environment,Evaluation * evaluation);
+    //add by yangjinfeng
+    Model * model;
+    //modified by yangjinfeng
+	Simulator(Environment * environment,Evaluation * evaluation,Model * model);
 
 //	bool Simulator::addBCellWordAgent(WordAgent & pWordAgent)
 

@@ -33,7 +33,8 @@ private:
 	int activeLevel;
 	//相同B细胞的序号
 	int num;
-
+	//add by yangjinfeng 记录匹配的paratope受体,突变发生在匹配的受体上，可产生多组突变
+	map<int,vector<double> > matchedparatopeFeature;
 
     int AgentID;
 	int ID;
@@ -99,6 +100,11 @@ public:
 	void addIdiotopeDependentFeature(const vector<int> & feature);
 	//add by yangjinfeng
 	void addParatopeParentFeature(const vector<int> & feature);
+	//add by yangjinfeng
+	set<int>& getIdiotopeDependentFeature();
+	//add by yangjinfeng
+	set<int>& getParatopeParentFeature();
+
 
 	//add by yangjinfeng
 	void setLifetime(int lifetime);
@@ -116,6 +122,18 @@ public:
 	bool hasActivation();
 	//add by yangjinfeng
 	bool runImmune();
+	//add by yangjinfeng
+	double calAffinity(WordAgent& agent);
+	//add by yangjinfeng
+	double calAffinity(vector<int>& matchedFeature);
+	//add by yangjinfeng
+	void matchFeatureRecptor(WordAgent& agent,vector<int>& matchedFeature);
+	//add by yangjinfeng
+	void setMatchedFeatureRecptor(vector<int>& matchedFeature);
+	//add by yangjinfeng
+	void newMutate();
+	//add by yangjinfeng
+	void addBehavior(int behavior);
 
 	bool run();
 
@@ -136,6 +154,7 @@ public:
 
 	/*operation on status*/
 	int     getStatus();
+	//set status modified by yangjinfeng
 	void    setStatus(int s);
 
 	/*getting affinity*/

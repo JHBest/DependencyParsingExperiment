@@ -35,6 +35,10 @@ public:
 	bool getFeatures(const Sentence & sen, std::vector<std::vector<std::string> > & sens,std::vector<int> & fa);
 	bool getAllFeatures(const Sentence & sen, std::vector<std::vector<std::string> > & sens, int senID);
 	int initFeatureWeight();
+	//add by yangjinfeng
+	double calAffinity(vector<int>& matchedFeature);
+	double getSingleFeatureWeight(int featureID);
+
 	std::vector<double> getFeatureWeight();
 	bool setFeatureWeight(std::vector<double> & newWeight);
 	bool updateFeatureWeight(std::map<int, double> & newFea);

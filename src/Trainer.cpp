@@ -12,7 +12,7 @@ using namespace std;
 Trainer::Trainer(Model * pm, Evaluation * eva) : pModel(pm)
 {
 	pEnv = new Environment(ROWS, COLS,eva,pm);
-	simu = new Simulator(pEnv,eva);
+	simu = new Simulator(pEnv,eva,pm);
 	pEva = eva;
 	f.open("./result/mid",ios::out);
 	vSen.clear();
@@ -185,12 +185,14 @@ bool Trainer::addAntigenToSimulator()
 	Logger::logger<<StrHead::header + "add antigen to simulator\n";
 	int antigencount = RunParameter::instance.getParameter("ANTIGEN_COUNT").getIntValue();
 
+	int lifetime = RunParameter::instance.getParameter("ANTIGEN_LIFETIME").getIntValue();
 	if(antigenAgents.size() > 0)
 	{
 		for(size_t i = 0;i < antigenAgents.size();i ++){
 			for(int j = 0;j < antigencount;j ++){
 				WordAgent ag = antigenAgents[i];
 				ag.setNum(j);
+				ag.setLifetime(lifetime);
 				simu->addWordAgent(ag);//抗原词主体加到模拟器里面
 			}
 		}

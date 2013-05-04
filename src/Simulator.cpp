@@ -7,7 +7,7 @@
 
 using namespace std;
 
-Simulator::Simulator(Environment * environment,Evaluation * evaluation)
+Simulator::Simulator(Environment * environment,Evaluation * evaluation,Model * model)
 {
 	rows = ROWS;
 	cols = COLS;
@@ -17,6 +17,7 @@ Simulator::Simulator(Environment * environment,Evaluation * evaluation)
 	resetAgents();
 	agNum = 0;
 	eva = evaluation;
+	this->model = model;
 
 }
 bool Simulator::resetAgents()
@@ -60,11 +61,18 @@ void Simulator::moveAgent(WordAgent& agent,std::pair<int, int>& fromPos,std::pai
 	if(agent.getCategory() == ANTIGEN){
 		agent.antigenWeaken();
 		if(agent.getLifetime() < 0){
+//			wordAgentGrid[fromIndex].removeAgent(agent);
+			agent.setStatus(DIE);
+		}else{
+			wordAgentGrid[toIndex].addAgent(agent);
 			wordAgentGrid[fromIndex].removeAgent(agent);
 		}
 	}else{
 		wordAgentGrid[toIndex].addAgent(agent);
 		wordAgentGrid[fromIndex].removeAgent(agent);
+		if(agent.hasActivation()){
+			agent.antigenWeaken();
+		}
 	}
 }
 
