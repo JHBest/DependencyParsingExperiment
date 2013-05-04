@@ -168,6 +168,17 @@ public:
 
     	return X;
     }
+
+    static double normalRand2(){
+    	double result = 0;
+    	while(true){
+    		result = fabs(normalRand());
+    		if(result < 1){
+    			break;
+    		}
+    	}
+    	return result;
+    }
 };
 
 #endif /* TOOLS_H_ */

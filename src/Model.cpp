@@ -1,7 +1,6 @@
 #include "Model.hpp"
 #include <iostream>
 #include <algorithm>
-#include <stdlib.h>
 
 Model::Model()
 {
@@ -196,7 +195,7 @@ int Model::initFeatureWeight()
 	double alpha = 1.0 / (RunParameter::instance.getParameter("BETA").getIntValue() * 1.0);
 	for(size_t i = 0; i < fWeight.size(); i++)
 	{
-	        fWeight[i] = alpha * abs( Tools::normalRand() );
+	        fWeight[i] = alpha * Tools::normalRand2();
      }
 	return (int)fWeight.size();
 }
