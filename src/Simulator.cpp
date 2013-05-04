@@ -51,15 +51,20 @@ bool Simulator::addWordAgent(WordAgent & pWordAgent)
 	return true;
 }
 
-void Simulator::moveAgent(WordAgent& agent,int fromPos,int toPos){
+/**
+ * 如果抗原生命期已结束，就自行消亡
+ */
+void Simulator::moveAgent(WordAgent& agent,std::pair<int, int>& fromPos,std::pair<int, int>& toPos){
+	int fromIndex = _calcSub(fromPos);
+	int toIndex = _calcSub(toPos);
 	if(agent.getCategory() == ANTIGEN){
 		agent.antigenWeaken();
 		if(agent.getLifetime() < 0){
-			wordAgentGrid[fromPos].removeAgent(agent);
+			wordAgentGrid[fromIndex].removeAgent(agent);
 		}
 	}else{
-		wordAgentGrid[toPos].addAgent(agent);
-		wordAgentGrid[fromPos].removeAgent(agent);
+		wordAgentGrid[toIndex].addAgent(agent);
+		wordAgentGrid[fromIndex].removeAgent(agent);
 	}
 }
 

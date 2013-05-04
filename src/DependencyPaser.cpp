@@ -46,7 +46,7 @@ bool DependencyPaser::train(const char * file){
 
 
 	cout<<"Online learning...";
-	_readFileTrain(file);//¶ÁÈ¡ÒÀ´æÊ÷¿â£¬Öð¾äÑµÁ·
+	trainFromFile(file);//¶ÁÈ¡ÒÀ´æÊ÷¿â£¬Öð¾äÑµÁ·
 	cout<<"Online learning finished!"<<endl;
 
 	return true;

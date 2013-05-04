@@ -6,15 +6,17 @@
 #include <cstdlib>
 #include <math.h>
 #include <iomanip>
-
+#include "Tools.h"
 #include <algorithm>
-
+#include "RunParameter.h"
 #include "Parameter.hpp"
 #include "WordAgent.hpp"
 
 using namespace std;
 
+WordAgent::WordAgent(){
 
+}
 
 //add by yangjinfeng
 WordAgent::WordAgent(WordInfo& wordinfo,
@@ -371,27 +373,27 @@ bool WordAgent::select()
 	return true;
 }
 
-bool WordAgent::_calFeedback(WordAgent & wordAgent)
-{
-	/*calculating feedback based on mutated receptors*/
-	feedback = env->gainFeedback(&wordAgent,wordAgent.getSentence(),wordAgent.getFather());
-	if(feedback.first > 0)
-	{
-	       // cout<<"**ag number is "<<env->getAntigenNum()<<endl;
-	        //env->setFeedback(true);
-	        if((wordAgent.getSentenceID() == env->getSentenceID()) && (feedback.second > ACCURACYTHRESHOLD))
-	        {
-                        env->setFeedbackFlag(true);
-
-	        }
-	        //cout<<"sentence "<<wordAgent.getSentenceID()<<" positive feedback by memory or antibody! ";
-
-
-                return true;
-	}
-	//cout<<"negative feedback ";
-	return false;
-}
+//bool WordAgent::_calFeedback(WordAgent & wordAgent)
+//{
+//	/*calculating feedback based on mutated receptors*/
+//	feedback = env->gainFeedback(&wordAgent,wordAgent.getSentence(),wordAgent.getFather());
+//	if(feedback.first > 0)
+//	{
+//	       // cout<<"**ag number is "<<env->getAntigenNum()<<endl;
+//	        //env->setFeedback(true);
+//	        if((wordAgent.getSentenceID() == env->getSentenceID()) && (feedback.second > ACCURACYTHRESHOLD))
+//	        {
+//                        env->setFeedbackFlag(true);
+//
+//	        }
+//	        //cout<<"sentence "<<wordAgent.getSentenceID()<<" positive feedback by memory or antibody! ";
+//
+//
+//                return true;
+//	}
+//	//cout<<"negative feedback ";
+//	return false;
+//}
 
 bool WordAgent::clone()
 {
@@ -1445,7 +1447,7 @@ void WordAgent::_mapStatusToBehavior()
 	}
 }
 
-void WordAgent::setPosition(std::pair<int,int> p)
+void WordAgent::setPosition(const std::pair<int,int>& p)
 {
         position.first = p.first;
         position.second = p.second;

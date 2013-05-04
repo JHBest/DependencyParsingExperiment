@@ -14,7 +14,9 @@ using namespace std;
 
 class Model{
 private:
+	//yangjinfeng key是特征字符串，value是特征的编号
 	map<std::string, int> fMap;
+	//yangjinfeng 特征编号作为vector下标的值就是特征的权重
 	std::vector<double> fWeight;
 	FeatureTemplate ft;
 	int fNumber;

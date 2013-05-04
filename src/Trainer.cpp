@@ -1,6 +1,6 @@
 #include "Trainer.hpp"
 #include "Parameter.hpp"
-
+#include "RunParameter.h"
 #include <iostream>
 #include <vector>
 #include <fstream>
@@ -95,13 +95,14 @@ void Trainer::reduceWordFreq(){
 
 void Trainer::distributeBCells(){
 	Logger::logger<<StrHead::header + "distribute B cells randomly according B cell frequncy" +"\n";
-	Logger::logger<<StrHead::header + "number of B cell type is "+BCellAgents.size() +"\n";
+	int count = BCellAgents.size();
+	Logger::logger<<StrHead::header + "number of B cell type is "+count +"\n";
 	int bcellcount = 0;
 	for(size_t i = 0; i < BCellAgents.size(); i++)
 	{
 
 		int wordfreq = BCellAgents[i].getWordInfo().getFreq();
-		for(size_t j = 0; j < wordfreq; j++){//每个B细胞加入的个数为wordfreq
+		for(int j = 0; j < wordfreq; j++){//每个B细胞加入的个数为wordfreq
 			WordAgent bagent = BCellAgents[i];//复制一个
 			bagent.setNum(j);
 			simu->addWordAgent(bagent);
@@ -112,7 +113,6 @@ void Trainer::distributeBCells(){
 //	BCells.clear();
 	Logger::logger<<StrHead::header + "number of B cell is "+bcellcount +"\n";
 	Logger::logger<<StrHead::header + "distribution of b cells finished"+"\n";
-	return true;
 }
 
 
@@ -169,7 +169,7 @@ bool Trainer::injectAntigen(const Sentence & sen, const std::vector<int> & fa)
  */
 bool Trainer::buildAntigen(const Sentence & sen,int child,const int parent)
 {
-	WordInfo wi(sen[i].first,sen[i].second);
+	WordInfo wi(sen[child].first,sen[child].second);
 	WordAgent antigenagent(wi,pEnv,simu,pEnv->getRandomPosition(), ANTIGEN,1);
 	vector<int> features;
 	pModel->getFeatureIDVec(sen, parent, child, features);

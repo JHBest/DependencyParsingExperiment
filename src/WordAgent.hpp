@@ -6,6 +6,7 @@
 #include <vector>
 #include <queue>
 #include <set>
+#include <pair.h>
 
 #include "Environment.hpp"
 #include "Simulator.hpp"
@@ -30,6 +31,8 @@ private:
 	int lifetime;
 	//仅用于B细胞
 	int activeLevel;
+	//相同B细胞的序号
+	int num;
 
 
     int AgentID;
@@ -66,6 +69,7 @@ private:
 
 	bool isMem;
 public:
+	WordAgent();
 	WordAgent(int id,
 			Environment * environment,
 			Simulator * simulator,

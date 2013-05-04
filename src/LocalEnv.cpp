@@ -18,11 +18,11 @@ LocalEnv::~LocalEnv() {
 }
 
 void LocalEnv::addAgent(WordAgent& wordAgent){
-	localunit[wordAgent.getWordInfo().toStringID()] = wordAgent;
+	localunit[wordAgent.toStringID()] = wordAgent;
 }
 
 void LocalEnv::removeAgent(WordAgent& wordAgent){
-	localunit.erase(wordAgent.getWordInfo().toStringID());
+	localunit.erase(wordAgent.toStringID());
 }
 
 int LocalEnv::getAgentCount(){
@@ -40,19 +40,34 @@ void LocalEnv::getAllAgentIDs(vector<string>& ids){
 	}
 }
 
-
+/**
+ * 交互之后，突变、选择一起完成
+ */
 void LocalEnv::interact(WordAgent& wordAgent){
 	if(wordAgent.getCategory() == BCELL){
 		if(wordAgent.hasActivation()){//有激活值，既可以和抗原反应，也可以和B细胞反应
+			double maxaffinity = 0;
+			map<string,WordAgent>::iterator it = localunit.begin();
+			WordAgent& maxaffinityagent = it->second;
+			for(;it != localunit.end();it ++){
+				WordAgent& agent = it->second;
+				if(agent.getCategory() == BCELL){
+					//如果agent是wordAgent的父节点
+					if(wordAgent.getWordInfo().hasParent(agent.getWordInfo())){
+//						doubel aff =
+					}
 
-			for(map<string,WordAgent>::iterator it = localunit.begin();it != localunit.end();it ++){
-				WordAgent& bcell = it->second;
+				}else if(agent.getCategory() == ANTIGEN){
 
-				if(bcell.getCategory() == BCELL){
-					wordAgent.getWordInfo().hasParent(bcell.getWordInfo());
 				}
 			}
-		}else{
+		}else{//没有激活值，只能和抗原反应
+			for(map<string,WordAgent>::iterator it = localunit.begin();it != localunit.end();it ++){
+				WordAgent& agent = it->second;
+				if(agent.getCategory() == ANTIGEN){
+
+				}
+			}
 
 		}
 

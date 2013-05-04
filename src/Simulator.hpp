@@ -13,6 +13,7 @@
 class Environment;
 class Evaluation;
 class WordAgent;
+class LocalEnv;
 
 class Simulator{
 private:
@@ -43,7 +44,7 @@ public:
 	//add by yangjinfeng
 	bool immuneResponse();
 	//add by yangjinfeng
-	void moveAgent(WordAgent& agent,int fromPos,int toPos);
+	void moveAgent(WordAgent& agent,std::pair<int, int>& fromPos,std::pair<int, int>& toPos);
 	//add by yangjinfeng
 	bool interactLocal(WordAgent & wa) ;
 
