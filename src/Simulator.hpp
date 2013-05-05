@@ -17,6 +17,9 @@ class WordAgent;
 class LocalEnv;
 class Model;
 
+/**
+ * 对免疫环境的模拟，模拟为一个大网格，主要表示细胞所处环境的数据结构，模拟免疫反应
+ */
 class Simulator{
 private:
 	Environment * env;
@@ -24,6 +27,7 @@ private:
 	int times;
 	//add by yangjifneng,wordAgentGrid是一个vector，模拟网格，每一个网格存放一个map
 	std::vector<LocalEnv> wordAgentGrid;
+	SentenceDependency sentenceDependency;
 //	std::vector<std::vector<WordAgent> > wordAgentGrid;
 
 	//vWordAgents是一个vector，模拟网格，每一个网格存放一个map
@@ -48,6 +52,10 @@ public:
 
 	//add by yangjinfeng
 	bool immuneResponse();
+//	void setSentenceAndDependency(Sentence& sen,vector<int>& parent);
+	SentenceDependency& getSentenceDependency(){
+		return sentenceDependency;
+	}
 	//add by yangjinfeng
 	void moveAgent(WordAgent& agent,std::pair<int, int>& fromPos,std::pair<int, int>& toPos);
 	//add by yangjinfeng

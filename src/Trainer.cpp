@@ -134,7 +134,8 @@ bool Trainer::trainBySentence(const Sentence & sen, const vector<int> & fa)
 	injectAntigen(sen, fa);//ע�뿹ԭ
 
 	Logger::logger<<StrHead::header + "after antigen injection, immune response come to start\n";
-	if(simu->run(sen,fa))
+	simu->getSentenceDependency().setSentenceAndDependency(sen,fa);
+	if(simu->immuneResponse())
 	{
 		vector<double> fw = pModel->getFeatureWeight();
 		pModel->accumulateFeatureWeight(fw);

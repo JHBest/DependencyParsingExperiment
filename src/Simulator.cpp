@@ -76,6 +76,10 @@ void Simulator::moveAgent(WordAgent& agent,std::pair<int, int>& fromPos,std::pai
 	}
 }
 
+//void Simulator::setSentenceAndDependency(Sentence& sen,vector<int>& parent){
+//	sentenceDependency.setSentenceAndDependency(sen,parent);
+//}
+
 
 
 bool Simulator::immuneResponse(){

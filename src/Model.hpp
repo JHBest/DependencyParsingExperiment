@@ -12,6 +12,9 @@
 using namespace std;
 //using namespace __gnu_cxx;
 
+/**
+ * 该类主要是封装特征、特征权重权重以及权重相关的操作
+ */
 class Model{
 private:
 	//yangjinfeng key是特征字符串，value是特征的编号

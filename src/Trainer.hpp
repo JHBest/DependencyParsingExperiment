@@ -9,7 +9,9 @@
 #include "Simulator.hpp"
 #include "WordSimpleInfo.h"
 #include "WordInfo.h"
-
+/**
+ * 把Model、Simulator等组合起来，实现完整的词主体免疫反应
+ */
 class Trainer{
 private:
 	Model * pModel;

@@ -92,6 +92,7 @@ void LocalEnv::interact(WordAgent& wordAgent){
 				maxAffinityAgent.matchFeatureRecptor(wordAgent,matchedFeature);
 				maxAffinityAgent.setMatchedFeatureRecptor(matchedFeature);
 				maxAffinityAgent.setStatus(MATCH);
+				maxAffinityAgent.setCurrentAffinity(maxaffinity);
 				maxAffinityAgent.mapStatusToBehavior();
 				maxAffinityAgent.setActiveLevel(wordAgent.getActiveLevel() - 1);
 
@@ -101,6 +102,7 @@ void LocalEnv::interact(WordAgent& wordAgent){
 			}else{
 				wordAgent.matchFeatureRecptor(maxAffinityAgent,matchedFeature);
 				wordAgent.setMatchedFeatureRecptor(matchedFeature);
+				wordAgent.setCurrentAffinity(maxaffinity);
 				wordAgent.setStatus(MATCH);
 				wordAgent.mapStatusToBehavior();
 
@@ -132,6 +134,7 @@ void LocalEnv::interact(WordAgent& wordAgent){
 			vector<int> matchedFeature;
 			maxAffinityAgent.matchFeatureRecptor(wordAgent,matchedFeature);
 			maxAffinityAgent.setMatchedFeatureRecptor(matchedFeature);
+			maxAffinityAgent.setCurrentAffinity(maxaffinity);
 			maxAffinityAgent.setStatus(MATCH);
 			maxAffinityAgent.setActiveLevel(RunParameter::instance.getParameter("K").getIntValue());
 			maxAffinityAgent.mapStatusToBehavior();

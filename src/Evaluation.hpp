@@ -12,10 +12,10 @@ class WordAgent;
 
 class Evaluation{
 private:
-	Predictor * pPredictor;
 	Model * pModel;
 	fstream fout;
 public:
+	Predictor * pPredictor;
 	Evaluation(Predictor * pre, Model * mod);
 	~Evaluation();
 

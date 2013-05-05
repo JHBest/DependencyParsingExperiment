@@ -17,6 +17,9 @@
 using namespace std;
 
 class WordAgent;
+/**
+ * 表示网格的单元格，并模拟单元格内的交互反应
+ */
 class LocalEnv {
 public:
 	LocalEnv();

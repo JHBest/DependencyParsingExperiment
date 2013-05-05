@@ -35,6 +35,8 @@ private:
 	int num;
 	//add by yangjinfeng 记录匹配的paratope受体,突变发生在匹配的受体上，可产生多组突变
 	map<int,vector<double> > matchedparatopeFeature;
+	//add by yangjinfeng B细胞和抗原突变前的亲和度。B细胞识别抗原后，记录识别的亲和度。
+	double currentAffinity;
 
     int AgentID;
 	int ID;
@@ -134,7 +136,14 @@ public:
 	void newMutate();
 	//add by yangjinfeng
 	void addBehavior(int behavior);
-
+	//add by yangjinfeng
+	void setCurrentAffinity(double currentAffinity){
+		this->currentAffinity = currentAffinity;
+	}
+	//add by yangjinfeng
+	double getCurrentAffinity() const{
+		return this->currentAffinity;
+	}
 	bool run();
 
 	/*operation on id*/

@@ -626,8 +626,10 @@ void WordAgent::setMatchedFeatureRecptor(vector<int>& matchedFeature){
 
 void WordAgent::newMutate(){
 
-	double f = 1.0;//待计算
-	double affinity = 1.0;
+	//首先进行预测
+
+	double f = simu->getSentenceDependency().getSentencePrecision();//待计算
+	double affinity = getCurrentAffinity();
 	double alpha = 1.0 / (RunParameter::instance.getParameter("BETA").getIntValue() * 1.0);
 	alpha = alpha * exp(-1 * f) * exp(-1 * affinity);
 
