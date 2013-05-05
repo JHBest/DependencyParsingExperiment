@@ -44,6 +44,11 @@ void LocalEnv::getAllAgentIDs(vector<string>& ids){
 
 /**
  * 交互之后，突变、选择一起完成
+ * 交互过程如下：
+ * 如果当前主体是B细胞:B细胞可以和其他B细胞交互，也可以和抗原交互
+ * 		如果当前主体是B细胞，并且有激活值，则可以和其他B细胞交互，也可以和抗原交互
+ * 		如果没有激活值，则只能与抗原交互
+ * 如果当前主体是抗原，则只能和B细胞交互
  */
 void LocalEnv::interact(WordAgent& wordAgent){
 	Logger::logger<<"词主体在局部环境交互"<<"\n";
@@ -53,7 +58,10 @@ void LocalEnv::interact(WordAgent& wordAgent){
 		WordAgent& maxAffinityAgent = it->second;
 		for(;it != localunit.end();it ++){
 			WordAgent& agent = it->second;
-			if( agent.getCategory() == BCELL && agent.getStatus() == ACTIVE){//是B细胞
+			if(agent.getStatus() != ACTIVE){
+				continue;
+			}
+			if( agent.getCategory() == BCELL){//是B细胞
 				if(wordAgent.hasActivation()){//有激活值，既可以和抗原反应，也可以和B细胞反应
 					//如果agent是wordAgent的父节点
 					if(wordAgent.getWordInfo().hasParent(agent.getWordInfo())){
@@ -65,15 +73,13 @@ void LocalEnv::interact(WordAgent& wordAgent){
 					}
 				}
 			}else{//是抗原
-				if(agent.getStatus() == ACTIVE){
-					vector<int> matchedFeature;
-					wordAgent.matchFeatureRecptor(agent,matchedFeature);
-					if(matchedFeature.size() == agent.getIdiotopeDependentFeature().size()){//若成立，表示B细胞的paratope完全包含抗原的idiotope
-						double aff = wordAgent.calAffinity(matchedFeature);
-						if(aff > maxaffinity){
-							maxaffinity = aff;
-							maxAffinityAgent = agent;
-						}
+				vector<int> matchedFeature;
+				wordAgent.matchFeatureRecptor(agent,matchedFeature);
+				if(matchedFeature.size() == agent.getIdiotopeDependentFeature().size()){//若成立，表示B细胞的paratope完全包含抗原的idiotope
+					double aff = wordAgent.calAffinity(matchedFeature);
+					if(aff > maxaffinity){
+						maxaffinity = aff;
+						maxAffinityAgent = agent;
 					}
 				}
 

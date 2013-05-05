@@ -12,3 +12,7 @@ MIN_FREQ=5
 REDUCE_RATE=10
 #突变控制参数
 BETA=100
+#克隆的数量，也就是产生几组突变
+K=5
+#抗原最大生命期限
+ANTIGEN_LIFETIME=20
