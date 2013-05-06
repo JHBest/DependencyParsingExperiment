@@ -30,6 +30,7 @@ private:
 	//add by yangjifneng,wordAgentGrid是一个vector，模拟网格，每一个网格存放一个map
 	std::vector<LocalEnv> wordAgentGrid;
 	SentenceDependency sentenceDependency;
+	map<string,pair<int,int> > bcellPosition;
 //	std::vector<std::vector<WordAgent> > wordAgentGrid;
 
 	//vWordAgents是一个vector，模拟网格，每一个网格存放一个map
@@ -62,6 +63,9 @@ public:
 	void moveAgent(WordAgent& agent,std::pair<int, int>& fromPos,std::pair<int, int>& toPos);
 	//add by yangjinfeng
 	bool interactLocal(WordAgent & wa) ;
+    //add by yangjinfeng
+    void saveBCell();
+
 
 
 	bool deleteWordAgent(WordAgent & pWordAgent);
@@ -95,6 +99,8 @@ public:
         void _setAgNum(int num);
         void _updateAgNum();
 private:
+        //add by yangjinfeng
+        void loadBCell();
         bool resetInteratObjects();
         int _calcSub(const std::pair<int, int> & pos) const;
         bool _isSame(const std::vector<int> & s, const std::vector<int> & d);

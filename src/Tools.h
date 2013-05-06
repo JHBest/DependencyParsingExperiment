@@ -73,12 +73,13 @@ public:
 	}
 
     static bool fileExists(const char* filename){
-        fstream file(filename);
-        if(file){
-            file.close();
-            return true;
-        }
-        return false;
+//        fstream file(filename);
+//        if(file){
+//            file.close();
+//            return true;
+//        }
+//        return false;
+    	return access(filename,0) == 0;
 	}
 
 
@@ -184,6 +185,7 @@ public:
     static double uniformRand(){
 	    return (rand()%1000)/1000.0;
     }
+
 };
 
 #endif /* TOOLS_H_ */

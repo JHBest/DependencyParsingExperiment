@@ -11,7 +11,9 @@ using namespace std;
 
 Trainer::Trainer(Model * pm, Evaluation * eva) : pModel(pm)
 {
-	pEnv = new Environment(ROWS, COLS,eva,pm);
+	rows = RunParameter::instance.getParameter("ROWS").getIntValue();
+	cols = RunParameter::instance.getParameter("COLS").getIntValue();
+	pEnv = new Environment(rows, cols,eva,pm);
 	simu = new Simulator(pEnv,eva,pm);
 	pEva = eva;
 	f.open("./result/mid",ios::out);
@@ -28,7 +30,7 @@ Trainer::~Trainer()
 
 
 /**
- * add by yangjinfeng 从句子里构建B细胞词,并抽取特征
+ * add by yangjinfeng 从句子里构建B细胞词,并抽取特征,特征抽取完后保存
  */
 bool Trainer::initBCells(const Sentence & sen, const vector<int> & fa)
 {
@@ -37,6 +39,7 @@ bool Trainer::initBCells(const Sentence & sen, const vector<int> & fa)
 		int j = fa[i];
 		buildBCell(sen,i,j);
 	}
+	this->pModel->saveFeature();
 	return true;
 }
 
@@ -115,6 +118,9 @@ void Trainer::distributeBCells(){
 	Logger::logger<<StrHead::header + "distribution of b cells finished"+"\n";
 }
 
+void Trainer::saveBCells(){
+	simu->saveBCell();
+}
 
 
 /**
@@ -362,9 +368,9 @@ bool Trainer::_addAntigen()
 {
         vector<pair<int,int> > positions;
 
-        for(size_t i = 0; i < ROWS; i++)
+        for(size_t i = 0; i < rows; i++)
         {
-                for(size_t j = 0; j < COLS; j++)
+                for(size_t j = 0; j < cols; j++)
                 {
                         positions.push_back(make_pair(i,j));
                 }
@@ -420,7 +426,7 @@ bool Trainer::cloneAntigens()
         //cout<<"id "<<Antigens[l].getID()<<endl;
 	//for(size_t j = 0; j < 5; j++)
 	//{
-        for(size_t p = 1; p < ROWS * COLS; p++)
+        for(size_t p = 1; p < rows * cols; p++)
         {
                 //cout<<"id is "<<Antigens[l].getID()<<endl;
                 WordAgent wa(Antigens[l].getID(), pEnv,simu,Antigens[l].getPosition(), ANTIGEN,1);

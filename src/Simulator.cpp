@@ -6,13 +6,15 @@
 #include "Parameter.hpp"
 #include "StrHead.h"
 #include "Logger.h"
+#include "RunParameter.h"
 
 using namespace std;
 
 Simulator::Simulator(Environment * environment,Evaluation * evaluation,Model * model)
 {
-	rows = ROWS;
-	cols = COLS;
+
+	rows = RunParameter::instance.getParameter("ROWS").getIntValue();
+	cols = RunParameter::instance.getParameter("COLS").getIntValue();
 	agentId = 0;
 	env = environment;
 	times = 1;
@@ -20,6 +22,7 @@ Simulator::Simulator(Environment * environment,Evaluation * evaluation,Model * m
 	agNum = 0;
 	eva = evaluation;
 	this->model = model;
+	loadBCell();
 
 }
 bool Simulator::resetAgents()
@@ -33,9 +36,48 @@ bool Simulator::resetAgents()
 	return true;
 }
 
+void Simulator::loadBCell(){
+	string bcellfile = RunParameter::instance.getParameter("BCELL_FILE").getStringValue();
+	if(Tools::fileExists(bcellfile.c_str())){
+		ifstream fin(bcellfile.c_str());
+		string line;
+		while(getline(fin, line)){
+			istringstream sin(line);
+			string bcellid;
+			sin >> bcellid;
+			string row;
+			sin >> row;
+			string col;
+			sin >> col;
+			pair<int,int> position = make_pair(atoi(row.c_str()),atoi(col.c_str()));
+			bcellPosition[bcellid] = position;
+		}
+		fin.close();
+	}
+}
+
+
+void Simulator::saveBCell(){
+	string bcellfile = RunParameter::instance.getParameter("BCELL_FILE").getStringValue();
+	ofstream fout(bcellfile.c_str(), ios::out);
+	vector<string> agentIDs;
+	for(size_t i = 0; i < wordAgentGrid.size(); i++)//遍历每一个网格
+	{
+		agentIDs.clear();
+		wordAgentGrid[i].getAllAgentIDs(agentIDs);
+		for(size_t ii = 0;ii < agentIDs.size();ii ++)//遍历网格中map里的每一个主体
+		{
+			string positionInfo = wordAgentGrid[i].getWordAgent(agentIDs[ii]).toPosition();
+			fout<<positionInfo<<endl;
+		}
+	}
+	fout.close();
+
+}
 
 /**
  * modified by yangjinfeng
+ * 如果是B细胞，并且保存有B细胞位置，则不随机分配
  */
 bool Simulator::addWordAgent(WordAgent & pWordAgent)
 {
@@ -43,7 +85,17 @@ bool Simulator::addWordAgent(WordAgent & pWordAgent)
 	{
 		agNum++;
 	}
-	pair<int,int> pos = env->getRandomPosition();//网格中随机分配一个位置
+	bool randomPosition = true;
+	if(pWordAgent.getCategory() == BCELL && bcellPosition.size() > 0){
+		randomPosition = false;
+	}
+	pair<int,int> pos;
+	if(randomPosition){
+		pos = env->getRandomPosition();//网格中随机分配一个位置
+	}else{
+		pos = bcellPosition[pWordAgent.toStringID()];
+	}
+
 	pWordAgent.setPosition(pos);
 	//wordAgentGrid是一个vector，模拟网格，每一个网格存放一个map
 	int index = _calcSub(pWordAgent.getPosition());

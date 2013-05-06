@@ -3,17 +3,83 @@
 #include <algorithm>
 #include "RunParameter.h"
 #include "Tools.h"
+using namespace std;
 
 Model::Model()
 {
 	accFeatureWeight.resize(fWeight.size());
         sentenceFeature.clear();
         f.open("./result/fwid",ios::out);
+
+        loadFeatureAndWeight();
 }
 Model::~Model()
 {
         f.close();
 }
+/**
+ * 特征文件存储格式为：每行为一个特征，特征字符串+\t+特征编号
+ * 特征权重文件存储格式为:权重1\t权重2\t权重3\t……，
+ * 						顺序为特征编号的顺序
+ * 						所有特征权重占一行，不同行的特征权重对应于不同的学习的结果
+ */
+void Model::loadFeatureAndWeight(){
+	string featureFile = RunParameter::instance.getParameter("FEATURE_FILE").getStringValue();
+	if(Tools::fileExists(featureFile.c_str())){//如果特征文件存在，则特征权重文件也存在
+		ifstream fin(featureFile.c_str());
+		string line;
+		while(getline(fin, line)){
+			istringstream sin(line);
+			string featurename;
+			sin >> featurename;
+			string id;
+			sin >> id;
+			fMap[featurename] = atoi(id.c_str());
+		}
+		fin.close();
+	}
+	string weightFile = RunParameter::instance.getParameter("WEIGHT_FILE").getStringValue();
+	if(Tools::fileExists(weightFile.c_str())){
+		ifstream fin(weightFile.c_str());
+		string line;
+		string lastLine;
+		while(getline(fin, line)){
+			lastLine = line;
+		}
+		fin.close();
+		istringstream sin(lastLine);
+		string value;
+		int i = 0;
+		while(sin >> value){
+			fWeight[i] = atof(value.c_str());
+			i ++;
+		}
+	}
+}
+
+void Model::saveFeature(){
+	string featureFile = RunParameter::instance.getParameter("FEATURE_FILE").getStringValue();
+	if(!Tools::fileExists(featureFile.c_str())){//如果特征文件存在，则特征权重文件也存在
+		ofstream fout(featureFile.c_str(),ios::out);
+		for(map<string,int>::iterator it = fMap.begin();it != fMap.end();it ++){
+			fout<<it->first<<"\t"<<it->second<<endl;
+		}
+		fout.close();
+	}
+
+}
+void Model::saveWeight(){
+	string weightFile = RunParameter::instance.getParameter("WEIGHT_FILE").getStringValue();
+	ofstream fout(weightFile.c_str(), ios::out|ios::app);
+	for(vector<double>::iterator it = fWeight.begin();it != fWeight.end();it ++){
+		fout<<*it<<"\t";
+	}
+	fout<<endl;
+	fout.close();
+}
+
+
+
 
 //yangjinfeng 初始化特征权重，有待修改
 int Model::initFeatureWeight()
@@ -80,6 +146,7 @@ double Model::wordPairWeight(const Sentence & sen, int senID,int p, int c)
 	//return 0.0;
 }
 
+//modified by yangjinfeng
 double Model::wordPairWeight(const Sentence & sen,int p, int c)
 {
 	vector<string> featVec;

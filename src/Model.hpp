@@ -37,6 +37,9 @@ public:
     //add by yangjinfeng
     void updateWeightByDelta();
 
+    void saveFeature();
+    void saveWeight();
+
 	double wordPairWeight(const Sentence & sen, int senID,int p, int c);
 	double wordPairWeight(const Sentence & sen,int p, int c);
 	double sumFeatureWeight(const std::vector<std::string> & featVec);
@@ -61,6 +64,9 @@ public:
 	void setAccumulateFeatureSize(int size);
 private:
 	inline int _getFeatureID(const std::string & feat);
+
+	//add by yangjinfeng
+	void loadFeatureAndWeight();
 };
 
 #endif

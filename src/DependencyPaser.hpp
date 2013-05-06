@@ -33,6 +33,7 @@ public:
 	bool trainFile(const char * file);
 	double predict(const Sentence & sen, int senID,std::vector<int> & fa);
 	double predict(const Sentence & sen,std::vector<int> & fa);
+	bool predict(const char * testFile, const char * outFile);
 	bool predictFile(const char * testFile, const char * outFile);
 	bool predictFile(const char * testFile, const char * outFile, int Iter, int Num);
 	double evaluate(const char * resultFile, const char * evaluateFile);

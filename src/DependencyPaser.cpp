@@ -9,6 +9,9 @@
 
 #include "DependencyPaser.hpp"
 #include "Parameter.hpp"
+#include "Logger.h"
+#include "StrHead.h"
+#include "RunParameter.h"
 
 using namespace std;
 
@@ -40,15 +43,18 @@ bool DependencyPaser::saveModel(const char * file)
  * add by yangjinfeng
  */
 bool DependencyPaser::train(const char * file){
-	cout<<"Initilizing B cell Network...";
+	Logger::logger<<StrHead::header + "Initilizing B cell Network..." +"\n";
 	initBCell(file);
-	cout<<"Initilizing finished!"<<endl;
+	Logger::logger<<StrHead::header + "Initilizing finished!" +"\n";
 
 
-	cout<<"Online learning...";
+	Logger::logger<<StrHead::header + "Online learning..." +"\n";
 	trainFromFile(file);//读取依存树库，逐句训练
-	cout<<"Online learning finished!"<<endl;
+	Logger::logger<<StrHead::header + "Online learning finished!" +"\n";
 
+	Logger::logger<<StrHead::header + "saving b cells and feature weight" +"\n";
+	pTrainer->saveBCells();
+	pModel->saveWeight();
 	return true;
 
 }
@@ -103,9 +109,10 @@ bool DependencyPaser::trainFromFile(const char * file)
 	string line;
 	vector<vector<string> > senes;
 	pModel->initFeatureWeight();//初始化特征权重
-	for(size_t i = 0; i < LEARNTIMES; i++)//迭代次数
+	int learnTimes = RunParameter::instance.getParameter("LEARNTIMES").getIntValue();
+	for(int i = 0; i < learnTimes; i++)//迭代次数
 	{
-		cout<<"Learning "<<i+1<<" times"<<endl;
+		Logger::logger<<StrHead::header +"Learning "+(i+1)+ " times" +"\n";
 		ifstream fin(file);
 		//int num = 0;
 		pTrainer->initSentences();
@@ -126,12 +133,7 @@ bool DependencyPaser::trainFromFile(const char * file)
 				//逐句训练
 				pTrainer->trainBySentence(sen,  father);
 
-				/*save feature weights*/
-				//pTrainer->saveFeatureWeights();
 				senes.clear();
-				//num++;
-				//if(num > 10)
-				// break;
 			}
 			else{
 				vector<string> item;
@@ -145,13 +147,64 @@ bool DependencyPaser::trainFromFile(const char * file)
 		}
 		//cout<<"number of sentences is "<<num<<endl;
 		fin.close();
-		pTrainer->initSentenceID();
+//		pTrainer->initSentenceID();
 
 	}
+	return true;
+}
 
 
+bool DependencyPaser::predict(const char * testFile, const char * outFile)
+{
+	Logger::logger<<StrHead::header + "Predicting..." +"\n";
 
+	ifstream fin(testFile);
+	ofstream fout(outFile, ios::out|ios::app);
+	string line;
+	vector<vector<string> > senes;
 
+	int senNum = 0;
+	double sum  = 0.0;
+	while(getline(fin, line)){
+		if(line == ""){
+			vector<int> predictedFather;
+			Sentence sen;
+			sen.push_back(make_pair("ROOT", "ORG"));
+			for(size_t i = 0; i < senes.size(); i++){
+				sen.push_back(make_pair(senes[i][1], senes[i][3]));
+			}
+			predictedFather.resize(sen.size());
+			predict(sen,predictedFather);
+			int rightFather = 0;
+			for(size_t i = 0; i < senes.size(); i++){
+				if(predictedFather[i+1] == atoi(senes[i][6].c_str())){
+					rightFather++;
+				}
+			}
+
+			double acc = (double)rightFather/(double)senes.size();
+			sum += acc;
+			senNum++;
+
+			fout<<senNum<<","<<senes.size()<<","<<rightFather<<","<<acc<<endl;
+			senes.clear();
+
+		}
+		else{
+			vector<string> item;
+			string tmp;
+			istringstream sin(line);
+			while(sin >> tmp){
+				item.push_back(tmp);
+			}
+			senes.push_back(item);
+		}
+	}
+	double average = sum /(double)senNum;
+	Logger::logger<<StrHead::header + "Accuracy is " + average +"\n";
+	fout<<"Accuracy:"<<average<<endl;
+	fout.close();
+	Logger::logger<<StrHead::header + "Predicting finished!" +"\n";
 	return true;
 }
 
@@ -598,38 +651,35 @@ double DependencyPaser::predict(const Sentence & sen,std::vector<int> & fa)
 
 double DependencyPaser::evaluate(const char * outFile, const char * evaluateFile)
 {
-        cout<<"Evaluating..."<<endl;
-        double accuracy = 0.0;
-        int all = 0;
-        int correct = 0;
-        ifstream fin(outFile);
-        ofstream fout(evaluateFile,ios::app);
-        string line;
-        while(getline(fin,line))
-        {
-                if(line != "")
-                {
-                        vector<string> item;
+	cout<<"Evaluating..."<<endl;
+	double accuracy = 0.0;
+	int all = 0;
+	int correct = 0;
+	ifstream fin(outFile);
+	ofstream fout(evaluateFile,ios::app);
+	string line;
+	while(getline(fin,line)){
+		if(line != ""){
+			vector<string> item;
 			string tmp;
 			istringstream sin(line);
 			while(sin >> tmp){
 				item.push_back(tmp);
 			}
 
-			if(atoi(item[(int)item.size() - 1].c_str()) == 1)
-			{
-			        correct++;
-                        }
-                        all++;
-                }
-        }
+			if(atoi(item[(int)item.size() - 1].c_str()) == 1){
+				correct++;
+			}
+			all++;
+		}
+	}
 
-        accuracy = (double)correct/(double)all;
-        cout<<"Evaluating finished!"<<endl;
-        cout<<"Accuracy is "<<accuracy<<endl;
+	accuracy = (double)correct/(double)all;
+	cout<<"Evaluating finished!"<<endl;
+	cout<<"Accuracy is "<<accuracy<<endl;
 
-        fout<<"Accuracy is "<<accuracy<<endl;
-        return accuracy;
+	fout<<"Accuracy is "<<accuracy<<endl;
+	return accuracy;
 }
 
 void DependencyPaser::parsing(const char * trainFile,const char * testFile, const char * outFile, const char * evaluateFile)

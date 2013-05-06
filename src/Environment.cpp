@@ -210,8 +210,8 @@ int Environment::getBcellNum()
 void Environment::_initGrid()
 {
         vector<int> v;
-        v.resize(COLS);
-        for(size_t i = 0; i < ROWS; i++)
+        v.resize(cols);
+        for(size_t i = 0; i < rows; i++)
         {
                 grid.push_back(v);
         }

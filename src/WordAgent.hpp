@@ -98,6 +98,7 @@ public:
 
 	//add by yangjinfeng
 	string toStringID();
+	string toPosition();
 	//add by yangjinfeng
 	void addIdiotopeDependentFeature(const vector<int> & feature);
 	//add by yangjinfeng

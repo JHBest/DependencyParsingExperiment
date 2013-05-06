@@ -21,6 +21,8 @@ private:
 	std::vector<WordAgent> Antigens;
 	//add by yangjinfeng 抗原主体
 	std::vector<WordAgent> antigenAgents;
+	int rows;
+	int cols;
 
 	Environment * pEnv;
 	Evaluation * pEva;
@@ -49,6 +51,8 @@ public:
 	void reduceWordFreq();
 	//add by yangjinfeng 随机分配B细胞的位置
 	void distributeBCells();
+	//add by yanngjinfeng
+	void saveBCells();
 
 	bool rfTrain(const Sentence & sen, const int senID,const std::vector<int> & fa);
 	bool constructBcellNet();

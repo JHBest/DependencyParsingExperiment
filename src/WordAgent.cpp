@@ -47,6 +47,14 @@ string WordAgent::toStringID(){
 	id = Tools::appendIntToStr(id,this->category)+"_";
 	return Tools::appendIntToStr(id,this->num);
 }
+
+string WordAgent::toPosition(){
+	string id = toStringID()+"\t";
+	string pos = Tools::appendIntToStr(id,position.first)+"\t";
+	pos = Tools::appendIntToStr(pos,position.second);
+	return pos;
+}
+
 //add by yangjinfeng
 void WordAgent::addIdiotopeDependentFeature(const vector<int> & feature){
 	for(size_t i = 0; i < feature.size(); i++){
