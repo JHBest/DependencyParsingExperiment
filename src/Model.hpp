@@ -21,6 +21,9 @@ private:
 	map<std::string, int> fMap;
 	//yangjinfeng 特征编号作为vector下标的值就是特征的权重
 	std::vector<double> fWeight;
+	//add by yangjinfeng
+	map<int,double> deltaWeight;
+
 	FeatureTemplate ft;
 	int fNumber;
 	std::vector<int> sentenceFeature;
@@ -29,6 +32,11 @@ private:
 public:
         Model();
         ~Model();
+    //add by yangjinfeng 把权重的增量设置进来
+    void setDeltaWeight(const map<int,double>& deltaWeight);
+    //add by yangjinfeng
+    void updateWeightByDelta();
+
 	double wordPairWeight(const Sentence & sen, int senID,int p, int c);
 	double wordPairWeight(const Sentence & sen,int p, int c);
 	double sumFeatureWeight(const std::vector<std::string> & featVec);

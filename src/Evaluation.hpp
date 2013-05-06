@@ -7,6 +7,7 @@
 #include "Predictor.hpp"
 #include "Model.hpp"
 #include "WordAgent.hpp"
+#include "Sentence.hpp"
 
 class WordAgent;
 
@@ -18,6 +19,8 @@ public:
 	Predictor * pPredictor;
 	Evaluation(Predictor * pre, Model * mod);
 	~Evaluation();
+
+	void predict(const Sentence & sen, std::vector<int> & fa);
 
 	double calAccuracy(const std::vector<int> & newLabel,
 			const std::vector<int> & orgLabel);

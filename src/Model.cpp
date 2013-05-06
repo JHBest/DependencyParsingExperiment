@@ -42,6 +42,16 @@ double Model::getSingleFeatureWeight(int featureID){
 	return fWeight[featureID];
 }
 
+void Model::setDeltaWeight(const map<int,double>& deltaWeight){
+	this->deltaWeight = deltaWeight;
+}
+
+void Model::updateWeightByDelta(){
+	for(map<int,double>::iterator it = deltaWeight.begin();it != deltaWeight.end();it ++){
+		fWeight[it->first] = fWeight[it->first] + it->second;
+	}
+	deltaWeight.clear();
+}
 
 ////////////////////////////////////
 
@@ -72,19 +82,9 @@ double Model::wordPairWeight(const Sentence & sen, int senID,int p, int c)
 
 double Model::wordPairWeight(const Sentence & sen,int p, int c)
 {
-        vector<string> featVec;
+	vector<string> featVec;
 
 	ft.abstractFeature(sen,p, c,featVec);
-	//vector<string> featVec2;
-	//ft.abstractFeature(sen, p, c, featVec2);
-	/*if(featVec.size()!= featVec2.size() )
-	{
-	    int a;
-	    //cout<<featVec.size()<<" "<<featVec2.size();
-	    cin>>a;
-	    return -1.0;
-    }
-    */
 
 	return sumFeatureWeight(featVec);
 }
@@ -105,43 +105,19 @@ bool Model::getFeatureIDVec(const Sentence & sen, int p, int c,
 	return true;
 }
 
-
+//modified by yangjinfeng
 double Model::sumFeatureWeight(const vector<string> & featVec)
 {
 	double sum = 0.0;
 
 
-	//cout<<"feat size is "<<featVec.size()<<endl;
-	//double totaltime;
-        //clock_t start,finish;
-       // start = clock();
-
-        int fid = 0;
+	int fid = 0;
 	for(size_t i = 0; i < featVec.size(); i++){
 		fid = _getFeatureID(featVec[i]);
-		//string f = featVec[i];
-		//fid = 10;
-
-
-		//int fid = 0;
-		//fid = fMap[featVec[i]];
 
 		if(fid == -1) continue;
-		sum += fWeight[fid];
-		//cout<<fid<<" ";
-		/*vector<int>::iterator it = find(sentenceFeature.begin(),sentenceFeature.end(),fid);
-		if(it == sentenceFeature.end())
-		{
-		        sentenceFeature.push_back(fid);
-                }
-                */
-		//cout<<fid<<" ";
+		sum += fWeight[fid] + deltaWeight[fid];
 	}
-
-                //finish = clock();
-                //totaltime=(double)(finish-start)/CLOCKS_PER_SEC;
-                //if(totaltime > 0.0)
-                //cout<<"sum time is "<<totaltime<<endl;
 	return sum;
 }
 

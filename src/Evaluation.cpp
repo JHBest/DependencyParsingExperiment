@@ -15,6 +15,12 @@ Evaluation::Evaluation(Predictor * pre, Model * mod)
 Evaluation::~Evaluation()
 {}
 
+void Evaluation::predict(const Sentence & sen, std::vector<int> & fa){
+	pPredictor->predict(sen,fa);
+}
+
+/////////////////////////////////////////////
+
 double Evaluation::calAccuracy(const vector<int> & newLabel,
 		const vector<int> & orgLabel)
 {

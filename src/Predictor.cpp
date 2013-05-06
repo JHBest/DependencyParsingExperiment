@@ -10,6 +10,35 @@ Predictor::Predictor(Model * pm) : pModel(pm)
 {
 }
 
+
+bool Predictor::buildGraph(const Sentence & sen,
+			std::vector<std::vector<double> > & graph)
+{
+
+	vFeaID.clear();
+	graph.clear();
+	int n = sen.size();
+	//cout<<"n "<<n<<endl;
+	graph.resize(n, vector<double>(n, 0));
+	//double sum  = 0.0;
+	for(int i = 0; i < n; i++){
+		for(int j = 0; j < n; j++){
+			if(j == i) continue;
+			//start = clock();
+			graph[i][j] = pModel->wordPairWeight(sen, i, j);
+		}
+	}
+	return true;
+}
+
+
+
+
+
+
+
+///////////////////////////////////////////////////////////
+
 bool Predictor::_decode(
 		const double f[maxLen][maxLen][2][2],
 		int s, int t, int d, int c,
@@ -194,10 +223,11 @@ double Predictor::predict(const Sentence & sen, int senID,vector<int> & fa)
 	return _eisner(graph, fa);
 }
 
+//modified by yangjinfeng fa是预测的每个词的父节点
 double Predictor::predict(const Sentence & sen, std::vector<int> & fa)
 {
         vector<vector<double> > graph;
-	_buildGraph(sen, graph);
+	buildGraph(sen, graph);
 	return _eisner(graph, fa);
 
 }

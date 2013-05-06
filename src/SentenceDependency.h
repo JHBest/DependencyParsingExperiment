@@ -20,6 +20,9 @@ public:
 	double getSentencePrecision(){
 		return precision;
 	}
+	Sentence& getCurrentSentence(){
+		return currenSentence;
+	}
 
 private:
 	Sentence currenSentence;
@@ -28,6 +31,8 @@ private:
 	vector<int> predictedParent;
 
 	double precision;
+
+	double calPrecision();
 
 };
 

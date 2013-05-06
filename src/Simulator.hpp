@@ -70,6 +70,12 @@ public:
 	bool select(WordAgent & wa);
 	bool regulateByDelete(WordAgent & wa,int N);
 	int getAgNum();
+	void anAgDie(){
+		agNum --;
+	}
+	void anAgBorn(){
+		agNum ++;
+	}
 
 	void init();
 

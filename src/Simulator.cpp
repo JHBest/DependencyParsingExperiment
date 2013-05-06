@@ -4,6 +4,8 @@
 
 #include "Simulator.hpp"
 #include "Parameter.hpp"
+#include "StrHead.h"
+#include "Logger.h"
 
 using namespace std;
 
@@ -82,28 +84,20 @@ void Simulator::moveAgent(WordAgent& agent,std::pair<int, int>& fromPos,std::pai
 
 
 
+
 bool Simulator::immuneResponse(){
 	/*reset interating objects*/
+	Logger::logger<<StrHead::header + "begin immune reponse within a sentence\n";
 	bool hasRun = true;
-//	int size = 0;//所有的主体数量
-//	for(size_t i = 0; i < vWordAgents.size(); i++)
-//	{
-//		size += vWordAgents[i].size();
-//		//cout<<vWordAgents[i].size()<<" ";
-//	}
-//	cout<<endl<<"size of agents is "<<size<<endl;
 
 	clock_t start,finish;
 	double totaltime;
 	start = clock();
 	bool fout = false;
-	env->setFeedbackFlag(false);
-//	std::pair<Sentence, vector<int> > p;
-//	p.first = sen;
-//	p.second = fa;
+//	env->setFeedbackFlag(false);
 	vector<string> agentIDs;
 	while(hasRun){
-		hasRun = false;
+		hasRun = true;
 
 		for(size_t i = 0; i < wordAgentGrid.size(); i++)//遍历每一个网格
 		{
@@ -115,48 +109,17 @@ bool Simulator::immuneResponse(){
 				 * 免疫机制核心部分,主体根据状态采取的活动
 				 */
 				wordAgentGrid[i].getWordAgent(agentIDs[ii]).runImmune();
-//				it->second.run();
-				if(_getAgNum() == 0)//如果抗原已消灭
+				if(getAgNum() == 0)//如果抗原已消灭
 				{
 					fout = true;
-					cout<<"Ags are all killed!"<<endl;
-					break;
+					Logger::logger<<StrHead::header + "Ags are all killed!\n";
+//					break;
+					return true;
 				}
+			}
+		}
 
-				if(!env->getFeedbackFlag())
-				{
-					hasRun = true;
-				}
-				else//如果系统得到正反馈
-				{
-					//double acc = eva->evalute(p.first,0,p.second);
-					//cout<<"acc "<<acc<<endl;
-					fout = true;
-					break;
-				}
-			}
-			_release();
-			if(fout)
-			{
-				hasRun = false;
-				fout = false;
-				break;
-			}
-		}
-		finish = clock();
-		totaltime = (double)(finish-start)/CLOCKS_PER_SEC;
-		if(totaltime > TIMETHRESHOLD)//如果时间超过设定阈值，也终止。
-		{
-			break;
-		}
 	}
-
-
-	/*remove antigen*/
-	_removeAg();
-	_resetStatus();
-	//int a;
-	//cin>>a;
 
 	return true;
 }
@@ -226,12 +189,15 @@ bool Simulator::_isSame(const std::vector<int> & s, const std::vector<int> & d)
 //	return true;
 //}
 
+/**
+ * modified by yangjinfeng
+ */
 bool Simulator::deleteWordAgent(WordAgent & pWordAgent)
 {
-        pWordAgent.setStatus(DIE);
-        //vWordAgents[_calcSub(pWordAgent.getPosition())].erase(pWordAgent.getAgentID());
+	int index = _calcSub(pWordAgent.getPosition());
+	wordAgentGrid[index].removeAgent(pWordAgent);
 
-        return true;
+	return true;
 }
 
 bool Simulator::interact(WordAgent & wa)
