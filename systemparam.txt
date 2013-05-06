@@ -1,3 +1,5 @@
+#学习词数，也叫迭代词数
+LEARNTIMES=200,int
 #行
 ROWS=5,int
 #列
@@ -17,4 +19,10 @@ K=5,int
 #抗原最大生命期限
 ANTIGEN_LIFETIME=20,int
 #如果突变后的精确度比突变前小，接受突变的概率
-ACCPET_MUTATE_RATE=1,int
+ACCPET_MUTATE_RATE=1,double
+#特征保存文件
+FEATURE_FILE=feature.txt,string
+#特征权重保存文件
+WEIGHT_FILE=weight.txt,string
+#B细胞位置保存文件
+BCELL_FILE=bcell.txt,string
