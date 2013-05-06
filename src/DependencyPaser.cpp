@@ -124,7 +124,7 @@ bool DependencyPaser::trainFromFile(const char * file)
 				}
 
 				//Öð¾äÑµÁ·
-				pTrainer->trainBySentence(sen, senID, father);
+				pTrainer->trainBySentence(sen,  father);
 
 				/*save feature weights*/
 				//pTrainer->saveFeatureWeights();

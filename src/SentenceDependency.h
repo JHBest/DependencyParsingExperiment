@@ -7,12 +7,15 @@
 
 #ifndef SENTENCEDEPENDENCY_H_
 #define SENTENCEDEPENDENCY_H_
+#include "Sentence.hpp"
+#include <vector>
+using namespace std;
 
 class SentenceDependency {
 public:
 	SentenceDependency();
 	virtual ~SentenceDependency();
-	void setSentenceAndDependency(Sentence& sen,vector<int>& parent);
+	void setSentenceAndDependency(const Sentence& sen,const vector<int>& parent);
 	void setPredictedParent(vector<int>& parent);
 	double getSentencePrecision(){
 		return precision;

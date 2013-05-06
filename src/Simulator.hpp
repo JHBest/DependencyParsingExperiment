@@ -10,12 +10,14 @@
 #include "WordInfo.h"
 #include "LocalEnv.h"
 #include "Model.hpp"
+#include "SentenceDependency.h"
 
 class Environment;
 class Evaluation;
 class WordAgent;
 class LocalEnv;
 class Model;
+class SentenceDependency;
 
 /**
  * 对免疫环境的模拟，模拟为一个大网格，主要表示细胞所处环境的数据结构，模拟免疫反应

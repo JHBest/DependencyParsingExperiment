@@ -16,7 +16,7 @@ SentenceDependency::~SentenceDependency() {
 	// TODO Auto-generated destructor stub
 }
 
-void SentenceDependency::setSentenceAndDependency(Sentence& sen,vector<int>& parent){
+void SentenceDependency::setSentenceAndDependency(const Sentence& sen,const vector<int>& parent){
 	this->currenSentence.clear();
 	this->realParent.clear();
 	this->currenSentence = sen;
