@@ -24,7 +24,7 @@ class SentenceDependency;
  */
 class Simulator{
 private:
-	Environment * env;
+//	Environment * env;
 
 	int times;
 	//add by yangjifneng,wordAgentGrid是一个vector，模拟网格，每一个网格存放一个map
@@ -38,11 +38,12 @@ private:
 	int agNum;
 public:
     Evaluation * eva;
+    Predictor * predictor;
     //add by yangjinfeng
     Model * model;
     //modified by yangjinfeng
-	Simulator(Environment * environment,Evaluation * evaluation,Model * model);
-
+	Simulator(Predictor * predictor,Model * model);
+	std::pair<int, int> getRandomPosition();
 
 	bool resetAgents();
 	//add by yangjinfeng

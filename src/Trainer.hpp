@@ -9,6 +9,7 @@
 #include "Simulator.hpp"
 #include "WordSimpleInfo.h"
 #include "WordInfo.h"
+#include "Predictor.hpp"
 /**
  * 把Model、Simulator等组合起来，实现完整的词主体免疫反应
  */
@@ -24,8 +25,9 @@ private:
 	int rows;
 	int cols;
 
-	Environment * pEnv;
-	Evaluation * pEva;
+//	Environment * pEnv;
+//	Evaluation * pEva;
+	Predictor * predictor;
 
 	//add by yangjinfeng
 	std::map<WordSimpleInfo, int> wordinfoID;
@@ -34,7 +36,7 @@ private:
 
 
 public:
-	Trainer(Model * pm, Evaluation * eva);
+	Trainer(Model * pm, Predictor * predictor);
 	~Trainer();
 	//add by yangjinfeng 逐句训练
 	bool trainBySentence(const Sentence & sen, const std::vector<int> & fa);

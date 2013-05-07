@@ -38,7 +38,6 @@ private:
 	//add by yangjinfeng B细胞和抗原突变前的亲和度。B细胞识别抗原后，记录识别的亲和度。
 	double currentAffinity;
 
-	Environment * env;
 	Simulator * simu;
 
 	std::queue<int> orders;//状态队列
@@ -49,7 +48,6 @@ public:
 	WordAgent();
 	//add by yangjinfeng
 	WordAgent(WordInfo& wordinfo,
-			Environment * environment,
 			Simulator * simulator,
 			const std::pair<int, int> & pos,
 			int cat,

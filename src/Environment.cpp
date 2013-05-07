@@ -16,21 +16,21 @@ Environment::Environment(int r, int c, Evaluation * evaluation, Model *model)
 	mod = model;
 }
 
-int Environment::_calcSub(const pair<int, int> & pos) const
-{
-	return pos.first * cols + pos.second;
-}
+//int Environment::_calcSub(const pair<int, int> & pos) const
+//{
+//	return pos.first * cols + pos.second;
+//}
 
 
 
-pair<int, int> Environment::getRandomPosition()
-{
-        //srand(time(NULL));
-        int row = rand() % rows;
-        int col = rand() % cols;
-
-	return make_pair(row, col);
-}
+//pair<int, int> Environment::getRandomPosition()
+//{
+//        //srand(time(NULL));
+//        int row = rand() % rows;
+//        int col = rand() % cols;
+//
+//	return make_pair(row, col);
+//}
 
 
 

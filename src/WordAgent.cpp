@@ -20,14 +20,12 @@ WordAgent::WordAgent(){
 
 //add by yangjinfeng
 WordAgent::WordAgent(WordInfo& wordinfo,
-			Environment * environment,
 			Simulator * simulator,
 			const std::pair<int, int> & pos,
 			int cat,
 			int con){
 
 	this->wordinfo = wordinfo;
-	env = environment;
 	position = pos;
 
 	category = cat;
@@ -263,7 +261,7 @@ void WordAgent::newMutate(){
 
 	//首先进行预测
 	std::vector<int> predictedParent;
-	simu->eva->predict(simu->getSentenceDependency().getCurrentSentence(),predictedParent);
+	simu->predictor->predict(simu->getSentenceDependency().getCurrentSentence(),predictedParent);
 	simu->getSentenceDependency().setPredictedParent(predictedParent);
 	double f = simu->getSentenceDependency().getSentencePrecision();//待计算
 
@@ -296,7 +294,7 @@ void WordAgent::newMutate(){
 		}
 
 		simu->model->setDeltaWeight(deltaWeight);
-		simu->eva->predict(simu->getSentenceDependency().getCurrentSentence(),predictedParent);
+		simu->predictor->predict(simu->getSentenceDependency().getCurrentSentence(),predictedParent);
 		simu->getSentenceDependency().setPredictedParent(predictedParent);
 		double senPrecision = simu->getSentenceDependency().getSentencePrecision();//待计算
 

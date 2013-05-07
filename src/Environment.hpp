@@ -12,6 +12,9 @@ class WordAgent;
 class Information;
 class Evaluation;
 
+/**
+ * ·ÏÆú
+ */
 class Environment{
 private:
 	int rows, cols;
@@ -20,10 +23,10 @@ private:
 
 public:
 	Environment(int r, int c, Evaluation * evaluation, Model *model);
-	std::pair<int, int> getRandomPosition();
+//	std::pair<int, int> getRandomPosition();
 
 private:
-	int _calcSub(const std::pair<int, int> & pos) const;
+//	int _calcSub(const std::pair<int, int> & pos) const;
 
 
 

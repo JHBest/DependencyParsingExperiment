@@ -10,16 +10,16 @@
 
 using namespace std;
 
-Simulator::Simulator(Environment * environment,Evaluation * evaluation,Model * model)
+Simulator::Simulator(Predictor * predictor,Model * model)
 {
 
 	rows = RunParameter::instance.getParameter("ROWS").getIntValue();
 	cols = RunParameter::instance.getParameter("COLS").getIntValue();
-	env = environment;
+//	env = environment;
 	times = 1;
 	resetAgents();
 	agNum = 0;
-	eva = evaluation;
+	this-> predictor = predictor;
 	this->model = model;
 	loadBCell();
 
@@ -33,6 +33,15 @@ bool Simulator::resetAgents()
 	wordAgentGrid.clear();
 	wordAgentGrid.resize(rows * cols, LocalEnv());
 	return true;
+}
+
+pair<int, int> Simulator::getRandomPosition()
+{
+        //srand(time(NULL));
+        int row = rand() % rows;
+        int col = rand() % cols;
+
+	return make_pair(row, col);
 }
 
 void Simulator::loadBCell(){
@@ -90,7 +99,7 @@ bool Simulator::addWordAgent(WordAgent & pWordAgent)
 	}
 	pair<int,int> pos;
 	if(randomPosition){
-		pos = env->getRandomPosition();//网格中随机分配一个位置
+		pos = getRandomPosition();//网格中随机分配一个位置
 	}else{
 		pos = bcellPosition[pWordAgent.toStringID()];
 	}

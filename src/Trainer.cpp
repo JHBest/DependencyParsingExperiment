@@ -9,18 +9,16 @@
 
 using namespace std;
 
-Trainer::Trainer(Model * pm, Evaluation * eva) : pModel(pm)
+Trainer::Trainer(Model * pm, Predictor * predictor) : pModel(pm)
 {
 	rows = RunParameter::instance.getParameter("ROWS").getIntValue();
 	cols = RunParameter::instance.getParameter("COLS").getIntValue();
-	pEnv = new Environment(rows, cols,eva,pm);
-	simu = new Simulator(pEnv,eva,pm);
-	pEva = eva;
+	simu = new Simulator(predictor,pm);
+	this->predictor = predictor;
 }
 
 Trainer::~Trainer()
 {
-	delete pEnv;
 	delete simu;
 }
 
@@ -53,9 +51,9 @@ void Trainer::buildBCell(const Sentence & sen,int current,int father)
 	WordSimpleInfo currentwordinfo(sen[current].first,sen[current].second);
     if(wordinfoID.find(currentwordinfo) == wordinfoID.end()){
     	wordinfoID[currentwordinfo] = BCellAgents.size();//记录每个词在BCells中的位置
-		pair<int,int> pos = pEnv->getRandomPosition();//网格中随机分配一个位置
+		pair<int,int> pos = simu->getRandomPosition();//网格中随机分配一个位置
 		WordInfo wi(currentwordinfo);
-		BCellAgents.push_back(WordAgent(wi, pEnv,simu,pos, BCELL,1));//相同的B细胞开始都在一个位置
+		BCellAgents.push_back(WordAgent(wi, simu,pos, BCELL,1));//相同的B细胞开始都在一个位置
 	}else{
 		BCellAgents[wordinfoID[currentwordinfo]].getWordInfo().addFreq();
     }
@@ -64,9 +62,9 @@ void Trainer::buildBCell(const Sentence & sen,int current,int father)
     WordSimpleInfo parentwordinfo(sen[father].first,sen[father].second);
     if(wordinfoID.find(parentwordinfo) == wordinfoID.end()){
      	wordinfoID[parentwordinfo] = BCellAgents.size();//记录每个词在BCells中的位置
- 		pair<int,int> pos = pEnv->getRandomPosition();//网格中随机分配一个位置
+ 		pair<int,int> pos = simu->getRandomPosition();//网格中随机分配一个位置
  		WordInfo wi(parentwordinfo);
- 		BCellAgents.push_back(WordAgent(wi, pEnv,simu,pos, BCELL,1));//相同的B细胞开始都在一个位置
+ 		BCellAgents.push_back(WordAgent(wi, simu,pos, BCELL,1));//相同的B细胞开始都在一个位置
  	}
     int parentindex = wordinfoID[parentwordinfo];
 
@@ -168,7 +166,7 @@ bool Trainer::injectAntigen(const Sentence & sen, const std::vector<int> & fa)
 bool Trainer::buildAntigen(const Sentence & sen,int child,const int parent)
 {
 	WordInfo wi(sen[child].first,sen[child].second);
-	WordAgent antigenagent(wi,pEnv,simu,pEnv->getRandomPosition(), ANTIGEN,1);
+	WordAgent antigenagent(wi,simu,simu->getRandomPosition(), ANTIGEN,1);
 	vector<int> features;
 	pModel->getFeatureIDVec(sen, parent, child, features);
 	antigenagent.addIdiotopeDependentFeature(features);

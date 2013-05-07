@@ -10,7 +10,9 @@
 #include "Sentence.hpp"
 
 class WordAgent;
-
+/**
+ * ·ÏÆú
+ */
 class Evaluation{
 private:
 	Model * pModel;

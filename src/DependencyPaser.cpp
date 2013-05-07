@@ -17,7 +17,7 @@ DependencyPaser::DependencyPaser()
 	pModel = new Model();
 	pPredictor = new Predictor((Model *)pModel);
 	pEvaluation = new Evaluation((Predictor *) pPredictor,(Model *) pModel);
-	pTrainer = new Trainer((Model *) pModel, (Evaluation *) pEvaluation);
+	pTrainer = new Trainer((Model *) pModel, (Predictor *) pPredictor);
 }
 
 DependencyPaser::~DependencyPaser()
