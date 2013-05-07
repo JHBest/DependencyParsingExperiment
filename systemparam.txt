@@ -26,3 +26,9 @@ FEATURE_FILE=feature.txt,string
 WEIGHT_FILE=weight.txt,string
 #B细胞位置保存文件
 BCELL_FILE=bcell.txt,string
+#训练树库文件
+TRAIN_FILE=./data/chi/train-20,string
+#测试树库文件
+TEST_FILE=./data/chi/test-300,string
+#预测结果文件
+RESULT_FILE=./result/result,string
