@@ -74,31 +74,31 @@ void testTrain()
 //        dp.trainFile("./data/english_train-copy.conll");
         //add by yangjinfeng
         dp.train("./data/english_train-copy.conll");
-        dp.predictFile("./data/english_test.conll","./result/result.conll");
+        dp.predict("./data/english_test.conll","./result/result.conll");
 }
 
-void testCulSub()
-{
-
-
-}
-
-void testPredict()
-{
-        DependencyPaser dp;
-        dp.predictFile("./data/english_test.conll","./result/result.conll");
-}
-
-void testEvaluation()
-{
-        DependencyPaser dp;
-        dp.evaluate("./result/result.conll","./result/evaluate.conll");
-}
-
-void testParsing()
-{
-        DependencyPaser dp;
-        dp.parsing("./data/chi/train-10","./data/chi/test-300","./result/result.conll","./result/evaluate.conll");
-
-
-}
+//void testCulSub()
+//{
+//
+//
+//}
+//
+//void testPredict()
+//{
+//        DependencyPaser dp;
+//        dp.predictFile("./data/english_test.conll","./result/result.conll");
+//}
+//
+//void testEvaluation()
+//{
+//        DependencyPaser dp;
+//        dp.evaluate("./result/result.conll","./result/evaluate.conll");
+//}
+//
+//void testParsing()
+//{
+//        DependencyPaser dp;
+//        dp.parsing("./data/chi/train-10","./data/chi/test-300","./result/result.conll","./result/evaluate.conll");
+//
+//
+//}

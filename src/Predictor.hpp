@@ -10,18 +10,11 @@ private:
 private:
 	static const int maxLen = 256;
 public:
-	std::vector<int> vFeaID;
-public:
 	Predictor(Model * pm);
-	double predict(const Sentence & sen, int senID, std::vector<int> & fa);
 	double predict(const Sentence & sen, std::vector<int> & fa);
 private:
 	//add by yangjinfeng
 	bool buildGraph(const Sentence & sen,std::vector<std::vector<double> > & graph);
-	bool _buildGraph(const Sentence & sen, int senID,
-			std::vector<std::vector<double> > & graph);
-	bool _buildGraph(const Sentence & sen,
-			std::vector<std::vector<double> > & graph);
 	double _eisner(const std::vector<std::vector<double> > & graph,
 			std::vector<int> & father);
 	bool _decode(

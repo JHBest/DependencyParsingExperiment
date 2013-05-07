@@ -7,15 +7,11 @@ using namespace std;
 
 Model::Model()
 {
-	accFeatureWeight.resize(fWeight.size());
-        sentenceFeature.clear();
-        f.open("./result/fwid",ios::out);
 
         loadFeatureAndWeight();
 }
 Model::~Model()
 {
-        f.close();
 }
 /**
  * 特征文件存储格式为：每行为一个特征，特征字符串+\t+特征编号
@@ -125,26 +121,6 @@ void Model::updateWeightByDelta(){
 
 
 
-double Model::wordPairWeight(const Sentence & sen, int senID,int p, int c)
-{
-
-	vector<string> featVec;
-	ft.abstractFeature(senID, p, c, featVec);
-	//featVec = ft.abstractFeature(senID, p, c);
-	//vector<string> featVec2;
-	//ft.abstractFeature(sen, p, c, featVec2);
-	/*if(featVec.size()!= featVec2.size() )
-	{
-	    int a;
-	    //cout<<featVec.size()<<" "<<featVec2.size();
-	    cin>>a;
-	    return -1.0;
-    }
-    */
-
-	return sumFeatureWeight(featVec);
-	//return 0.0;
-}
 
 //modified by yangjinfeng
 double Model::wordPairWeight(const Sentence & sen,int p, int c)
@@ -212,133 +188,8 @@ int Model::addFeature(const string & feat)
 	return fMap[feat];
 }
 
-bool Model::getFeatures(const Sentence & sen,vector<vector<string> > &sens, vector<int> & fa)
-{
-	for(size_t j = 1; j < sens.size(); j++)
-	{
-		vector<string> fea;
-		ft.abstractFeature(sen, fa[j], j, fea);
-	}
-
-	return true;
-}
-
-bool Model::getAllFeatures(const Sentence & sen, std::vector<std::vector<std::string> > & sens, int senID)
-{
-        vector<int> vfid;
-    int n = sen.size();
-    for(int i = 0; i < n; i++){
-		for(int j = 0; j < n; j++){
-			if(j == i) continue;
-			int key = int(senID * 1e4 + i * 1e2 + j);
-
-			vector<string> fea;
-            ft.abstractFeature(sen, i, j, fea);
-            for(size_t i = 0 ; i < fea.size(); i++)
-            {
-                    //cout<<fea[i]<<" ";
-                    int fid = _getFeatureID(fea[i]);;
-                    if(fid != -1)
-                    {
-                            //cout<<fid<<" ";
-                            vector<int>::iterator result = find( vfid.begin( ), vfid.end( ), fid ); //查找3
-                            if  ( result == vfid.end( ) ) //没找到
-                            {
-                                    vfid.push_back(fid);
-                                }
-
-                        }
-                        //cout<<endl;
-
-                        ft.insertFeatures(key,fea);
-
-                        }
-		}
-	}
-	sort(vfid.begin(),vfid.end());
-
-	for(size_t i = 0; i < vfid.size(); i++)
-	{
-	        //cout<<vfid[i]<<" ";
-	        f<<vfid[i]<<" ";
-        }
-        f<<endl;
-
-
-    return true;
-}
 
 
 
-vector<double> Model::getFeatureWeight()
-{
-        //cout<<"f weight size "<<fWeight.size()<<endl;
-	return fWeight;
-}
 
-bool Model::setFeatureWeight(std::vector<double> & newWeight)
-{
-        //fWeight = newWeight;
-        for(size_t i = 0; i < fWeight.size();i++)
-        {
-                fWeight[i] = newWeight[i];
-        }
-        return true;
-}
 
-bool Model::updateFeatureWeight(map<int, double> & domFeatures)
-{
-        //cout<<"update weight";
-	map<int, double>::iterator it;
-	for(it = domFeatures.begin(); it != domFeatures.end(); it++)
-	{
-		if(fWeight[it->first] < it->second)
-		{
-	//		cout<<"f: "<<fWeight[it->first]<<" : "<<it->second;
-                	fWeight[it->first] = it->second;
-		}
-		
-
-	}
-	return true;
-}
-
-std::vector<double> Model::getFeatureWeights()
-{
-        return fWeight;
-}
-
-std::vector<int> Model::getSentenceFeature()
-{
-        return sentenceFeature;
-}
-
-void Model::resetSentenceFeature()
-{
-        sentenceFeature.clear();
-}
-
-/**
- *特征权重累加
- */
-void Model::accumulateFeatureWeight(vector<double> & fw)
-{
-	if(accFeatureWeight.size() != fw.size())
-	{
-		cout<<"acc "<<accFeatureWeight.size()<<", fw "<<fw.size()<<endl;
-		cout<<"size is not the same"<<endl;
-		exit(-1);
-	}
-	for(size_t i = 0; i < fw.size(); i++)
-	accFeatureWeight[i] += fw[i];
-}
-
-vector<double> Model::getAccumulateFeatureWeight()
-{
-	return accFeatureWeight;
-}
-
-void Model::setAccumulateFeatureSize(int size)
-{
-	accFeatureWeight.resize(size);
-}
