@@ -3,35 +3,27 @@
 #include "Logger.h"
 #include "StrHead.h"
 #include "WordInfo.h"
+#include "DependencyPaser.hpp"
 #include <map>
+#include "string"
 
 using namespace std;
 
 int main()
 {
-//	WordInfo wi1(string("yang"),string("nn"));
-//
-//	WordInfo wi2(string("yang"),string("no"));
-//
-//	string w3 = string("yang");
-//	string p3 = string("no");
-//	WordInfo wi3(w3,p3);
-//
-//	string w4 = string("yang");
-//	string p4 = string("nm");
-//	WordInfo wi4(w4,p4);
-//
-//
-//
-//	WordInfo wi5;
-//	wi5.setWord(string("yang"));
-//	wi5.setPos(string("nn"));
-//
-//	map<WordInfo,int> wordinfos;
-//	wordinfos[wi1] = 1;
-//	cout<<wordinfos[wi2]<<endl;
 
-	Logger::logger<<StrHead::header + RunParameter::instance.getParameter("MUTATEPRO").getDoubleValue()+"\n";
+
+	string train_file = RunParameter::instance.getParameter("LEARNTIMES").getStringValue();
+	Logger::logger<<StrHead::header + "train file is: "+train_file+"\n";
+	string test_file = RunParameter::instance.getParameter("LEARNTIMES").getStringValue();
+	Logger::logger<<StrHead::header + "test file is: "+test_file+"\n";
+	string result_file = RunParameter::instance.getParameter("LEARNTIMES").getStringValue();
+
+	DependencyPaser dependencyPaser;
+	dependencyPaser.train(train_file.c_str());
+	dependencyPaser.predict(test_file.c_str(),result_file.c_str());
+
+	Logger::logger<<StrHead::header + "result file is: "+result_file+"\n";
 
     return 0;
 }
