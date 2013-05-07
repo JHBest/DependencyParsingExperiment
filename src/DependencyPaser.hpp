@@ -24,7 +24,6 @@ public:
 	 */
 	bool train(const char * file);
 
-	double predict(const Sentence & sen,std::vector<int> & fa);
 	bool predict(const char * testFile, const char * outFile);
 private:
 	//add by yangjinfeng

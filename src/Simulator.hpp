@@ -51,6 +51,7 @@ public:
 
 	//add by yangjinfeng
 	bool immuneResponse();
+	bool traversal();
 //	void setSentenceAndDependency(Sentence& sen,vector<int>& parent);
 	SentenceDependency& getSentenceDependency(){
 		return sentenceDependency;

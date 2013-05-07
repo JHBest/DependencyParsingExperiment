@@ -34,7 +34,7 @@ bool Trainer::initBCells(const Sentence & sen, const vector<int> & fa)
 		int j = fa[i];
 		buildBCell(sen,i,j);
 	}
-	this->pModel->saveFeature();
+
 	return true;
 }
 

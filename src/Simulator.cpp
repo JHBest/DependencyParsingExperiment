@@ -146,43 +146,48 @@ void Simulator::moveAgent(WordAgent& agent,std::pair<int, int>& fromPos,std::pai
 
 
 bool Simulator::immuneResponse(){
-	/*reset interating objects*/
 	Logger::logger<<StrHead::header + "begin immune reponse within a sentence\n";
-	bool hasRun = true;
+	bool toBeContinue = true;
 
-	clock_t start,finish;
-	double totaltime;
-	start = clock();
-	bool fout = false;
-//	env->setFeedbackFlag(false);
-	vector<string> agentIDs;
-	while(hasRun){
-		hasRun = true;
+	clock_t start = clock();
 
-		for(size_t i = 0; i < wordAgentGrid.size(); i++)//遍历每一个网格
-		{
-			agentIDs.clear();
-			wordAgentGrid[i].getAllAgentIDs(agentIDs);
-			for(size_t ii = 0;ii < agentIDs.size();ii ++)//遍历网格中map里的每一个主体
-			{
-				/**
-				 * 免疫机制核心部分,主体根据状态采取的活动
-				 */
-				wordAgentGrid[i].getWordAgent(agentIDs[ii]).runImmune();
-				if(getAgNum() == 0)//如果抗原已消灭
-				{
-					fout = true;
-					Logger::logger<<StrHead::header + "Ags are all killed!\n";
-//					break;
-					return true;
-				}
-			}
+	while(toBeContinue){
+
+		toBeContinue = traversal();
+		if(!toBeContinue){
+			clock_t finish = clock();
+			double totaltime = (double)(finish-start)/CLOCKS_PER_SEC;
+			Logger::logger<<StrHead::header + "wasted seconds: "+ totaltime +"\n";
 		}
+
 
 	}
 
 	return true;
 }
+
+bool Simulator::traversal(){
+	vector<string> agentIDs;
+	for(size_t i = 0; i < wordAgentGrid.size(); i++)//遍历每一个网格
+	{
+		agentIDs.clear();
+		wordAgentGrid[i].getAllAgentIDs(agentIDs);
+		for(size_t ii = 0;ii < agentIDs.size();ii ++)//遍历网格中map里的每一个主体
+		{
+			/**
+			 * 免疫机制核心部分,主体根据状态采取的活动
+			 */
+			wordAgentGrid[i].getWordAgent(agentIDs[ii]).runImmune();
+			if(getAgNum() == 0)//如果抗原已消灭
+			{
+				Logger::logger<<StrHead::header + "Ags are all killed!\n";
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
 
 bool Simulator::interactLocal(WordAgent & wa) {
 	int index = _calcSub(wa.getPosition());

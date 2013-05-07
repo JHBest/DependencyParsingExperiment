@@ -32,16 +32,20 @@ DependencyPaser::~DependencyPaser()
  */
 bool DependencyPaser::train(const char * file){
 	Logger::logger<<StrHead::header + "Initilizing B cell Network..." +"\n";
+	//初始化B细胞，包括抽取特征、构造网络，构建词主体
 	initBCell(file);
 	Logger::logger<<StrHead::header + "Initilizing finished!" +"\n";
-
+	//保存特征
+	pModel->saveFeature();
 
 	Logger::logger<<StrHead::header + "Online learning..." +"\n";
 	trainFromFile(file);//读取依存树库，逐句训练
 	Logger::logger<<StrHead::header + "Online learning finished!" +"\n";
 
 	Logger::logger<<StrHead::header + "saving b cells and feature weight" +"\n";
+	//保存B细胞的位置信息
 	pTrainer->saveBCells();
+	//保存特征的权重
 	pModel->saveWeight();
 	return true;
 
@@ -157,7 +161,7 @@ bool DependencyPaser::predict(const char * testFile, const char * outFile)
 				sen.push_back(make_pair(senes[i][1], senes[i][3]));
 			}
 			predictedFather.resize(sen.size());
-			predict(sen,predictedFather);
+			pPredictor->predict(sen,predictedFather);
 			int rightFather = 0;
 			for(size_t i = 0; i < senes.size(); i++){
 				if(predictedFather[i+1] == atoi(senes[i][6].c_str())){
@@ -192,14 +196,6 @@ bool DependencyPaser::predict(const char * testFile, const char * outFile)
 }
 
 
-/////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-double DependencyPaser::predict(const Sentence & sen,std::vector<int> & fa)
-{
-        return pPredictor->predict(sen, fa);
-}
 
 
 

@@ -393,18 +393,18 @@ void WordAgent::_mapStatusToBehavior()
 			case MATCH:
 				orders.push(MUTATING);
 				break;
-			case MUTATE:
-				orders.push(SELECTING);
-				break;
-			case MATURE:
-				orders.push(CLONING);
-				break;
+//			case MUTATE:
+//				orders.push(SELECTING);
+//				break;
+//			case MATURE:
+//				orders.push(CLONING);
+//				break;
 			case DIE:
 				orders.push(DYING);
 				break;
-                        case REGULATE:
-				orders.push(REGULATING);
-				break;
+//                        case REGULATE:
+//				orders.push(REGULATING);
+//				break;
 			default:
 				assert(0);
 		}
