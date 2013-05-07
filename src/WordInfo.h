@@ -22,36 +22,30 @@ public:
 	WordInfo(const WordSimpleInfo& wsi);
 	virtual ~WordInfo();
 
-	void addParent(WordInfo& wordinfo);
-	void addChild(WordInfo& wordinfo);
+	void addParent(WordInfo& wordsimpleinfo);
+	void addChild(WordInfo& wordsimpleinfo);
 
-	bool hasParent(WordInfo& wordinfo);
-	bool hasChild(WordInfo& wordinfo);
+	bool hasParent(WordInfo& wordsimpleinfo);
+	bool hasChild(WordInfo& wordsimpleinfo);
 
 	bool operator< (const WordInfo& wi) const;
 
     string getPos() const
     {
-        return pos;
+        return wordSimpleInfo.getPos();
     }
 
     string getWord() const
     {
-        return word;
+        return wordSimpleInfo.getWord();
+    }
+    WordSimpleInfo& getWordSimpleInfo(){
+    	return wordSimpleInfo;
     }
 
-    void setPos(const string& pos)
-    {
-        this->pos = pos;
-    }
-
-    void setWord(const string& word)
-    {
-        this->word = word;
-    }
 
     string toString(){
-    	return this->word + "_" + this->pos;
+    	return this->getWord() + "_" + this->getPos();
     }
 
 //    string toStringID(){
@@ -80,13 +74,14 @@ public:
     void reduceFreq();
 
 private:
-	string word;
-	string pos;
+//	string word;
+//	string pos;
+    WordSimpleInfo wordSimpleInfo;
 	int freq;
 	int num;//±àºÅ
 
-	set<WordInfo> parents;
-	set<WordInfo> children;
+	set<WordSimpleInfo> parents;
+	set<WordSimpleInfo> children;
 
 };
 

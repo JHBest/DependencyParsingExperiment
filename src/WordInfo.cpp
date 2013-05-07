@@ -19,38 +19,36 @@ WordInfo::~WordInfo() {
 }
 
 WordInfo::WordInfo(const string& word, const string& pos){
-	this->word = word;
-	this->pos = pos;
-	freq = 1;
+	this->wordSimpleInfo = WordSimpleInfo(word,pos);
+	freq = 0;
 }
 WordInfo::WordInfo(const WordSimpleInfo& wsi){
-	this->word = wsi.getWord();
-	this->pos = wsi.getPos();
-	freq = 1;
+	this->wordSimpleInfo = wsi;
+	freq = 0;
 
 }
 
 bool WordInfo::operator< (const WordInfo& wi) const{
-	bool result = this->word == wi.word;
+	bool result = this->getWord() == wi.getWord();
 	if(result){
-		return this->pos < wi.pos;
+		return this->getPos() < wi.getPos();
 	}else{
-		return this->word < wi.word;
+		return this->getWord() < wi.getWord();
 	}
 }
 
 void WordInfo::addParent(WordInfo& wordinfo){
-	parents.insert(wordinfo);
+	parents.insert(wordinfo.getWordSimpleInfo());
 }
 void WordInfo::addChild(WordInfo& wordinfo){
-	children.insert(wordinfo);
+	children.insert(wordinfo.getWordSimpleInfo());
 }
 
 bool WordInfo::hasParent(WordInfo& wordinfo){
-	return parents.find(wordinfo) != parents.end();
+	return parents.find(wordinfo.getWordSimpleInfo()) != parents.end();
 }
 bool WordInfo::hasChild(WordInfo& wordinfo){
-	return children.find(wordinfo) != children.end();
+	return children.find(wordinfo.getWordSimpleInfo()) != children.end();
 }
 
 void WordInfo::reduceFreq(){

@@ -79,7 +79,7 @@ bool DependencyPaser::initBCell(const char * file)
 			sen.clear();
 			senes.clear();
 			father.clear();
-			cout<<(sennum ++)<<endl;
+//			cout<<(sennum ++)<<endl;
 		}
 		else{
 			vector<string> item;
@@ -93,6 +93,7 @@ bool DependencyPaser::initBCell(const char * file)
 		}
 
 	}
+	pTrainer->outputNetwork();
 
 	pTrainer->reduceWordFreq();//´ÊÆµËõ¼õ
 	return true;
@@ -158,6 +159,8 @@ bool DependencyPaser::predict(const char * testFile, const char * outFile)
 	vector<vector<string> > senes;
 
 	int senNum = 0;
+	int rightHeaderCount = 0;
+	int allWordCount = 0;
 	double sum  = 0.0;
 	while(getline(fin, line)){
 		if(line == ""){
@@ -175,7 +178,8 @@ bool DependencyPaser::predict(const char * testFile, const char * outFile)
 					rightFather++;
 				}
 			}
-
+			rightHeaderCount = rightHeaderCount + rightFather;
+			allWordCount = allWordCount + senes.size();
 			double acc = (double)rightFather/(double)senes.size();
 			sum += acc;
 			senNum++;
@@ -194,9 +198,9 @@ bool DependencyPaser::predict(const char * testFile, const char * outFile)
 			senes.push_back(item);
 		}
 	}
-	double average = sum /(double)senNum;
-	Logger::logger<<StrHead::header + "Accuracy is " + average +"\n";
-	fout<<"Accuracy:"<<average<<endl;
+	double uas = rightHeaderCount /(double)allWordCount;
+	Logger::logger<<StrHead::header + "unlabeled attachment score:" + uas +"\n";
+	fout<<"unlabeled attachment score:"<<uas<<endl;
 	fout.close();
 	Logger::logger<<StrHead::header + "Predicting finished!" +"\n";
 	return true;

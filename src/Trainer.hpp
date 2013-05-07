@@ -50,6 +50,8 @@ public:
 	//add by yanngjinfeng
 	void saveBCells();
 
+	void outputNetwork();
+
 
 
 private:

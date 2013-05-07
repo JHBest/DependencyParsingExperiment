@@ -31,6 +31,10 @@ bool Trainer::initBCells(const Sentence & sen, const vector<int> & fa)
 {
 	for(size_t i = 1; i < sen.size(); i++){
 		int j = fa[i];
+		//也就是说，是否考虑把root作为一个词
+//		if(j == 0){
+//			continue;
+//		}
 		buildBCell(sen,i,j);
 	}
 
@@ -53,10 +57,10 @@ void Trainer::buildBCell(const Sentence & sen,int current,int father)
 		pair<int,int> pos = simu->getRandomPosition();//网格中随机分配一个位置
 		WordInfo wi(currentwordinfo);
 		BCellAgents.push_back(WordAgent(wi, simu,pos, BCELL,1));//相同的B细胞开始都在一个位置
-	}else{
-		BCellAgents[wordinfoID[currentwordinfo]].getWordInfo().addFreq();
-    }
+	}
     int currentindex = wordinfoID[currentwordinfo];
+	BCellAgents[currentindex].getWordInfo().addFreq();
+
 
     WordSimpleInfo parentwordinfo(sen[father].first,sen[father].second);
     if(wordinfoID.find(parentwordinfo) == wordinfoID.end()){
@@ -79,6 +83,16 @@ void Trainer::buildBCell(const Sentence & sen,int current,int father)
 	BCellAgents[parentindex].addParatopeParentFeature(features);//把特征作为父节点的支配方特征
 	features.clear();
 
+}
+
+void Trainer::outputNetwork(){
+	string networkfile = "networkfile.txt";
+	ofstream fout(networkfile.c_str());
+	for(size_t i = 0;i < BCellAgents.size();i ++){
+		WordInfo& wi = BCellAgents[i].getWordInfo();
+		fout<<wi.getWord()+"_"+wi.getPos()<<","<<wi.getParentCount()<<","<<wi.getChildrenCount()<<","<<(wi.getParentCount()+wi.getChildrenCount())<<","<<wi.getFreq()<<endl;
+	}
+	fout.close();
 }
 
 
