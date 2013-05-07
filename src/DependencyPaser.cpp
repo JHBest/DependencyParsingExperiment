@@ -37,7 +37,7 @@ bool DependencyPaser::train(const char * file){
 	Logger::logger<<StrHead::header + "Initilizing finished!" +"\n";
 	//保存特征
 	pModel->saveFeature();
-
+/*
 	Logger::logger<<StrHead::header + "Online learning..." +"\n";
 	trainFromFile(file);//读取依存树库，逐句训练
 	Logger::logger<<StrHead::header + "Online learning finished!" +"\n";
@@ -47,6 +47,7 @@ bool DependencyPaser::train(const char * file){
 	pTrainer->saveBCells();
 	//保存特征的权重
 	pModel->saveWeight();
+	*/
 	return true;
 
 }
@@ -60,10 +61,13 @@ bool DependencyPaser::initBCell(const char * file)
 	ifstream fin(file);
 	string line;
 	vector<vector<string> > senes;
+	int sennum = 0;
+	Sentence sen;
+	vector<int> father;
 	while(getline(fin, line)){
 		if(line == ""){
-			vector<int> father;
-			Sentence sen;
+			sen.clear();
+			father.clear();
 			sen.push_back(make_pair("ROOT", "ORG"));//第0个是root
 			father.push_back(-1);
 			for(size_t i = 0; i < senes.size(); i++){
@@ -72,7 +76,10 @@ bool DependencyPaser::initBCell(const char * file)
 			}
 
 			pTrainer->initBCells(sen, father);//词、词性、父节点，作为参数
+			sen.clear();
 			senes.clear();
+			father.clear();
+			cout<<(sennum ++)<<endl;
 		}
 		else{
 			vector<string> item;

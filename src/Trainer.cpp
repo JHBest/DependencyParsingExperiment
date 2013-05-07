@@ -29,7 +29,6 @@ Trainer::~Trainer()
  */
 bool Trainer::initBCells(const Sentence & sen, const vector<int> & fa)
 {
-	vector<int> features;
 	for(size_t i = 1; i < sen.size(); i++){
 		int j = fa[i];
 		buildBCell(sen,i,j);
@@ -78,6 +77,7 @@ void Trainer::buildBCell(const Sentence & sen,int current,int father)
 	pModel->getFeatureIDVec(sen, father, current, features);//抽取特征
 	BCellAgents[currentindex].addIdiotopeDependentFeature(features);//把特征作为子节点的依赖方特征
 	BCellAgents[parentindex].addParatopeParentFeature(features);//把特征作为父节点的支配方特征
+	features.clear();
 
 }
 
