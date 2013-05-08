@@ -5,6 +5,7 @@
 #include <vector>
 #include <fstream>
 #include "Logger.h"
+#include "LoggerUtil.h"
 
 
 using namespace std;
@@ -54,9 +55,8 @@ void Trainer::buildBCell(const Sentence & sen,int current,int father)
 	WordSimpleInfo currentwordinfo(sen[current].first,sen[current].second);
     if(wordinfoID.find(currentwordinfo) == wordinfoID.end()){
     	wordinfoID[currentwordinfo] = BCellAgents.size();//记录每个词在BCells中的位置
-		pair<int,int> pos = simu->getRandomPosition();//网格中随机分配一个位置
 		WordInfo wi(currentwordinfo);
-		BCellAgents.push_back(WordAgent(wi, simu,pos, BCELL,1));//相同的B细胞开始都在一个位置
+		BCellAgents.push_back(WordAgent(wi, simu,BCELL));//相同的B细胞开始都在一个位置
 	}
     int currentindex = wordinfoID[currentwordinfo];
 	BCellAgents[currentindex].getWordInfo().addFreq();
@@ -67,7 +67,7 @@ void Trainer::buildBCell(const Sentence & sen,int current,int father)
      	wordinfoID[parentwordinfo] = BCellAgents.size();//记录每个词在BCells中的位置
  		pair<int,int> pos = simu->getRandomPosition();//网格中随机分配一个位置
  		WordInfo wi(parentwordinfo);
- 		BCellAgents.push_back(WordAgent(wi, simu,pos, BCELL,1));//相同的B细胞开始都在一个位置
+ 		BCellAgents.push_back(WordAgent(wi, simu, BCELL));//相同的B细胞开始都在一个位置
  	}
     int parentindex = wordinfoID[parentwordinfo];
 
@@ -137,7 +137,8 @@ void Trainer::saveBCells(){
  */
 bool Trainer::trainBySentence(const Sentence & sen, const vector<int> & fa)
 {
-	Logger::logger<<StrHead::header + "train the model with sentence one by one\n";
+	string senStr = LoggerUtil::sentenceToString(sen);
+	Logger::logger<<StrHead::header + "train the model with sentence one by one : "+senStr+"\n";
 
 
 	injectAntigen(sen, fa);//注入抗原
@@ -180,7 +181,7 @@ bool Trainer::injectAntigen(const Sentence & sen, const std::vector<int> & fa)
 bool Trainer::buildAntigen(const Sentence & sen,int child,const int parent)
 {
 	WordInfo wi(sen[child].first,sen[child].second);
-	WordAgent antigenagent(wi,simu,simu->getRandomPosition(), ANTIGEN,1);
+	WordAgent antigenagent(wi,simu, ANTIGEN);
 	vector<int> features;
 	pModel->getFeatureIDVec(sen, parent, child, features);
 	antigenagent.addIdiotopeDependentFeature(features);
@@ -192,8 +193,8 @@ bool Trainer::buildAntigen(const Sentence & sen,int child,const int parent)
 
 bool Trainer::addAntigenToSimulator()
 {
-	Logger::logger<<StrHead::header + "add antigen to simulator\n";
 	int antigencount = RunParameter::instance.getParameter("ANTIGEN_COUNT").getIntValue();
+	Logger::logger<<StrHead::header + "add antigen to simulator. "+ antigencount +" per antigen\n";
 
 	int lifetime = RunParameter::instance.getParameter("ANTIGEN_LIFETIME").getIntValue();
 	if(antigenAgents.size() > 0)
@@ -207,6 +208,7 @@ bool Trainer::addAntigenToSimulator()
 			}
 		}
 	}
+	Logger::logger<<StrHead::header + "inject antigen total number is  "+ simu->getAgNum() +" \n";
 
 	Antigens.clear();
 

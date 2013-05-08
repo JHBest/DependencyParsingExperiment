@@ -31,13 +31,16 @@ DependencyPaser::~DependencyPaser()
  * add by yangjinfeng
  */
 bool DependencyPaser::train(const char * file){
-	Logger::logger<<StrHead::header + "Initilizing B cell Network..." +"\n";
+	Logger::logger<<StrHead::header + "Initilizing B cell and B cell Network..." +"\n";
 	//初始化B细胞，包括抽取特征、构造网络，构建词主体
 	initBCell(file);
-	Logger::logger<<StrHead::header + "Initilizing finished!" +"\n";
 	//保存特征
 	pModel->saveFeature();
-/*
+	Logger::logger<<StrHead::header + "Initilizing(Loading) position and weight!" +"\n";
+	//初始化位置和权重
+	initPositionAndWeight();
+	Logger::logger<<StrHead::header + "Initilizing finished!" +"\n";
+
 	Logger::logger<<StrHead::header + "Online learning..." +"\n";
 	trainFromFile(file);//读取依存树库，逐句训练
 	Logger::logger<<StrHead::header + "Online learning finished!" +"\n";
@@ -47,7 +50,7 @@ bool DependencyPaser::train(const char * file){
 	pTrainer->saveBCells();
 	//保存特征的权重
 	pModel->saveWeight();
-	*/
+
 	return true;
 
 }
@@ -99,16 +102,20 @@ bool DependencyPaser::initBCell(const char * file)
 	return true;
 }
 
+void DependencyPaser::initPositionAndWeight(){
+	pTrainer->distributeBCells();//构造B细胞网络
+	pModel->initFeatureWeight();//初始化特征权重
+
+}
+
 /**
  *file是用作训练语料的依存树库文件
  *add by yangjinfeng
  */
 bool DependencyPaser::trainFromFile(const char * file)
 {
-	pTrainer->distributeBCells();//构造B细胞网络
 	string line;
 	vector<vector<string> > senes;
-	pModel->initFeatureWeight();//初始化特征权重
 	int learnTimes = RunParameter::instance.getParameter("LEARNTIMES").getIntValue();
 	for(int i = 0; i < learnTimes; i++)//迭代次数
 	{

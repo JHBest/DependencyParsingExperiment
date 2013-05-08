@@ -6,12 +6,16 @@
 #include "DependencyPaser.hpp"
 #include <map>
 #include "string"
+#include <time.h>
+#include <stdlib.h>
+
 
 using namespace std;
 
 int main()
 {
 
+	srand((unsigned) time(NULL));
 
 	string train_file = RunParameter::instance.getParameter("TRAIN_FILE").getStringValue();
 	Logger::logger<<StrHead::header + "train file is: "+train_file+"\n";

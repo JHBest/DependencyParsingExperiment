@@ -11,6 +11,9 @@
 #include "RunParameter.h"
 #include "Parameter.hpp"
 #include "WordAgent.hpp"
+#include "LoggerUtil.h"
+#include "StrHead.h"
+#include "Logger.h"
 
 using namespace std;
 
@@ -21,18 +24,19 @@ WordAgent::WordAgent(){
 //add by yangjinfeng
 WordAgent::WordAgent(WordInfo& wordinfo,
 			Simulator * simulator,
-			const std::pair<int, int> & pos,
-			int cat,
-			int con){
+			int cat
+			){
 
 	this->wordinfo = wordinfo;
-	position = pos;
+//	position = pos;
 
 	category = cat;
 //	concentration = con;
 	status = ACTIVE;
 
 	simu = simulator;
+
+	activeLevel = 0;
 
 	mapStatusToBehavior();
 
@@ -147,10 +151,11 @@ bool WordAgent::runImmune()
 //                        case REGULATING:
 //                                _regulate();
 //                                break;
-//                        case DYING:
-//                                _die();
-//                                break;
+                        case DYING:
+                                die();
+                                break;
                         default:
+                        	cout<<now<<endl;
                                 assert(0);
                 }
                 hasRun = true;
@@ -207,6 +212,7 @@ bool WordAgent::interact()
 
 bool WordAgent::die()
 {
+	Logger::logger<<StrHead::header+LoggerUtil::DIED+toStringID()+" is ag and going to dying (removed) \n";
 	if(simu->deleteWordAgent(*this))
 	{
 		return true;
@@ -224,7 +230,7 @@ set<int>& WordAgent::getParatopeParentFeature(){
 }
 
 
-//add by yangjinfeng
+//add by yangjinfeng agent is ag
 double WordAgent::calAffinity(WordAgent& agent){
 	vector<int> matchedFeature;
 	matchFeatureRecptor(agent,matchedFeature);
@@ -258,17 +264,16 @@ void WordAgent::setMatchedFeatureRecptor(vector<int>& matchedFeature){
 }
 
 void WordAgent::newMutate(){
-
+	Logger::logger<<StrHead::header+LoggerUtil::MUTATE+this->toStringID()+" begin to mutate \n";
 	//首先进行预测
-	std::vector<int> predictedParent;
-	simu->predictor->predict(simu->getSentenceDependency().getCurrentSentence(),predictedParent);
-	simu->getSentenceDependency().setPredictedParent(predictedParent);
-	double f = simu->getSentenceDependency().getSentencePrecision();//待计算
-
+	simu->predictBeforeMutate();
+	double currentPrecision = simu->getSentenceDependency().getCurrentSentencePrecision();
 	double affinity = getCurrentAffinity();
+
 	double alpha = 1.0 / (RunParameter::instance.getParameter("BETA").getIntValue() * 1.0);
-	alpha = alpha * exp(-1 * f) * exp(-1 * affinity);
-	//先突变
+	alpha = alpha * exp(-1 * currentPrecision) * exp(-1 * affinity);
+	Logger::logger<<StrHead::header+" the  mutate parameter alpha  is: "+alpha +"\n";
+	//突变
 	int k = RunParameter::instance.getParameter("K").getIntValue();
 	double mutatePro = RunParameter::instance.getParameter("MUTATEPRO").getDoubleValue();
 	for(int i = 0;i < k;i ++){
@@ -282,47 +287,12 @@ void WordAgent::newMutate(){
 			it->second.push_back(mutateDelta);
 		}
 	}
+	Logger::logger<<StrHead::header+" clone and  mutate "+k+" agents\n";
 	//后选择
-	map<int,double> deltaWeight;
-	double maxPrecision = 0;
-	int maxPrecisionIndex = 0;
-	for(int i = 0;i < k;i ++){
-		deltaWeight.clear();
-		predictedParent.clear();
-		for(map<int,vector<double> >::iterator it = matchedparatopeFeature.begin();it != matchedparatopeFeature.end();it ++){
-			deltaWeight[it->first] = it->second[k];
-		}
 
-		simu->model->setDeltaWeight(deltaWeight);
-		simu->predictor->predict(simu->getSentenceDependency().getCurrentSentence(),predictedParent);
-		simu->getSentenceDependency().setPredictedParent(predictedParent);
-		double senPrecision = simu->getSentenceDependency().getSentencePrecision();//待计算
+	simu->selectAfterMutate(*this);
+	matchedparatopeFeature.clear();
 
-		if(senPrecision > maxPrecision){
-			maxPrecisionIndex = i;
-			maxPrecision = senPrecision;
-		}
-	}
-	if(maxPrecision > 0){
-		bool accpetMutate = false;
-		if(maxPrecision > f){
-			accpetMutate = true;
-		}else{
-			double acceptrate = RunParameter::instance.getParameter("ACCPET_MUTATE_RATE").getDoubleValue();
-			if(Tools::uniformRand() < acceptrate){
-				accpetMutate = true;
-			}
-		}
-		if(accpetMutate){
-			deltaWeight.clear();
-			for(map<int,vector<double> >::iterator it = matchedparatopeFeature.begin();it != matchedparatopeFeature.end();it ++){
-				deltaWeight[it->first] = it->second[maxPrecisionIndex];
-			}
-			simu->model->setDeltaWeight(deltaWeight);
-			simu->model->updateWeightByDelta();
-		}
-
-	}
 	setStatus(ACTIVE);
 	mapStatusToBehavior();
 
@@ -399,9 +369,9 @@ void WordAgent::_mapStatusToBehavior()
 //			case MATURE:
 //				orders.push(CLONING);
 //				break;
-			case DIE:
-				orders.push(DYING);
-				break;
+//			case DIE:
+//				orders.push(DYING);
+//				break;
 //                        case REGULATE:
 //				orders.push(REGULATING);
 //				break;
@@ -438,6 +408,7 @@ void    WordAgent::mapStatusToBehavior()
 			orders.push(DYING);
 			break;
 		default:
+			cout<<status<<endl;
 			assert(0);
 		}
 	}

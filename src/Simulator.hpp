@@ -56,6 +56,11 @@ public:
 	SentenceDependency& getSentenceDependency(){
 		return sentenceDependency;
 	}
+	//在突变前预测一下
+	void predictBeforeMutate();
+
+	void selectAfterMutate(WordAgent& wordAgent);
+
 	//add by yangjinfeng
 	void moveAgent(WordAgent& agent,std::pair<int, int>& fromPos,std::pair<int, int>& toPos);
 	//add by yangjinfeng

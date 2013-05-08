@@ -46,6 +46,8 @@ public:
 	double calAffinity(vector<int>& matchedFeature);
 	double getSingleFeatureWeight(int featureID);
 
+	double calTreeScore(const Sentence & sen,const vector<int> parent);
+
 private:
 	inline int _getFeatureID(const std::string & feat);
 

@@ -43,6 +43,10 @@ public:
 private:
 	map<string,WordAgent> localunit;
 	map<int,WordAgent>::iterator pointer;
+
+	void bCellInteraction(WordAgent& bcell);
+
+	void agInterfaction(WordAgent& ag);
 };
 
 #endif /* LOCALENV_H_ */

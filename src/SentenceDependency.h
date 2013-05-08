@@ -9,6 +9,7 @@
 #define SENTENCEDEPENDENCY_H_
 #include "Sentence.hpp"
 #include <vector>
+#include "PredictedResult.h"
 using namespace std;
 
 class SentenceDependency {
@@ -16,23 +17,67 @@ public:
 	SentenceDependency();
 	virtual ~SentenceDependency();
 	void setSentenceAndDependency(const Sentence& sen,const vector<int>& parent);
-	void setPredictedParent(vector<int>& parent);
-	double getSentencePrecision(){
-		return precision;
+	void setCurrentPredictedParent(vector<int>& parent);
+	double getCurrentSentencePrecision(){
+		return currerntPrecision;
 	}
 	Sentence& getCurrentSentence(){
 		return currenSentence;
 	}
 
+	vector<PredictedResult>& getPredictedResults(){
+		return predictedResults;
+	}
+
+	void addPredictedResult(const vector<int>& predict);
+	/**
+	 * 选择最好的预测，也就是精度最高的预测
+	 */
+	void selectBestPredicts(vector<int> & indexs);
+
+	int selectMinScoreDifference();
+
+    double getRealScore() const
+    {
+        return realScore;
+    }
+
+    void setRealScore(double realScore)
+    {
+        this->realScore = realScore;
+    }
+
+    void setPredictedScore(int index,double score);
+    vector<int>& getPredictedParent(int index);
+    double getMaxPredictedPrecision() const
+    {
+        return maxPredictedPrecision;
+    }
+
+    void setMaxPredictedPrecision(double maxPredictedPrecision)
+    {
+        this->maxPredictedPrecision = maxPredictedPrecision;
+    }
+
+    void reset();
+
 private:
 	Sentence currenSentence;
 	vector<int> realParent;
+	//突变后，正确依存树的值
+	double realScore;
+	//突变前的预测结果
+	vector<int> currentPredictedParent;
+	//突变前预测结果的精确度
+	double currerntPrecision;
+	//突变后最大的预测精度
+	double maxPredictedPrecision;
 
-	vector<int> predictedParent;
+	//多个突变的结果
+	vector<PredictedResult> predictedResults;
 
-	double precision;
 
-	double calPrecision();
+	double calPrecision(const vector<int>& predict);
 
 };
 

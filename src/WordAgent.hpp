@@ -47,11 +47,8 @@ private:
 public:
 	WordAgent();
 	//add by yangjinfeng
-	WordAgent(WordInfo& wordinfo,
-			Simulator * simulator,
-			const std::pair<int, int> & pos,
-			int cat,
-			int con);
+	WordAgent(WordInfo& wordinfo,Simulator * simulator,	int cat);
+
 	WordInfo& getWordInfo(){
 		return wordinfo;
 	}
@@ -100,6 +97,10 @@ public:
 	void matchFeatureRecptor(WordAgent& agent,vector<int>& matchedFeature);
 	//add by yangjinfeng
 	void setMatchedFeatureRecptor(vector<int>& matchedFeature);
+
+	map<int,vector<double> >& getMatchedparatopeFeature(){
+		return matchedparatopeFeature;
+	}
 
 	//add by yangjinfeng
 	void addBehavior(int behavior);

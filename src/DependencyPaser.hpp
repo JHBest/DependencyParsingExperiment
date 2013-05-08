@@ -28,6 +28,8 @@ public:
 private:
 	//add by yangjinfeng
 	bool initBCell(const char * file);
+	//初始化位置和权重
+	void initPositionAndWeight();
 	//add by yangjinfeng
 	bool trainFromFile(const char * file);
 

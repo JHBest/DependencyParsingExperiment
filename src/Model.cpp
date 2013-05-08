@@ -45,10 +45,8 @@ void Model::loadFeatureAndWeight(){
 		fin.close();
 		istringstream sin(lastLine);
 		string value;
-		int i = 0;
 		while(sin >> value){
-			fWeight[i] = atof(value.c_str());
-			i ++;
+			fWeight.push_back(atof(value.c_str()));
 		}
 	}
 }
@@ -80,12 +78,14 @@ void Model::saveWeight(){
 //yangjinfeng 初始化特征权重，有待修改
 int Model::initFeatureWeight()
 {
-	fWeight.resize((int)fMap.size());
-	double alpha = 1.0 / (RunParameter::instance.getParameter("BETA").getIntValue() * 1.0);
-	for(size_t i = 0; i < fWeight.size(); i++)
-	{
-	        fWeight[i] = alpha * Tools::normalRand2();
-     }
+	if(fWeight.size() == 0){
+		fWeight.resize((int)fMap.size());
+		double alpha = 1.0 / (RunParameter::instance.getParameter("BETA").getIntValue() * 1.0);
+		for(size_t i = 0; i < fWeight.size(); i++)
+		{
+			fWeight[i] = alpha * Tools::normalRand2();
+		}
+	}
 	return (int)fWeight.size();
 }
 
@@ -115,8 +115,16 @@ void Model::updateWeightByDelta(){
 	deltaWeight.clear();
 }
 
-////////////////////////////////////
-
+double Model::calTreeScore(const Sentence & sen,const vector<int> parent){
+	double score = 0;
+	for(size_t i = 1; i < sen.size(); i++)
+	{
+		int j = parent[i];
+		double weight = wordPairWeight(sen,j,i);
+		score = score + weight;
+	}
+	return score;
+}
 
 
 

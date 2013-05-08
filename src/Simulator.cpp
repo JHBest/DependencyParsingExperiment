@@ -7,6 +7,7 @@
 #include "StrHead.h"
 #include "Logger.h"
 #include "RunParameter.h"
+#include "LoggerUtil.h"
 
 using namespace std;
 
@@ -138,11 +139,91 @@ void Simulator::moveAgent(WordAgent& agent,std::pair<int, int>& fromPos,std::pai
 	}
 }
 
-//void Simulator::setSentenceAndDependency(Sentence& sen,vector<int>& parent){
-//	sentenceDependency.setSentenceAndDependency(sen,parent);
-//}
+void Simulator::predictBeforeMutate(){
+	Logger::logger<<StrHead::header+" predict sentence ("+ LoggerUtil::sentenceToString(getSentenceDependency().getCurrentSentence()) +") before mutate \n";
+	std::vector<int> predictedParent;
+	predictor->predict(getSentenceDependency().getCurrentSentence(),predictedParent);
+	getSentenceDependency().setCurrentPredictedParent(predictedParent);
+	Logger::logger<<StrHead::header+" predict precision is "+getSentenceDependency().getCurrentSentencePrecision()+"\n";
+}
+/**
+ * 选择过程如下：
+ * 对每一个突变产生的增量，预测出一个最大生成树，并计算准确率，选择准确率最大的生成树
+ * 如果最大的准确率比突变前的准确率要大，则肯定选择某个突变，否则，以一定概率选择某个突变
+ *
+ * 选择某个突变：
+ * 如果准确率最大的生成树不止一个，则分别计算生成树的值，并和标准依存树的值相减，选择绝对值最小的那个生成树
+ * 对应的突变就是要选择的突变。
+ * 把选择的突变更新到特征的权重上
+ */
+void Simulator::selectAfterMutate(WordAgent& wordAgent){
 
+	map<int,vector<double> >& matchedparatopeFeature = wordAgent.getMatchedparatopeFeature();
+	//后选择
+	map<int,double> deltaWeight;
+	std::vector<int> predictedParent;
 
+	int k = RunParameter::instance.getParameter("K").getIntValue();
+	for(int i = 0;i < k;i ++){
+		deltaWeight.clear();
+		predictedParent.clear();
+		for(map<int,vector<double> >::iterator it = matchedparatopeFeature.begin();it != matchedparatopeFeature.end();it ++){
+			deltaWeight[it->first] = it->second[k];
+		}
+
+		model->setDeltaWeight(deltaWeight);
+		predictor->predict(getSentenceDependency().getCurrentSentence(),predictedParent);
+		getSentenceDependency().addPredictedResult(predictedParent);
+	}
+
+	vector<int> bestPredicts;
+	getSentenceDependency().selectBestPredicts(bestPredicts);
+	double maxPrecision = getSentenceDependency().getMaxPredictedPrecision();
+
+	bool accpetMutate = false;
+	double currentPrecision = getSentenceDependency().getCurrentSentencePrecision();
+	if(maxPrecision > currentPrecision){
+		accpetMutate = true;
+	}else{
+		double acceptrate = RunParameter::instance.getParameter("ACCPET_MUTATE_RATE").getDoubleValue();
+		if(Tools::uniformRand() < acceptrate){
+			accpetMutate = true;
+		}
+	}
+	if(accpetMutate){//接受突变
+		Logger::logger<<StrHead::header+LoggerUtil::SELECTED+wordAgent.toStringID()+" mutation is selected and reserved \n";
+
+		deltaWeight.clear();
+		int selectedIndex = -1;
+		if(bestPredicts.size() == 1){
+			selectedIndex = bestPredicts[0];
+		}else{
+
+			for(size_t i = 0;i < bestPredicts.size();i ++){
+				deltaWeight.clear();
+				for(map<int,vector<double> >::iterator it = matchedparatopeFeature.begin();it != matchedparatopeFeature.end();it ++){
+					deltaWeight[it->first] = it->second[bestPredicts[i]];
+				}
+				model->setDeltaWeight(deltaWeight);
+//				下面计算预测树的值
+				Sentence& sen = getSentenceDependency().getCurrentSentence();
+				vector<int>& predictedParent = getSentenceDependency().getPredictedParent(bestPredicts[i]);
+				double treescore = model->calTreeScore(sen,predictedParent);
+				getSentenceDependency().setPredictedScore(bestPredicts[i],treescore);
+			}
+			selectedIndex = getSentenceDependency().selectMinScoreDifference();
+		}
+
+		deltaWeight.clear();
+		for(map<int,vector<double> >::iterator it = matchedparatopeFeature.begin();it != matchedparatopeFeature.end();it ++){
+			deltaWeight[it->first] = it->second[selectedIndex];
+		}
+		model->setDeltaWeight(deltaWeight);
+		model->updateWeightByDelta();
+	}else{
+		Logger::logger<<StrHead::header+LoggerUtil::ABORTED+wordAgent.toStringID()+" mutation is aborted \n";
+	}
+}
 
 
 bool Simulator::immuneResponse(){
