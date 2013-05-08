@@ -16,6 +16,8 @@ REDUCE_RATE=10,int
 BETA=100,int
 #克隆的数量，也就是产生几组突变
 K=5,int
+#每个抗原的个数
+ANTIGEN_COUNT=5
 #抗原最大生命期限
 ANTIGEN_LIFETIME=20,int
 #如果突变后的精确度比突变前小，接受突变的概率
@@ -27,7 +29,7 @@ WEIGHT_FILE=weight.txt,string
 #B细胞位置保存文件
 BCELL_FILE=bcell.txt,string
 #训练树库文件
-TRAIN_FILE=./data/chi/train-20,string
+TRAIN_FILE=./data/chi/train-10,string
 #测试树库文件
 TEST_FILE=./data/chi/test-300,string
 #预测结果文件
