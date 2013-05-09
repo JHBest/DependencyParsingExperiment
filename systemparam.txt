@@ -1,5 +1,5 @@
 #学习词数，也叫迭代词数
-LEARNTIMES=200,int
+LEARNTIMES=10,int
 #行
 ROWS=5,int
 #列
@@ -18,6 +18,8 @@ REDUCE_RATE=10,int
 BETA=100,int
 #克隆的数量，也就是产生几组突变
 K=5,int
+#激活值上限
+MAX_ACTIVATION_LEVEL=3
 #每个抗原的个数
 ANTIGEN_COUNT=5
 #抗原最大生命期限
