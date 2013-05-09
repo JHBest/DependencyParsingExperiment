@@ -4,8 +4,10 @@ LEARNTIMES=200,int
 ROWS=5,int
 #列
 COLS=5,int
+#预测时需要初始化数组的最大长度，根据不同系统设置
+MAX_LENGTH=128
 #突变频率阈值
-MUTATEPRO=0.08,double
+MUTATEPRO=0.5,double
 #最大词频率
 MAX_FREQ=50,int
 #最小词频率
