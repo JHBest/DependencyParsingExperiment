@@ -138,6 +138,7 @@ private:
 	bool doMove();
 	bool interact();
 	bool die();
+	bool activationDie();
 
 	//add by yangjinfeng
 	void newMutate();

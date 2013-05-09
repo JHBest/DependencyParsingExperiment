@@ -22,7 +22,7 @@ public:
 	Evaluation(Predictor * pre, Model * mod);
 	~Evaluation();
 
-	void predict(const Sentence & sen, std::vector<int> & fa);
+	void predict(Sentence & sen, std::vector<int> & fa);
 };
 
 #endif

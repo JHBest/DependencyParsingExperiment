@@ -154,6 +154,9 @@ bool WordAgent::runImmune()
                         case DYING:
                                 die();
                                 break;
+                        case ACTIVATION_DYING:
+                        	activationDie();
+                        	break;
                         default:
                         	cout<<now<<endl;
                                 assert(0);
@@ -162,6 +165,12 @@ bool WordAgent::runImmune()
         }
         //cout<<"orun "<<endl;
 	return hasRun;
+}
+
+bool WordAgent::activationDie(){
+	setStatus(ACTIVE);
+	mapStatusToBehavior();
+
 }
 
 //add by yangjinfeng,随机移动，不考虑密度，如果考虑密度，有可能减慢移动
@@ -202,11 +211,15 @@ bool WordAgent::interact()
 //	updateSelf();
 	if(status != ACTIVE)
 	{
+		_mapStatusToBehavior();//
 		return false;
 	}
-	simu->interactLocal(*this);
+	bool interacted = simu->interactLocal(*this);
+	if(!interacted){
+		_mapStatusToBehavior();
+	}
 	//cout<<"oin";
-	return true;
+	return interacted;
 }
 
 
@@ -258,10 +271,14 @@ void WordAgent::matchFeatureRecptor(WordAgent& agent,vector<int>& matchedFeature
  */
 void WordAgent::setMatchedFeatureRecptor(vector<int>& matchedFeature){
 	matchedparatopeFeature.clear();
+	cout<<"matched feature:";
 	for(size_t i = 0;i < matchedFeature.size();i ++){
+		cout<<matchedFeature[i]<<",";
 		matchedparatopeFeature[matchedFeature[i]] = vector<double>();
 	}
+	cout<<endl;
 }
+
 
 void WordAgent::newMutate(){
 	Logger::logger<<StrHead::header+LoggerUtil::MUTATE+this->toStringID()+" begin to mutate \n";
@@ -269,6 +286,8 @@ void WordAgent::newMutate(){
 	simu->predictBeforeMutate();
 	double currentPrecision = simu->getSentenceDependency().getCurrentSentencePrecision();
 	double affinity = getCurrentAffinity();
+
+	Logger::logger<<StrHead::header+LoggerUtil::MUTATE+" current sentence precision is:"+currentPrecision+"\n";
 
 	double alpha = 1.0 / (RunParameter::instance.getParameter("BETA").getIntValue() * 1.0);
 	alpha = alpha * exp(-1 * currentPrecision) * exp(-1 * affinity);
@@ -358,7 +377,7 @@ void WordAgent::_mapStatusToBehavior()
 		switch(status)
 		{
 			case ACTIVE:
-                                orders.push(MOVING);
+                orders.push(MOVING);
 				break;
 			case MATCH:
 				orders.push(MUTATING);
@@ -423,19 +442,23 @@ void    WordAgent::mapStatusToBehavior()
 		case MATCH:
 			orders.push(MUTATING);
 			break;
-//		case MUTATE:
-//			orders.push(SELECTING);
-//			break;
-//		case MATURE:
-//			orders.push(CLONING);
-//			break;
-//		case DIE:
-//			orders.push(DYING);
-//			break;
-//		case REGULATE:
-//			orders.push(REGULATING);
-//			break;
+			//		case MUTATE:
+			//			orders.push(SELECTING);
+			//			break;
+			//		case MATURE:
+			//			orders.push(CLONING);
+			//			break;
+			//		case DIE:
+			//			orders.push(DYING);
+			//			break;
+			//		case REGULATE:
+			//			orders.push(REGULATING);
+			//			break;
+		case ACTIVATION_DIE:
+			orders.push(ACTIVATION_DYING);
+			break;
 		default:
+			cout<<status<<endl;
 			assert(0);
 		}
 	}

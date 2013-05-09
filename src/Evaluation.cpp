@@ -15,7 +15,7 @@ Evaluation::Evaluation(Predictor * pre, Model * mod)
 Evaluation::~Evaluation()
 {}
 
-void Evaluation::predict(const Sentence & sen, std::vector<int> & fa){
+void Evaluation::predict(Sentence & sen, std::vector<int> & fa){
 	pPredictor->predict(sen,fa);
 }
 

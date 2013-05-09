@@ -142,7 +142,8 @@ void Simulator::moveAgent(WordAgent& agent,std::pair<int, int>& fromPos,std::pai
 void Simulator::predictBeforeMutate(){
 	Logger::logger<<StrHead::header+" predict sentence ("+ LoggerUtil::sentenceToString(getSentenceDependency().getCurrentSentence()) +") before mutate \n";
 	std::vector<int> predictedParent;
-	predictor->predict(getSentenceDependency().getCurrentSentence(),predictedParent);
+	Sentence& sen = getSentenceDependency().getCurrentSentence();
+	predictor->predict(sen,predictedParent);
 	getSentenceDependency().setCurrentPredictedParent(predictedParent);
 	Logger::logger<<StrHead::header+" predict precision is "+getSentenceDependency().getCurrentSentencePrecision()+"\n";
 }
@@ -167,12 +168,21 @@ void Simulator::selectAfterMutate(WordAgent& wordAgent){
 	for(int i = 0;i < k;i ++){
 		deltaWeight.clear();
 		predictedParent.clear();
+//		cout<<"\n the "<<i<<" mutate delta is:";/////////////
 		for(map<int,vector<double> >::iterator it = matchedparatopeFeature.begin();it != matchedparatopeFeature.end();it ++){
-			deltaWeight[it->first] = it->second[k];
+			deltaWeight[it->first] = it->second[i];
+//			cout<<deltaWeight[it->first]<<",";
 		}
+//		cout<<endl;////////////////////
 
 		model->setDeltaWeight(deltaWeight);
-		predictor->predict(getSentenceDependency().getCurrentSentence(),predictedParent);
+		Sentence& sen = getSentenceDependency().getCurrentSentence();
+		predictor->predict(sen,predictedParent);
+		cout<<"predicited parent is:";/////////////////////////////////////////////
+		for(size_t i= 0;i < predictedParent.size();i ++){
+			cout<<predictedParent[i]<<",";
+		}
+		cout<<endl;//////////////////////////////////////////////////////////////
 		getSentenceDependency().addPredictedResult(predictedParent);
 	}
 
@@ -191,35 +201,43 @@ void Simulator::selectAfterMutate(WordAgent& wordAgent){
 		}
 	}
 	if(accpetMutate){//接受突变
-		Logger::logger<<StrHead::header+LoggerUtil::SELECTED+wordAgent.toStringID()+" mutation is selected and reserved \n";
-
+		Logger::logger<<StrHead::header+LoggerUtil::SELECTED+wordAgent.toStringID()+" mutation is selected from "+(int)bestPredicts.size()+" mutations\n";
+		int i;
+		cin>>i;
 		deltaWeight.clear();
 		int selectedIndex = -1;
 		if(bestPredicts.size() == 1){
 			selectedIndex = bestPredicts[0];
-		}else{
-
+		}else if(bestPredicts.size() > 1){
+			cout<<"bestPredicts.size()="<<bestPredicts.size()<<endl;
 			for(size_t i = 0;i < bestPredicts.size();i ++){
 				deltaWeight.clear();
 				for(map<int,vector<double> >::iterator it = matchedparatopeFeature.begin();it != matchedparatopeFeature.end();it ++){
 					deltaWeight[it->first] = it->second[bestPredicts[i]];
 				}
 				model->setDeltaWeight(deltaWeight);
+				cout<<"deltaWeight="<<deltaWeight.size()<<endl;
 //				下面计算预测树的值
 				Sentence& sen = getSentenceDependency().getCurrentSentence();
 				vector<int>& predictedParent = getSentenceDependency().getPredictedParent(bestPredicts[i]);
+				cout<<endl;
+				cout<<"predictedParent ="<<predictedParent.size()<<endl;
 				double treescore = model->calTreeScore(sen,predictedParent);
+				cout<<"treescore="<<treescore<<endl;
 				getSentenceDependency().setPredictedScore(bestPredicts[i],treescore);
 			}
 			selectedIndex = getSentenceDependency().selectMinScoreDifference();
 		}
-
-		deltaWeight.clear();
-		for(map<int,vector<double> >::iterator it = matchedparatopeFeature.begin();it != matchedparatopeFeature.end();it ++){
-			deltaWeight[it->first] = it->second[selectedIndex];
+		cout<<"selectedIndex="<<selectedIndex<<endl;
+		if(selectedIndex >= 0){
+			Logger::logger<<StrHead::header+LoggerUtil::SELECTED+wordAgent.toStringID()+" mutation is selected from index:"+selectedIndex+" mutations\n";
+			deltaWeight.clear();
+			for(map<int,vector<double> >::iterator it = matchedparatopeFeature.begin();it != matchedparatopeFeature.end();it ++){
+				deltaWeight[it->first] = it->second[selectedIndex];
+			}
+			model->setDeltaWeight(deltaWeight);
+			model->updateWeightByDelta();
 		}
-		model->setDeltaWeight(deltaWeight);
-		model->updateWeightByDelta();
 	}else{
 		Logger::logger<<StrHead::header+LoggerUtil::ABORTED+wordAgent.toStringID()+" mutation is aborted \n";
 	}
@@ -272,7 +290,7 @@ bool Simulator::traversal(){
 
 bool Simulator::interactLocal(WordAgent & wa) {
 	int index = _calcSub(wa.getPosition());
-	wordAgentGrid[index].interact(wa);
+	return wordAgentGrid[index].interact(wa);
 }
 
 

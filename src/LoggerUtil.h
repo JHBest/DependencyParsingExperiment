@@ -30,6 +30,8 @@ public:
 		}
 		return result;
 	}
+
+
 };
 
 #endif /* LOGGERUTIL_H_ */

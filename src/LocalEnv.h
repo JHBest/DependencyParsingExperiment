@@ -35,7 +35,7 @@ public:
 
 	void getAllAgentIDs(vector<string>& ids);
 
-	void interact(WordAgent& wordAgent);
+	bool interact(WordAgent& wordAgent);
 
 
 
@@ -44,9 +44,10 @@ private:
 	map<string,WordAgent> localunit;
 	map<int,WordAgent>::iterator pointer;
 
-	void bCellInteraction(WordAgent& bcell);
+//	void bCellInteraction(WordAgent* bcell);
+	bool bCellInteraction(WordAgent& bcell);
 
-	void agInterfaction(WordAgent& ag);
+	bool agInterfaction(WordAgent& ag);
 };
 
 #endif /* LOCALENV_H_ */

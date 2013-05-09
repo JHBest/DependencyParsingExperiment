@@ -15,6 +15,7 @@
 //#define MATURE		4	/*mature*/
 #define DIE		5	/*die*/
 //#define REGULATE        6       /*regulated*/
+#define ACTIVATION_DIE  7
 
 /*Behavior of Word-agent*/
 #define MOVING		1	/*move*/
@@ -24,6 +25,7 @@
 //#define CLONING		5	/*clone*/
 //#define	REGULATING	6	/*regulate*/
 #define DYING		7	/*die*/
+#define ACTIVATION_DYING  8
 
 //#define AFFINITY	0.0	/*affinity threshold for adaptive recognition*/
 //#define STIMULUS	0.0	/*stimulus threshold*/

@@ -23,7 +23,7 @@ void SentenceDependency::setSentenceAndDependency(const Sentence& sen,const vect
 	this->realParent = parent;
 }
 void SentenceDependency::setCurrentPredictedParent(vector<int>& parent){
-	this->currentPredictedParent.clear();
+	resetForNextMutate();
 	this->currentPredictedParent = parent;
 	//同时计算边的准确率
 	currerntPrecision = calPrecision(parent);
@@ -80,6 +80,10 @@ int SentenceDependency::selectMinScoreDifference(){
 	int result = -1;
 	for(size_t i = 0;i < predictedResults.size();i ++){
 		double diff = fabs(predictedResults[i].getScore() - getRealScore());
+		if(i == 0){
+			mindiff = diff;
+			result = i;
+		}
 		if(diff < mindiff){
 			mindiff = diff;
 			result = i;
@@ -104,5 +108,13 @@ void SentenceDependency::reset(){
 	//多个突变的结果
 	predictedResults.clear();
 
+}
+
+void SentenceDependency::resetForNextMutate(){
+	maxPredictedPrecision = 0;
+	realScore = 0;
+	currerntPrecision = 0;
+	currentPredictedParent.clear();
+	predictedResults.clear();
 }
 

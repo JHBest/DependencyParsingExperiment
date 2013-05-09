@@ -15,8 +15,9 @@ using namespace std;
 int main()
 {
 
-	srand((unsigned) time(NULL));
-
+//	srand((unsigned) time(NULL));
+	cout<< "train file is:\n";
+	Logger::logger<<StrHead::header + "train file is:\n";
 	string train_file = RunParameter::instance.getParameter("TRAIN_FILE").getStringValue();
 	Logger::logger<<StrHead::header + "train file is: "+train_file+"\n";
 	string test_file = RunParameter::instance.getParameter("TEST_FILE").getStringValue();

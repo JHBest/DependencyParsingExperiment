@@ -47,31 +47,32 @@ void LocalEnv::getAllAgentIDs(vector<string>& ids){
  * 		如果当前主体是B细胞，并且有激活值，则可以和其他B细胞交互，也可以和抗原交互
  * 		如果没有激活值，则只能与抗原交互
  */
-void LocalEnv::bCellInteraction(WordAgent& bcell){
+bool LocalEnv::bCellInteraction(WordAgent& bcell){
+//	Logger::logger<<"bCellInteraction :当前主体是----"<<bcell.toStringID()<<"  cat="<<bcell.getCategory()<<" addr="<<(int)(&bcell)<<"\n";
 	double maxaffinity = 0;
 	map<string,WordAgent>::iterator it = localunit.begin();
-	WordAgent& maxAffinityAgent = it->second;
-	cout<<bcell.getCategory()<<endl;
+	WordAgent* maxAffinityAgent = NULL;
+//	cout<<bcell.getCategory()<<endl;
 	for(;it != localunit.end();it ++){
-		WordAgent& agent = it->second;
-		if(agent.getStatus() != ACTIVE || bcell.toStringID() == agent.toStringID()){
+		WordAgent* agent = &(it->second);
+		if(agent->getStatus() != ACTIVE || bcell.toStringID() == agent->toStringID()){
 			continue;
 		}
-		if(agent.getCategory() == ANTIGEN){//是抗原
+		if(agent->getCategory() == ANTIGEN){//是抗原
 			vector<int> matchedFeature;
-			bcell.matchFeatureRecptor(agent,matchedFeature);
-			if(matchedFeature.size() == agent.getIdiotopeDependentFeature().size()){//若成立，表示B细胞的paratope完全包含抗原的idiotope
+			bcell.matchFeatureRecptor(*agent,matchedFeature);
+			if(matchedFeature.size() == agent->getIdiotopeDependentFeature().size()){//若成立，表示B细胞的paratope完全包含抗原的idiotope
 				double aff = bcell.calAffinity(matchedFeature);
 				if(aff > maxaffinity){
 					maxaffinity = aff;
 					maxAffinityAgent = agent;//此时maxAffinityAgent是抗原
 				}
 			}
-		}else if(agent.getCategory() == BCELL){//如果是B细胞
+		}else if(agent->getCategory() == BCELL){//如果是B细胞
 			if(bcell.hasActivation()){//有激活值，才可以和B细胞反应
 				//如果agent是wordAgent的父节点
-				if(bcell.getWordInfo().hasParent(agent.getWordInfo())){
-					double aff = agent.calAffinity(bcell);//wordAgent作为抗原，agent作为B细胞
+				if(bcell.getWordInfo().hasParent(agent->getWordInfo())){
+					double aff = agent->calAffinity(bcell);//wordAgent作为抗原，agent作为B细胞
 					if(aff > maxaffinity){
 						maxaffinity = aff;
 						maxAffinityAgent = agent;//此时maxAffinityAgent是B细胞
@@ -82,50 +83,52 @@ void LocalEnv::bCellInteraction(WordAgent& bcell){
 	}
 
 	if(maxaffinity > 0){
+//		Logger::logger<<"maxaffinity :当前主体是****"<<bcell.toStringID()<<"  cat="<<bcell.getCategory()<<" addr="<<(int)(&bcell)<<"\n";
 		vector<int> matchedFeature;
-		if(maxAffinityAgent.getCategory() == BCELL){//wordAgent作为抗原
-			Logger::logger<<StrHead::header+LoggerUtil::ACTIVE_B_RECOGNIZED+bcell.toStringID()+" act as antigen for active level("+bcell.getActiveLevel()+"),and being reconized by" +maxAffinityAgent.toStringID()+"\n";
+		if(maxAffinityAgent->getCategory() == BCELL){//wordAgent作为抗原
+			Logger::logger<<StrHead::header+LoggerUtil::ACTIVE_B_RECOGNIZED+bcell.toStringID()+" act as antigen for active level("+bcell.getActiveLevel()+"),and being reconized by" +maxAffinityAgent->toStringID()+"\n";
 
-			maxAffinityAgent.matchFeatureRecptor(bcell,matchedFeature);
-			maxAffinityAgent.setMatchedFeatureRecptor(matchedFeature);
-			maxAffinityAgent.setStatus(MATCH);
-			maxAffinityAgent.setCurrentAffinity(maxaffinity);
-			maxAffinityAgent.mapStatusToBehavior();
-			maxAffinityAgent.setActiveLevel(bcell.getActiveLevel() - 1);
+			maxAffinityAgent->matchFeatureRecptor(bcell,matchedFeature);
+			maxAffinityAgent->setMatchedFeatureRecptor(matchedFeature);
+			maxAffinityAgent->setStatus(MATCH);
+			maxAffinityAgent->setCurrentAffinity(maxaffinity);
+			maxAffinityAgent->mapStatusToBehavior();
+			maxAffinityAgent->setActiveLevel(bcell.getActiveLevel() - 1);
 
 			bcell.setActiveLevel(0);
 			bcell.setStatus(ACTIVE);
 			bcell.mapStatusToBehavior();
 		}else{
-			Logger::logger<<StrHead::header+LoggerUtil::AG_RECOGNIZED+maxAffinityAgent.toStringID()+" is antigen,and being reconized by current agent " +bcell.toStringID()+"\n";
+			Logger::logger<<StrHead::header+LoggerUtil::AG_RECOGNIZED+maxAffinityAgent->toStringID()+" is antigen,and being reconized by current agent " +bcell.toStringID()+"\n";
 			cout<<bcell.getCategory()<<endl;
-			bcell.matchFeatureRecptor(maxAffinityAgent,matchedFeature);
+			bcell.matchFeatureRecptor(*maxAffinityAgent,matchedFeature);
 			bcell.setMatchedFeatureRecptor(matchedFeature);
 			bcell.setCurrentAffinity(maxaffinity);
 			bcell.setStatus(MATCH);
 			bcell.setActiveLevel(RunParameter::instance.getParameter("K").getIntValue());
 			bcell.mapStatusToBehavior();
 
-			maxAffinityAgent.setStatus(DIE);
-			maxAffinityAgent.mapStatusToBehavior();
+			maxAffinityAgent->setStatus(DIE);
+			maxAffinityAgent->mapStatusToBehavior();
 		}
+		return true;
 	}
+	return false;
 }
-
 
 
 /**
  * 抗原的交互，只能和B细胞交互
  */
-void LocalEnv::agInterfaction(WordAgent& ag){
+bool LocalEnv::agInterfaction(WordAgent& ag){
 	double maxaffinity = 0;
 	map<string,WordAgent>::iterator it = localunit.begin();
-	WordAgent& maxAffinityAgent = it->second;
+	WordAgent* maxAffinityAgent = NULL;
 	for(;it != localunit.end();it ++){
-		WordAgent& agent = it->second;
-		if(agent.getCategory() == BCELL && agent.getStatus() == ACTIVE){
+		WordAgent* agent = &(it->second);
+		if(agent->getCategory() == BCELL && agent->getStatus() == ACTIVE){
 			vector<int> matchedFeature;
-			agent.matchFeatureRecptor(ag,matchedFeature);
+			agent->matchFeatureRecptor(ag,matchedFeature);
 			if(matchedFeature.size() == ag.getIdiotopeDependentFeature().size()){//若成立，表示B细胞的paratope完全包含抗原的idiotope
 				double aff = ag.calAffinity(matchedFeature);
 				if(aff > maxaffinity){
@@ -137,18 +140,20 @@ void LocalEnv::agInterfaction(WordAgent& ag){
 		}
 	}
 	if(maxaffinity > 0){
-		Logger::logger<<StrHead::header+LoggerUtil::AG_RECOGNIZED+ag.toStringID()+" is antigen,and being reconized by" +maxAffinityAgent.toStringID()+"\n";
+		Logger::logger<<StrHead::header+LoggerUtil::AG_RECOGNIZED+ag.toStringID()+" is antigen,and being reconized by" +maxAffinityAgent->toStringID()+"\n";
 		vector<int> matchedFeature;
-		maxAffinityAgent.matchFeatureRecptor(ag,matchedFeature);
-		maxAffinityAgent.setMatchedFeatureRecptor(matchedFeature);
-		maxAffinityAgent.setCurrentAffinity(maxaffinity);
-		maxAffinityAgent.setStatus(MATCH);
-		maxAffinityAgent.setActiveLevel(RunParameter::instance.getParameter("K").getIntValue());
-		maxAffinityAgent.mapStatusToBehavior();
+		maxAffinityAgent->matchFeatureRecptor(ag,matchedFeature);
+		maxAffinityAgent->setMatchedFeatureRecptor(matchedFeature);
+		maxAffinityAgent->setCurrentAffinity(maxaffinity);
+		maxAffinityAgent->setStatus(MATCH);
+		maxAffinityAgent->setActiveLevel(RunParameter::instance.getParameter("K").getIntValue());
+		maxAffinityAgent->mapStatusToBehavior();
 
 		ag.setStatus(DIE);
 		ag.mapStatusToBehavior();
+		return true;
 	}
+	return false;
 }
 
 
@@ -160,14 +165,16 @@ void LocalEnv::agInterfaction(WordAgent& ag){
  * 		如果没有激活值，则只能与抗原交互
  * 如果当前主体是抗原，则只能和B细胞交互
  */
-void LocalEnv::interact(WordAgent& wordAgent){
+bool LocalEnv::interact(WordAgent& wordAgent){
 //	Logger::logger<<"词主体在局部环境交互"<<"\n";
+	bool interacted = false;
 	if(wordAgent.getCategory() == BCELL){
 //		Logger::logger<<"current agent is b cell\n";
-		bCellInteraction(wordAgent);
+		interacted = bCellInteraction(wordAgent);
 
 	}else if(wordAgent.getCategory() == ANTIGEN){//如果主体是抗原
 //		Logger::logger<<"current agent is antigen\n";
-		agInterfaction(wordAgent);
+		interacted = agInterfaction(wordAgent);
 	}
+	return interacted;
 }

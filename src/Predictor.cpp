@@ -11,10 +11,10 @@ Predictor::Predictor(Model * pm) : pModel(pm)
 }
 
 
-bool Predictor::buildGraph(const Sentence & sen,
+bool Predictor::buildGraph(Sentence & sen,
 			std::vector<std::vector<double> > & graph)
 {
-	cout<<"begin buildGraph"<<endl;
+//	cout<<"begin buildGraph"<<endl;
 	graph.clear();
 	int n = sen.size();
 	//cout<<"n "<<n<<endl;
@@ -27,7 +27,7 @@ bool Predictor::buildGraph(const Sentence & sen,
 			graph[i][j] = pModel->wordPairWeight(sen, i, j);
 		}
 	}
-	cout<<"end buildGraph"<<endl;
+//	cout<<"end buildGraph"<<endl;
 	return true;
 }
 
@@ -75,11 +75,9 @@ bool Predictor::_decode(
 	return true;
 }
 
-double Predictor::_eisner(
-		const vector<vector<double> > & graph,
-		vector<int> & father)
+double Predictor::_eisner(vector<vector<double> > & graph,vector<int> & father)
 {
-	cout<<"begin _eisner"<<endl;
+//	cout<<"begin _eisner"<<endl;
 	int n = graph.size();
 	assert(n < maxLen);
 	double f[maxLen][maxLen][2][2];
@@ -99,17 +97,26 @@ double Predictor::_eisner(
 	}
 	father.resize(n, -1);
 	_decode(f, 0, n - 1, 1, 0, graph, father);
-	cout<<"end _eisner"<<endl;
+//	cout<<"end _eisner"<<endl;
 	return f[0][n-1][1][0];
 }
 
 
 //modified by yangjinfeng fa是预测的每个词的父节点
-double Predictor::predict(const Sentence & sen, std::vector<int> & fa)
+double Predictor::predict(Sentence & sen, std::vector<int> & fa)
 {
-        vector<vector<double> > graph;
+//	cout <<"begin buildGraph(sen,graph)"<<endl;
+	vector<vector<double> > graph;
 	buildGraph(sen, graph);
+	cout <<"the  graph is: "<<endl;
+	for(int i = 0;i< graph.size();i++){
+		for(int j = 0;j < graph[i].size();j++){
+			cout<<graph[i][j]<<",";
+		}
+		cout<<endl;
+	}
 
-	return _eisner(graph, fa);
+	double result = _eisner(graph, fa);
+	return result;
 
 }

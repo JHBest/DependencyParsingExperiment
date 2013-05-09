@@ -78,6 +78,7 @@ private:
 
 
 	double calPrecision(const vector<int>& predict);
+	void resetForNextMutate();
 
 };
 
