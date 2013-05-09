@@ -178,11 +178,11 @@ void Simulator::selectAfterMutate(WordAgent& wordAgent){
 		model->setDeltaWeight(deltaWeight);
 		Sentence& sen = getSentenceDependency().getCurrentSentence();
 		predictor->predict(sen,predictedParent);
-		cout<<"predicited parent is:";/////////////////////////////////////////////
-		for(size_t i= 0;i < predictedParent.size();i ++){
-			cout<<predictedParent[i]<<",";
-		}
-		cout<<endl;//////////////////////////////////////////////////////////////
+//		cout<<"predicited parent is:";/////////////////////////////////////////////
+//		for(size_t i= 0;i < predictedParent.size();i ++){
+//			cout<<predictedParent[i]<<",";
+//		}
+//		cout<<endl;//////////////////////////////////////////////////////////////
 		getSentenceDependency().addPredictedResult(predictedParent);
 	}
 
@@ -202,8 +202,6 @@ void Simulator::selectAfterMutate(WordAgent& wordAgent){
 	}
 	if(accpetMutate){//接受突变
 		Logger::logger<<StrHead::header+LoggerUtil::SELECTED+wordAgent.toStringID()+" mutation is selected from "+(int)bestPredicts.size()+" mutations\n";
-		int i;
-		cin>>i;
 		deltaWeight.clear();
 		int selectedIndex = -1;
 		if(bestPredicts.size() == 1){
@@ -216,14 +214,14 @@ void Simulator::selectAfterMutate(WordAgent& wordAgent){
 					deltaWeight[it->first] = it->second[bestPredicts[i]];
 				}
 				model->setDeltaWeight(deltaWeight);
-				cout<<"deltaWeight="<<deltaWeight.size()<<endl;
+//				cout<<"deltaWeight="<<deltaWeight.size()<<endl;
 //				下面计算预测树的值
 				Sentence& sen = getSentenceDependency().getCurrentSentence();
 				vector<int>& predictedParent = getSentenceDependency().getPredictedParent(bestPredicts[i]);
-				cout<<endl;
-				cout<<"predictedParent ="<<predictedParent.size()<<endl;
+//				cout<<endl;
+//				cout<<"predictedParent ="<<predictedParent.size()<<endl;
 				double treescore = model->calTreeScore(sen,predictedParent);
-				cout<<"treescore="<<treescore<<endl;
+//				cout<<"treescore="<<treescore<<endl;
 				getSentenceDependency().setPredictedScore(bestPredicts[i],treescore);
 			}
 			selectedIndex = getSentenceDependency().selectMinScoreDifference();

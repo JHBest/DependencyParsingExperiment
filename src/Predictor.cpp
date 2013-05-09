@@ -3,6 +3,11 @@
 
 #include "Predictor.hpp"
 #include <iostream>
+#include <math.h>
+#include <stdlib.h>
+#include <sstream>
+#include <fstream>
+#include "Tools.h"
 
 using namespace std;
 
@@ -47,7 +52,11 @@ bool Predictor::_decode(
 {
 	if(!c){
 		for(int q = s; q <= t; q++){
-			if(f[s][q][d][d] + f[q][t][d][1-d] == f[s][t][d][c]){
+			double d1 = f[s][q][d][d] + f[q][t][d][1-d];
+			double d2 = f[s][t][d][c];
+			bool b = Tools::doubleEqual(d1,d2);
+//			if(f[s][q][d][d] + f[q][t][d][1-d] == f[s][t][d][c])
+			if(b){
 				if((q == t && d == c) || (q == s && 1 - d == c)){
 					continue;
 				}
@@ -63,7 +72,11 @@ bool Predictor::_decode(
 			i = s, j = t;
 		}
 		for(int q = s; q < t; q++){
-			if(f[s][t][d][c] == f[s][q][1][0] + f[q+1][t][0][0] + g[i][j])
+			double d1 = f[s][t][d][c];
+			double d2 = f[s][q][1][0] + f[q+1][t][0][0] + g[i][j];
+			bool b = Tools::doubleEqual(d1,d2);
+//			if(f[s][t][d][c] == f[s][q][1][0] + f[q+1][t][0][0] + g[i][j])
+			if(b)
 			{
 				father[j] = i;
 				_decode(f, s, q, 1, 0, g, father);
@@ -108,15 +121,50 @@ double Predictor::predict(Sentence & sen, std::vector<int> & fa)
 //	cout <<"begin buildGraph(sen,graph)"<<endl;
 	vector<vector<double> > graph;
 	buildGraph(sen, graph);
-	cout <<"the  graph is: "<<endl;
-	for(int i = 0;i< graph.size();i++){
-		for(int j = 0;j < graph[i].size();j++){
-			cout<<graph[i][j]<<",";
-		}
-		cout<<endl;
-	}
+//	cout <<"the  graph is: "<<endl;
+//	for(int i = 0;i< graph.size();i++){
+//		for(int j = 0;j < graph[i].size();j++){
+//			cout<<graph[i][j]<<",";
+//		}
+//		cout<<endl;
+//	}
 
 	double result = _eisner(graph, fa);
+//	cout<<"\npredicited parent is:";/////////////////////////////////////////////
+//	for(size_t i= 0;i < fa.size();i ++){
+//		cout<<fa[i]<<",";
+//	}
+//	cout<<endl;//////////////////////////////////////////////////////////////
+
 	return result;
 
+}
+
+void Predictor::predictByGraphs(char* filename){
+	string line;
+	ifstream fin(filename);
+	vector<double> row;
+	vector<vector<double> > graph;
+	while(getline(fin, line)){
+		if(line == ""){
+			vector<int> parent;
+			_eisner(graph,parent);
+			cout<<"\npredicited parent is:";/////////////////////////////////////////////
+			for(size_t i= 0;i < parent.size();i ++){
+				cout<<parent[i]<<",";
+			}
+			cout<<endl;//////////////////////////////////////////////////////////////
+			graph.clear();
+
+		}else{
+			string tmp;
+			istringstream sin(line);
+			while(sin >> tmp){
+				double w = atof(tmp.c_str());
+				row.push_back(w);
+			}
+			graph.push_back(row);
+			row.clear();
+		}
+	}
 }

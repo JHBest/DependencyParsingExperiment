@@ -106,11 +106,11 @@ double Model::getSingleFeatureWeight(int featureID){
 
 void Model::setDeltaWeight(const map<int,double>& deltaWeight){
 	this->deltaWeight = deltaWeight;
-	cout<<"this->deltaWeight = ";
-	for(map<int,double>::iterator it = this->deltaWeight.begin();it != this->deltaWeight.end();it ++){
-			cout<<it->second<<",";
-		}
-	cout<<endl;
+//	cout<<"this->deltaWeight = ";
+//	for(map<int,double>::iterator it = this->deltaWeight.begin();it != this->deltaWeight.end();it ++){
+//			cout<<it->second<<",";
+//		}
+//	cout<<endl;
 }
 
 void Model::updateWeightByDelta(){

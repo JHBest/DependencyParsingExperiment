@@ -16,6 +16,7 @@
 #include <iomanip.h>
 #include <vector>
 #include <math.h>
+#include <float.h>
 using namespace std;
 
 class Tools {
@@ -184,6 +185,10 @@ public:
 
     static double uniformRand(){
 	    return (rand()%1000)/1000.0;
+    }
+
+    static bool doubleEqual(double d1,double d2){
+    	return fabs(d1 - d2)  < DBL_EPSILON ;
     }
 
 };
