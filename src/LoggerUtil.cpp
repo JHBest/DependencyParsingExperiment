@@ -15,10 +15,11 @@ LoggerUtil::LoggerUtil() {
 LoggerUtil::~LoggerUtil() {
 	// TODO Auto-generated destructor stub
 }
-string LoggerUtil::AG_RECOGNIZED = "[AG_RECOGNIZED]";
-string LoggerUtil::ACTIVE_B_RECOGNIZED = "[ACTIVE_B_RECOGNIZED]";
-string LoggerUtil::MUTATE = "[MUTATE]";
-string LoggerUtil::SELECTED = "[SELECTED]";
-string LoggerUtil::ABORTED = "[ABORTED]";
-string LoggerUtil::DIED = "[DIED]";
+string LoggerUtil::AG_RECOGNIZED = "[AG_RECOGNIZED] ";
+string LoggerUtil::ACTIVE_B_RECOGNIZED = "[ACTIVE_B_RECOGNIZED] ";
+string LoggerUtil::B_ACTIVATION_DIE = "[B_ACTIVATION_DIE] ";
+string LoggerUtil::MUTATE = "[MUTATE] ";
+string LoggerUtil::SELECTED = "[SELECTED] ";
+string LoggerUtil::ABORTED = "[ABORTED] ";
+string LoggerUtil::DIED = "[DIED] ";
 

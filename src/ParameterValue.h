@@ -53,6 +53,7 @@ public:
     {
         this->stringValue = stringValue;
     }
+    string toString();
 
 private:
     string name;

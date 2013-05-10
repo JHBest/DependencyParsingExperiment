@@ -51,7 +51,7 @@ public:
 
 	//add by yangjinfeng
 	bool immuneResponse();
-	bool traversal();
+	bool traversal(clock_t immuneClock);
 //	void setSentenceAndDependency(Sentence& sen,vector<int>& parent);
 	SentenceDependency& getSentenceDependency(){
 		return sentenceDependency;
@@ -79,11 +79,18 @@ public:
 	void anAgBorn(){
 		agNum ++;
 	}
+	void systemClockNext(){
+		systemClock ++;
+	}
+	long getSystemClock(){
+		return systemClock;
+	}
 
 private:
         //add by yangjinfeng
         void loadBCell();
         int _calcSub(const std::pair<int, int> & pos) const;
+        long systemClock;
 
 
 };

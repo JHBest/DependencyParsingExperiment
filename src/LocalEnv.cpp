@@ -36,6 +36,10 @@ WordAgent& LocalEnv::getWordAgent(string agentID){
 	return localunit[agentID];
 }
 
+bool LocalEnv::existsWordAgent(string agentID){
+	return localunit.find(agentID) != localunit.end();
+}
+
 void LocalEnv::getAllAgentIDs(vector<string>& ids){
 	ids.clear();
 	for(map<string,WordAgent>::iterator it = localunit.begin();it != localunit.end();it ++){
@@ -93,19 +97,21 @@ bool LocalEnv::bCellInteraction(WordAgent& bcell){
 			maxAffinityAgent->setStatus(MATCH);
 			maxAffinityAgent->setCurrentAffinity(maxaffinity);
 			maxAffinityAgent->mapStatusToBehavior();
-			maxAffinityAgent->setActiveLevel(bcell.getActiveLevel() - 1);
+			if(bcell.getActiveLevel() - 1 > 0){
+				maxAffinityAgent->setActiveLevel(bcell.getActiveLevel() - 1);
+			}
 
 			bcell.setActiveLevel(0);
-			bcell.setStatus(ACTIVE);
+			bcell.setStatus(ACTIVATION_DIE);
 			bcell.mapStatusToBehavior();
 		}else{
 			Logger::logger<<StrHead::header+LoggerUtil::AG_RECOGNIZED+maxAffinityAgent->toStringID()+" is antigen,and being reconized by current agent " +bcell.toStringID()+"\n";
-			cout<<bcell.getCategory()<<endl;
+//			cout<<bcell.getCategory()<<endl;
 			bcell.matchFeatureRecptor(*maxAffinityAgent,matchedFeature);
 			bcell.setMatchedFeatureRecptor(matchedFeature);
 			bcell.setCurrentAffinity(maxaffinity);
 			bcell.setStatus(MATCH);
-			bcell.setActiveLevel(RunParameter::instance.getParameter("MAX_ACTIVATION_LEVEL").getIntValue());
+			bcell.setActiveLevel(RunParameter::instance.getParameter("ACTIVATION_LEVEL").getIntValue());
 			bcell.mapStatusToBehavior();
 
 			maxAffinityAgent->setStatus(DIE);
@@ -146,7 +152,7 @@ bool LocalEnv::agInterfaction(WordAgent& ag){
 		maxAffinityAgent->setMatchedFeatureRecptor(matchedFeature);
 		maxAffinityAgent->setCurrentAffinity(maxaffinity);
 		maxAffinityAgent->setStatus(MATCH);
-		maxAffinityAgent->setActiveLevel(RunParameter::instance.getParameter("MAX_ACTIVATION_LEVEL").getIntValue());
+		maxAffinityAgent->setActiveLevel(RunParameter::instance.getParameter("ACTIVATION_LEVEL").getIntValue());
 		maxAffinityAgent->mapStatusToBehavior();
 
 		ag.setStatus(DIE);

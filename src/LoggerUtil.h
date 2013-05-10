@@ -18,6 +18,7 @@ public:
 
 	static string AG_RECOGNIZED;
 	static string ACTIVE_B_RECOGNIZED;
+	static string B_ACTIVATION_DIE;
 	static string MUTATE;
 	static string SELECTED;
 	static string ABORTED;

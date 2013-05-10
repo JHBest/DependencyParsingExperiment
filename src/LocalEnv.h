@@ -32,6 +32,7 @@ public:
 	int getAgentCount();
 
 	WordAgent& getWordAgent(string agentID);
+	bool existsWordAgent(string agentID);
 
 	void getAllAgentIDs(vector<string>& ids);
 

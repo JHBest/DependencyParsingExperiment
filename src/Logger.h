@@ -10,7 +10,7 @@
 #include "StrHead.h"
 #include <map.h>
 using namespace std;
-
+//__FILE__ __LINE__ #include <stdlib.h> #include <stdio.h>
 class Logger
 {
     public:

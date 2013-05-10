@@ -30,10 +30,10 @@ void RunParameter::loadParam(){
 	string readStr;
 	while(!in.eof()){
 		getline(in, readStr);
-//		cout<<readStr<<endl;
 		if(readStr.length() <= 0 || readStr.find_first_of("#") == 0){
 			continue;
 		}
+//		cout<<readStr<<endl;
 		vector<string> pvs;
 		Tools::split(readStr,"=",pvs);
 		vector<string> vt;
@@ -49,6 +49,7 @@ void RunParameter::loadParam(){
 		}
 
 		paramMap[pvs[0]]=value;
+//		cout<<value.toString()<<endl;
 	}
 	in.close();
 }

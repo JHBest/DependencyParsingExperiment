@@ -205,6 +205,7 @@ bool Trainer::addAntigenToSimulator()
 				ag.setNum(j);
 				ag.setLifetime(lifetime);
 				simu->addWordAgent(ag);//抗原词主体加到模拟器里面
+				simu->anAgBorn();
 			}
 		}
 	}

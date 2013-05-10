@@ -39,7 +39,7 @@ WordAgent::WordAgent(WordInfo& wordinfo,
 	activeLevel = 0;
 
 	mapStatusToBehavior();
-
+	immuneClock = 0;
 
 }
 
@@ -82,8 +82,9 @@ int WordAgent::getLifetime(){
 }
 
 void WordAgent::antigenWeaken(){
+//	Logger::logger<<StrHead::header+int(this) + " antigenWeaken\n";
 	lifetime --;
-	if(lifetime < 0){
+	if(lifetime <= 0){
 		if(category == BCELL){
 			setActiveLevel(0);
 		}else{
@@ -93,15 +94,18 @@ void WordAgent::antigenWeaken(){
 }
 
 void WordAgent::setActiveLevel(int activelevel){
-	this->activeLevel = activelevel;
 	if(activelevel > 0){
 		int lifetime = RunParameter::instance.getParameter("ANTIGEN_LIFETIME").getIntValue();
 		setLifetime(lifetime);
-		simu->anAgBorn();
+		if(!hasActivation()){
+			simu->anAgBorn();
+		}
 	}else{
 		setLifetime(0);
 		simu->anAgDie();
+		setStatus(ACTIVATION_DIE);
 	}
+	this->activeLevel = activelevel;
 }
 int WordAgent::getActiveLevel(){
 	return activeLevel;
@@ -121,53 +125,144 @@ void WordAgent::addBehavior(int behavior){
  */
 bool WordAgent::runImmune()
 {
-        //cout<<"agent id "<<AgentID<<" ";
-        //cout<<"run ";
+//	if(getCategory() == ANTIGEN){
+//		Logger::logger<<StrHead::header+int(this)+" "+toStringID() + " ag lifetime= "+ getLifetime() +" \n";
+//	}
+//	Logger::logger<<StrHead::header + toStringID() +" action size is："+(int)orders.size()+"\n";
 	bool hasRun = false;
-	//cout<<"size "<<orders.size();
-        if(orders.size())
-        {
-                int now = orders.front();//取队列第一个值。
-                //cout<<"now is "<<now<<" ";
-                orders.pop();//删除队列第一个
-                switch(now)
-                {
-                        case MOVING:
-                                doMove();
-                                break;
-                        case INTERACTING:
-                                interact();
-                                break;
-                        case MUTATING:
-//                                mutate();
-								newMutate();
-                                break;
-//                        case SELECTING:
-//                                select();
-//                                break;
-//                        case CLONING:
-//                                _clone();
-//                                break;
-//                        case REGULATING:
-//                                _regulate();
-//                                break;
-                        case DYING:
-                                die();
-                                break;
-                        case ACTIVATION_DYING:
-                        	activationDie();
-                        	break;
-                        default:
-                        	cout<<now<<endl;
-                                assert(0);
-                }
-                hasRun = true;
-        }
-        //cout<<"orun "<<endl;
+	if(orders.size())
+	{
+		int now = orders.front();//取队列第一个值。
+		orders.pop();//删除队列第一个
+		switch(now)
+		{
+		case MOVING:
+			doMove();
+			break;
+		case INTERACTING:
+			interact();
+			break;
+		case MUTATING:
+			newMutate();
+			break;
+		case DYING:
+			die();
+			break;
+		case ACTIVATION_DYING:
+			activationDie();
+			break;
+		default:
+			assert(0);
+		}
+		hasRun = true;
+	}
 	return hasRun;
 }
 
+
+
+//void WordAgent::_mapStatusToBehavior()
+//{
+//	if(category == ANTIGEN)
+//	{
+//		/*selecting behavior according to status of antigen*/
+//		switch(status)
+//		{
+//			case ACTIVE:
+//				orders.push(MOVING);
+//				break;
+//			case DIE:
+//				orders.push(DYING);
+//				break;
+//			default:
+//				assert(0);
+//		}
+//	}
+//	else
+//	{
+//		/*selecting behavior according to status of B cell*/
+//		switch(status)
+//		{
+//			case ACTIVE:
+//                orders.push(MOVING);
+//				break;
+//			case MATCH:
+//				orders.push(MUTATING);
+//				break;
+//			case ACTIVATION_DIE:
+//				orders.push(ACTIVATION_DYING);
+//				break;
+////			case MUTATE:
+////				orders.push(SELECTING);
+////				break;
+////			case MATURE:
+////				orders.push(CLONING);
+////				break;
+////			case DIE:
+////				orders.push(DYING);
+////				break;
+////                        case REGULATE:
+////				orders.push(REGULATING);
+////				break;
+//			default:
+//				assert(0);
+//		}
+//	}
+//}
+
+
+
+
+/**
+ * modified by yangjinfeng
+ */
+void    WordAgent::mapStatusToBehavior()
+{
+	while(orders.size())
+	{
+		orders.pop();
+	}
+	//cout<<"size "<<orders.size()<<" ";
+	if(category == ANTIGEN)
+	{
+		/*selecting behavior according to status of antigen*/
+		switch(status)
+		{
+		case ACTIVE:
+			orders.push(MOVING);
+			break;
+		case DIE:
+			orders.push(DYING);
+			break;
+		default:
+			cout<<status<<endl;
+			assert(0);
+		}
+	}
+	else
+	{
+		/*selecting behavior according to status of B cell*/
+		switch(status)
+		{
+		case ACTIVE:
+			orders.push(MOVING);
+			break;
+		case MATCH:
+			orders.push(MUTATING);
+			break;
+		case ACTIVATION_DIE:
+			orders.push(ACTIVATION_DYING);
+			break;
+		default:
+			cout<<status<<endl;
+			assert(0);
+		}
+	}
+}
+
+
 bool WordAgent::activationDie(){
+	Logger::logger<<StrHead::header +LoggerUtil::B_ACTIVATION_DIE+ toStringID() +" become activationDie \n";
 	setStatus(ACTIVE);
 	mapStatusToBehavior();
 
@@ -176,10 +271,10 @@ bool WordAgent::activationDie(){
 //add by yangjinfeng,随机移动，不考虑密度，如果考虑密度，有可能减慢移动
 bool WordAgent::doMove()
 {
-
+//	Logger::logger<<StrHead::header + toStringID() +" do move \n";
 	if(status != ACTIVE)
 	{
-		_mapStatusToBehavior();
+		mapStatusToBehavior();
 		return false;
 	}
 	//updateSelf();
@@ -195,9 +290,9 @@ bool WordAgent::doMove()
 	pair<int, int> oldPos = position;
 	position = make_pair(newrow, newcol);
 
-	orders.push(INTERACTING);
 	simu->moveAgent(*this,oldPos,position);
 
+//	Logger::logger<<StrHead::header + toStringID() +",status="+ ACTIVE+",action="+INTERACTING+"  after move\n";
 	return true;
 }
 
@@ -207,16 +302,15 @@ bool WordAgent::interact()
 	(1) Antigens and B cells;
 	(2) B cells
 	*/
-	//cout<<"in ";
-//	updateSelf();
+//	Logger::logger<<StrHead::header + toStringID() +" do interact \n";
 	if(status != ACTIVE)
 	{
-		_mapStatusToBehavior();//
+		mapStatusToBehavior();//
 		return false;
 	}
 	bool interacted = simu->interactLocal(*this);
 	if(!interacted){
-		_mapStatusToBehavior();
+		mapStatusToBehavior();
 	}
 	//cout<<"oin";
 	return interacted;
@@ -226,6 +320,7 @@ bool WordAgent::interact()
 bool WordAgent::die()
 {
 	Logger::logger<<StrHead::header+LoggerUtil::DIED+toStringID()+" is ag and going to dying (removed) \n";
+	simu->anAgDie();
 	if(simu->deleteWordAgent(*this))
 	{
 		return true;
@@ -281,6 +376,7 @@ void WordAgent::setMatchedFeatureRecptor(vector<int>& matchedFeature){
 
 
 void WordAgent::newMutate(){
+
 	Logger::logger<<StrHead::header+LoggerUtil::MUTATE+this->toStringID()+" begin to mutate \n";
 	//首先进行预测
 	simu->predictBeforeMutate();
@@ -306,10 +402,11 @@ void WordAgent::newMutate(){
 			it->second.push_back(mutateDelta);
 		}
 	}
-	Logger::logger<<StrHead::header+" clone and  mutate "+k+" agents\n";
+//	Logger::logger<<StrHead::header+" clone and  mutate "+k+" agents\n";
 	//后选择
 
 	simu->selectAfterMutate(*this);
+
 	matchedparatopeFeature.clear();
 
 	setStatus(ACTIVE);
@@ -354,113 +451,9 @@ void WordAgent::setCategory(int cat)
 
 
 
-void WordAgent::_mapStatusToBehavior()
-{
-	if(category == ANTIGEN)
-	{
-		/*selecting behavior according to status of antigen*/
-		switch(status)
-		{
-			case ACTIVE:
-				orders.push(MOVING);
-				break;
-			case DIE:
-				orders.push(DYING);
-				break;
-			default:
-				assert(0);
-		}
-	}
-	else
-	{
-		/*selecting behavior according to status of B cell*/
-		switch(status)
-		{
-			case ACTIVE:
-                orders.push(MOVING);
-				break;
-			case MATCH:
-				orders.push(MUTATING);
-				break;
-//			case MUTATE:
-//				orders.push(SELECTING);
-//				break;
-//			case MATURE:
-//				orders.push(CLONING);
-//				break;
-//			case DIE:
-//				orders.push(DYING);
-//				break;
-//                        case REGULATE:
-//				orders.push(REGULATING);
-//				break;
-			default:
-				assert(0);
-		}
-	}
-}
-
 void WordAgent::setPosition(const std::pair<int,int>& p)
 {
         position.first = p.first;
         position.second = p.second;
-}
-
-
-//modified by yangjinfeng
-void    WordAgent::mapStatusToBehavior()
-{
-	while(orders.size())
-	{
-		orders.pop();
-	}
-	//cout<<"size "<<orders.size()<<" ";
-	if(category == ANTIGEN)
-	{
-		/*selecting behavior according to status of antigen*/
-		switch(status)
-		{
-		case ACTIVE:
-			orders.push(MOVING);
-			break;
-		case DIE:
-			orders.push(DYING);
-			break;
-		default:
-			cout<<status<<endl;
-			assert(0);
-		}
-	}
-	else
-	{
-		/*selecting behavior according to status of B cell*/
-		switch(status)
-		{
-		case ACTIVE:
-			orders.push(MOVING);
-			break;
-		case MATCH:
-			orders.push(MUTATING);
-			break;
-			//		case MUTATE:
-			//			orders.push(SELECTING);
-			//			break;
-			//		case MATURE:
-			//			orders.push(CLONING);
-			//			break;
-			//		case DIE:
-			//			orders.push(DYING);
-			//			break;
-			//		case REGULATE:
-			//			orders.push(REGULATING);
-			//			break;
-		case ACTIVATION_DIE:
-			orders.push(ACTIVATION_DYING);
-			break;
-		default:
-			cout<<status<<endl;
-			assert(0);
-		}
-	}
 }
 

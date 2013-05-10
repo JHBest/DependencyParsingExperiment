@@ -22,6 +22,7 @@ Simulator::Simulator(Predictor * predictor,Model * model)
 	agNum = 0;
 	this-> predictor = predictor;
 	this->model = model;
+	systemClock = 0;
 	loadBCell();
 
 }
@@ -90,10 +91,6 @@ void Simulator::saveBCell(){
  */
 bool Simulator::addWordAgent(WordAgent & pWordAgent)
 {
-	if(pWordAgent.getCategory() == ANTIGEN)
-	{
-		agNum++;
-	}
 	bool randomPosition = true;
 	if(pWordAgent.getCategory() == BCELL && bcellPosition.size() > 0){
 		randomPosition = false;
@@ -121,20 +118,36 @@ bool Simulator::addWordAgent(WordAgent & pWordAgent)
 void Simulator::moveAgent(WordAgent& agent,std::pair<int, int>& fromPos,std::pair<int, int>& toPos){
 	int fromIndex = _calcSub(fromPos);
 	int toIndex = _calcSub(toPos);
+//	Logger::logger<<StrHead::header + "agent.getCategory()= "+ agent.getCategory() +" \n";
 	if(agent.getCategory() == ANTIGEN){
+//		Logger::logger<<StrHead::header+int(&agent) + " moveAgent  lifetime= "+ agent.getLifetime() +" \n";
 		agent.antigenWeaken();
-		if(agent.getLifetime() < 0){
-//			wordAgentGrid[fromIndex].removeAgent(agent);
+		if(agent.getLifetime() == 0){
 			agent.setStatus(DIE);
-		}else{
-			wordAgentGrid[toIndex].addAgent(agent);
-			wordAgentGrid[fromIndex].removeAgent(agent);
 		}
 	}else{
-		wordAgentGrid[toIndex].addAgent(agent);
-		wordAgentGrid[fromIndex].removeAgent(agent);
 		if(agent.hasActivation()){
 			agent.antigenWeaken();
+		}
+	}
+/**
+ * 细胞移动过程涉及抗原生命周期和激活B细胞的激活值保鲜期，因此会改变状态
+ */
+	if(agent.getStatus() != ACTIVE){
+		agent.mapStatusToBehavior();
+	}else{//如果还是ACTIVE，下一步就是交互
+		agent.addBehavior(INTERACTING);
+	}
+
+	//即将死亡的细胞不需要移动。一定要在移动映射下一步行动
+	if(agent.getStatus() != DIE){
+//			if(agent.getCategory() == ANTIGEN){
+//
+//			Logger::logger<<StrHead::header+int(&agent) +" "+agent.toStringID()+ " from  "+fromIndex+" to "+toIndex +" \n";
+//			}
+		if(toIndex != fromIndex){
+			wordAgentGrid[toIndex].addAgent(agent);
+			wordAgentGrid[fromIndex].removeAgent(agent);
 		}
 	}
 }
@@ -207,7 +220,6 @@ void Simulator::selectAfterMutate(WordAgent& wordAgent){
 		if(bestPredicts.size() == 1){
 			selectedIndex = bestPredicts[0];
 		}else if(bestPredicts.size() > 1){
-			cout<<"bestPredicts.size()="<<bestPredicts.size()<<endl;
 			for(size_t i = 0;i < bestPredicts.size();i ++){
 				deltaWeight.clear();
 				for(map<int,vector<double> >::iterator it = matchedparatopeFeature.begin();it != matchedparatopeFeature.end();it ++){
@@ -226,7 +238,7 @@ void Simulator::selectAfterMutate(WordAgent& wordAgent){
 			}
 			selectedIndex = getSentenceDependency().selectMinScoreDifference();
 		}
-		cout<<"selectedIndex="<<selectedIndex<<endl;
+		Logger::logger<<StrHead::header+"selectedIndex="+selectedIndex+" in "+(int)bestPredicts.size()+" mutations\n";
 		if(selectedIndex >= 0){
 			Logger::logger<<StrHead::header+LoggerUtil::SELECTED+wordAgent.toStringID()+" mutation is selected from index:"+selectedIndex+" mutations\n";
 			deltaWeight.clear();
@@ -244,36 +256,72 @@ void Simulator::selectAfterMutate(WordAgent& wordAgent){
 
 bool Simulator::immuneResponse(){
 	Logger::logger<<StrHead::header + "begin immune reponse within a sentence\n";
+//	////
+//	vector<string> agentIDs;
+//	for(size_t i = 0; i < wordAgentGrid.size(); i++)//遍历每一个网格
+//	{
+//		agentIDs.clear();
+//		wordAgentGrid[i].getAllAgentIDs(agentIDs);
+////		Logger::logger<<StrHead::header + "grid "+(int)i +" cell count is:"+(int)agentIDs.size()+"\n";
+//		for(size_t ii = 0;ii < agentIDs.size();ii ++)//遍历网格中map里的每一个主体
+//		{
+//			WordAgent& wa = wordAgentGrid[i].getWordAgent(agentIDs[ii]);
+//			if(wa.getCategory() == ANTIGEN){
+//					Logger::logger<<StrHead::header+int(&wa)+" "+wa.toStringID() + " init ag lifetime= "+ wa.getLifetime() +" \n";
+//			}
+//		}
+//	}
+//	//////
+//
+//
+//
+//
+//
+
+
 	bool toBeContinue = true;
 
 	clock_t start = clock();
-
+	Sentence& sen = getSentenceDependency().getCurrentSentence();
+	int traversalCounter = 0;
 	while(toBeContinue){
-
-		toBeContinue = traversal();
+		traversalCounter ++;
+		systemClockNext();
+		Logger::logger<<StrHead::header +"the round for antigens from  the sentence " + LoggerUtil::sentenceToString(sen) +" is: "+traversalCounter+",ag number is:"+getAgNum()+"\n";
+		toBeContinue = traversal(getSystemClock());
 		if(!toBeContinue){
 			clock_t finish = clock();
 			double totaltime = (double)(finish-start)/CLOCKS_PER_SEC;
 			Logger::logger<<StrHead::header + "wasted seconds: "+ totaltime +"\n";
 		}
-
+//		Logger::logger<<StrHead::header +"the round for antigens from  the sentence " + LoggerUtil::sentenceToString(sen) +" is: "+traversalCounter+" (finishied) continue="+toBeContinue+"\n";
 
 	}
 
 	return true;
 }
 
-bool Simulator::traversal(){
+bool Simulator::traversal(long immuneClock){
 	vector<string> agentIDs;
 	for(size_t i = 0; i < wordAgentGrid.size(); i++)//遍历每一个网格
 	{
 		agentIDs.clear();
 		wordAgentGrid[i].getAllAgentIDs(agentIDs);
+//		Logger::logger<<StrHead::header + "grid "+(int)i +" cell count is:"+(int)agentIDs.size()+"\n";
 		for(size_t ii = 0;ii < agentIDs.size();ii ++)//遍历网格中map里的每一个主体
 		{
 			/**
 			 * 免疫机制核心部分,主体根据状态采取的活动
 			 */
+//			Logger::logger<<StrHead::header + agentIDs[ii] +" become in action \n";
+			if(!wordAgentGrid[i].existsWordAgent(agentIDs[ii])){
+				continue;
+			}
+			//表示已经反应过
+			if(wordAgentGrid[i].getWordAgent(agentIDs[ii]).getImmuneClock() == immuneClock){
+				continue;
+			}
+			wordAgentGrid[i].getWordAgent(agentIDs[ii]).setImmuneClock(immuneClock);
 			wordAgentGrid[i].getWordAgent(agentIDs[ii]).runImmune();
 			if(getAgNum() == 0)//如果抗原已消灭
 			{

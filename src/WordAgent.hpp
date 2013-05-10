@@ -7,6 +7,7 @@
 #include <queue>
 #include <set>
 #include <pair.h>
+#include <time.h>
 
 #include "Environment.hpp"
 #include "Simulator.hpp"
@@ -126,7 +127,12 @@ public:
 	/*operation on position*/
 	std::pair<int, int> getPosition() const;
 	void setPosition(const std::pair<int,int>& p);
-
+	void setImmuneClock(long ic){
+		this->immuneClock = ic;
+	}
+	long getImmuneClock(){
+		return immuneClock;
+	}
 
 
 
@@ -144,6 +150,7 @@ private:
 	void newMutate();
 	/*mapping status to behaviors*/
 	void    _mapStatusToBehavior();
+	long immuneClock;
 
 
 
