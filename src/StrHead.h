@@ -10,8 +10,12 @@
 #include <time.h>
 #include <string>
 #include "Tools.h"
+#include <stdlib.h>
+#include <stdio.h>
 #include <iostream>
 using namespace std;
+
+#define SRC   (StrHead::header+"["+__FILE__+"("+__LINE__+")] ").toSimpleString();
 
 class StrHead {
 public:
@@ -58,8 +62,11 @@ public:
 	}
 	string toString(){
 	    string strv = "";
-	    strv = strv + "[" + Tools::timeToStr(time(NULL))+"] " + head;
+	    strv = strv + "[" + Tools::timeToStr(time(NULL))+"]" + head;
 		return strv;
+	}
+	string toSimpleString(){
+		return head;
 	}
 
 

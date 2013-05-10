@@ -255,7 +255,7 @@ void Simulator::selectAfterMutate(WordAgent& wordAgent){
 
 
 bool Simulator::immuneResponse(){
-	Logger::logger<<StrHead::header + "begin immune reponse within a sentence\n";
+	Logger::logger<<StrHead::header+SRC + "begin immune reponse within a sentence\n";
 //	////
 //	vector<string> agentIDs;
 //	for(size_t i = 0; i < wordAgentGrid.size(); i++)//遍历每一个网格
