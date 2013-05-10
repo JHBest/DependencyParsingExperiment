@@ -10,6 +10,7 @@ private:
 private:
 	static const int maxLen = 128;
 public:
+	Predictor();
 	Predictor(Model * pm);
 	double predict(Sentence & sen, std::vector<int> & fa);
 

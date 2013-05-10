@@ -10,6 +10,9 @@
 #include "Tools.h"
 
 using namespace std;
+Predictor::Predictor(){
+
+}
 
 Predictor::Predictor(Model * pm) : pModel(pm)
 {
@@ -19,7 +22,7 @@ Predictor::Predictor(Model * pm) : pModel(pm)
 bool Predictor::buildGraph(Sentence & sen,
 			std::vector<std::vector<double> > & graph)
 {
-//	cout<<"begin buildGraph"<<endl;
+	cout<<"begin buildGraph"<<endl;
 	graph.clear();
 	int n = sen.size();
 	//cout<<"n "<<n<<endl;
@@ -32,7 +35,7 @@ bool Predictor::buildGraph(Sentence & sen,
 			graph[i][j] = pModel->wordPairWeight(sen, i, j);
 		}
 	}
-//	cout<<"end buildGraph"<<endl;
+	cout<<"end buildGraph"<<endl;
 	return true;
 }
 
@@ -121,20 +124,20 @@ double Predictor::predict(Sentence & sen, std::vector<int> & fa)
 //	cout <<"begin buildGraph(sen,graph)"<<endl;
 	vector<vector<double> > graph;
 	buildGraph(sen, graph);
-//	cout <<"the  graph is: "<<endl;
-//	for(int i = 0;i< graph.size();i++){
-//		for(int j = 0;j < graph[i].size();j++){
-//			cout<<graph[i][j]<<",";
-//		}
-//		cout<<endl;
-//	}
+	cout <<"the  graph is: "<<endl;
+	for(int i = 0;i< graph.size();i++){
+		for(int j = 0;j < graph[i].size();j++){
+			cout<<graph[i][j]<<",";
+		}
+		cout<<endl;
+	}
 
 	double result = _eisner(graph, fa);
-//	cout<<"\npredicited parent is:";/////////////////////////////////////////////
-//	for(size_t i= 0;i < fa.size();i ++){
-//		cout<<fa[i]<<",";
-//	}
-//	cout<<endl;//////////////////////////////////////////////////////////////
+	cout<<"\npredicited parent is:";/////////////////////////////////////////////
+	for(size_t i= 0;i < fa.size();i ++){
+		cout<<fa[i]<<",";
+	}
+	cout<<endl;//////////////////////////////////////////////////////////////
 
 	return result;
 

@@ -9,6 +9,7 @@
 #include "Logger.h"
 #include "StrHead.h"
 #include "RunParameter.h"
+#include "LoggerUtil.h"
 
 using namespace std;
 
@@ -177,6 +178,7 @@ bool DependencyPaser::predict(const char * testFile, const char * outFile)
 			for(size_t i = 0; i < senes.size(); i++){
 				sen.push_back(make_pair(senes[i][1], senes[i][3]));
 			}
+			cout<<LoggerUtil::sentenceToString(sen)<<endl;
 			predictedFather.resize(sen.size());
 			pPredictor->predict(sen,predictedFather);
 			int rightFather = 0;

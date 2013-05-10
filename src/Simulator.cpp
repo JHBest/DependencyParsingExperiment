@@ -231,9 +231,14 @@ void Simulator::selectAfterMutate(WordAgent& wordAgent){
 				Sentence& sen = getSentenceDependency().getCurrentSentence();
 				vector<int>& predictedParent = getSentenceDependency().getPredictedParent(bestPredicts[i]);
 //				cout<<endl;
-//				cout<<"predictedParent ="<<predictedParent.size()<<endl;
+				cout<<"predictedParent ="<<predictedParent.size()<<endl;
+				cout<<"\npredicited parent is:";
+							for(size_t ii= 0;ii < predictedParent.size();ii ++){
+								cout<<predictedParent[ii]<<",";
+							}
+							cout<<endl;
 				double treescore = model->calTreeScore(sen,predictedParent);
-//				cout<<"treescore="<<treescore<<endl;
+				cout<<"treescore="<<treescore<<endl;
 				getSentenceDependency().setPredictedScore(bestPredicts[i],treescore);
 			}
 			selectedIndex = getSentenceDependency().selectMinScoreDifference();

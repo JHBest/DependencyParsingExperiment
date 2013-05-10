@@ -19,7 +19,7 @@ private:
 	std::vector<WordAgent> BCells;
 	//add by yangjinfeng B细胞主体
 	std::vector<WordAgent> BCellAgents;
-	std::vector<WordAgent> Antigens;
+//	std::vector<WordAgent> Antigens;
 	//add by yangjinfeng 抗原主体
 	std::vector<WordAgent> antigenAgents;
 	int rows;

@@ -211,7 +211,7 @@ bool Trainer::addAntigenToSimulator()
 	}
 	Logger::logger<<StrHead::header + "inject antigen total number is  "+ simu->getAgNum() +" \n";
 
-	Antigens.clear();
+	antigenAgents.clear();
 
 	return true;
 
