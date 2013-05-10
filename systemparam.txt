@@ -5,7 +5,7 @@ ROWS=5,int
 #列
 COLS=5,int
 #预测时需要初始化数组的最大长度，根据不同系统设置
-MAX_LENGTH=128
+MAX_LENGTH=128,int
 #突变频率阈值
 MUTATEPRO=0.5,double
 #最大词频率
@@ -16,12 +16,12 @@ MIN_FREQ=5,int
 REDUCE_RATE=10,int
 #突变控制参数
 BETA=100,int
-#克隆的数量，也就是产生几组突变
-K=5,int
 #激活值上限
-MAX_ACTIVATION_LEVEL=3
+ACTIVATION_LEVEL=3,int
+#克隆的数量，也就是产生几组突变
+K=6,int
 #每个抗原的个数
-ANTIGEN_COUNT=5
+ANTIGEN_COUNT=5,int
 #抗原最大生命期限
 ANTIGEN_LIFETIME=20,int
 #如果突变后的精确度比突变前小，接受突变的概率
