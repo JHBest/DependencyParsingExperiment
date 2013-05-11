@@ -93,26 +93,24 @@ void WordAgent::antigenWeaken(){
 	}
 }
 
-void WordAgent::setActiveLevel(int activelevel){
-	if(activelevel > 0){
+void WordAgent::setActiveLevel(int al){
+	if(al > 0){
 		int lifetime = RunParameter::instance.getParameter("ANTIGEN_LIFETIME").getIntValue();
 		setLifetime(lifetime);
 		if(!hasActivation()){
-			simu->anAgBorn();
+			simu->anBAgBorn();
 		}
 	}else{
 		setLifetime(0);
-		simu->anAgDie();
+		simu->anBAgDie();
 		setStatus(ACTIVATION_DIE);
 	}
-	this->activeLevel = activelevel;
+	this->activeLevel = al;
 }
 int WordAgent::getActiveLevel(){
 	return activeLevel;
 }
-void WordAgent::acitvationWeaken(){
-	activeLevel --;
-}
+
 bool WordAgent::hasActivation(){
 	return activeLevel > 0;
 }

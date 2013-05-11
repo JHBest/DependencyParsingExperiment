@@ -13,7 +13,7 @@
 
 using namespace std;
 
-int main1()
+int main()
 {
 
 
@@ -33,7 +33,7 @@ int main1()
     return 0;
 }
 
-int main(){
+int main1(){
 	Predictor pre;
 	pre.predictByGraphs("yjf.txt");
 }

@@ -191,6 +191,14 @@ public:
     	return fabs(d1 - d2)  < DBL_EPSILON ;
     }
 
+    static bool doubleEqualByStr(double d1,double d2){
+    	stringstream ss;
+    	ss <<setprecision(6)<<d1<<endl<<d2;
+    	string str1,str2;
+    	ss>>str1>>str2;
+    	return str1 == str2;
+    }
+
 };
 
 #endif /* TOOLS_H_ */

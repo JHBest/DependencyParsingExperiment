@@ -22,7 +22,7 @@ Predictor::Predictor(Model * pm) : pModel(pm)
 bool Predictor::buildGraph(Sentence & sen,
 			std::vector<std::vector<double> > & graph)
 {
-	cout<<"begin buildGraph"<<endl;
+//	cout<<"begin buildGraph"<<endl;
 	graph.clear();
 	int n = sen.size();
 	//cout<<"n "<<n<<endl;
@@ -35,7 +35,7 @@ bool Predictor::buildGraph(Sentence & sen,
 			graph[i][j] = pModel->wordPairWeight(sen, i, j);
 		}
 	}
-	cout<<"end buildGraph"<<endl;
+//	cout<<"end buildGraph"<<endl;
 	return true;
 }
 
@@ -57,9 +57,10 @@ bool Predictor::_decode(
 		for(int q = s; q <= t; q++){
 			double d1 = f[s][q][d][d] + f[q][t][d][1-d];
 			double d2 = f[s][t][d][c];
-			bool b = Tools::doubleEqual(d1,d2);
+			bool b = Tools::doubleEqualByStr(d1,d2);
 //			if(f[s][q][d][d] + f[q][t][d][1-d] == f[s][t][d][c])
 			if(b){
+//				cout<<"f[s][q][d][d] + f[q][t][d][1-d] == f[s][t][d][c]:	"<<f[s][q][d][d]<<",	"<< f[q][t][d][1-d] <<",	"<< f[s][t][d][c]<<endl;
 				if((q == t && d == c) || (q == s && 1 - d == c)){
 					continue;
 				}
@@ -77,10 +78,11 @@ bool Predictor::_decode(
 		for(int q = s; q < t; q++){
 			double d1 = f[s][t][d][c];
 			double d2 = f[s][q][1][0] + f[q+1][t][0][0] + g[i][j];
-			bool b = Tools::doubleEqual(d1,d2);
+			bool b = Tools::doubleEqualByStr(d1,d2);
 //			if(f[s][t][d][c] == f[s][q][1][0] + f[q+1][t][0][0] + g[i][j])
 			if(b)
 			{
+//				cout<<"f[s][t][d][c] == f[s][q][1][0] + f[q+1][t][0][0] + g[i][j]:	"<<f[s][t][d][c]<<",	"<<f[s][q][1][0]<<",	"<<f[q+1][t][0][0]<<",	"<<g[i][j]<<endl;
 				father[j] = i;
 				_decode(f, s, q, 1, 0, g, father);
 				_decode(f, q + 1, t, 0, 0, g, father);
@@ -124,20 +126,20 @@ double Predictor::predict(Sentence & sen, std::vector<int> & fa)
 //	cout <<"begin buildGraph(sen,graph)"<<endl;
 	vector<vector<double> > graph;
 	buildGraph(sen, graph);
-	cout <<"the  graph is: "<<endl;
-	for(int i = 0;i< graph.size();i++){
-		for(int j = 0;j < graph[i].size();j++){
-			cout<<graph[i][j]<<",";
-		}
-		cout<<endl;
-	}
+//	cout <<"the  graph is: "<<endl;
+//	for(int i = 0;i< graph.size();i++){
+//		for(int j = 0;j < graph[i].size();j++){
+//			cout<<graph[i][j]<<",";
+//		}
+//		cout<<endl;
+//	}
 
 	double result = _eisner(graph, fa);
-	cout<<"\npredicited parent is:";/////////////////////////////////////////////
-	for(size_t i= 0;i < fa.size();i ++){
-		cout<<fa[i]<<",";
-	}
-	cout<<endl;//////////////////////////////////////////////////////////////
+//	cout<<"\npredicited parent is:";/////////////////////////////////////////////
+//	for(size_t i= 0;i < fa.size();i ++){
+//		cout<<fa[i]<<",";
+//	}
+//	cout<<endl;//////////////////////////////////////////////////////////////
 
 	return result;
 

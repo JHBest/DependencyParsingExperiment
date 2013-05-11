@@ -85,8 +85,6 @@ public:
 	//add by yangjinfeng
 	int WordAgent::getActiveLevel();
 	//add by yangjinfeng
-	void WordAgent::acitvationWeaken();
-	//add by yangjinfeng
 	bool hasActivation();
 	//add by yangjinfeng
 	bool runImmune();

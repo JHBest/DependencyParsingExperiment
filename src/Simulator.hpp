@@ -36,6 +36,7 @@ private:
 	//vWordAgents是一个vector，模拟网格，每一个网格存放一个map
 	int rows, cols;
 	int agNum;
+	int bAgNum;
 public:
     Evaluation * eva;
     Predictor * predictor;
@@ -72,12 +73,24 @@ public:
 
 	bool deleteWordAgent(WordAgent & pWordAgent);
 
-	int getAgNum();
+	int getAgNum(){
+		return agNum;
+	}
+	int getBAgNum(){
+		return bAgNum;
+	}
+
 	void anAgDie(){
 		agNum --;
 	}
 	void anAgBorn(){
 		agNum ++;
+	}
+	void anBAgDie(){
+		bAgNum --;
+	}
+	void anBAgBorn(){
+		bAgNum ++;
 	}
 	void systemClockNext(){
 		systemClock ++;

@@ -20,6 +20,7 @@ Simulator::Simulator(Predictor * predictor,Model * model)
 	times = 1;
 	resetAgents();
 	agNum = 0;
+	bAgNum = 0;
 	this-> predictor = predictor;
 	this->model = model;
 	systemClock = 0;
@@ -126,7 +127,7 @@ void Simulator::moveAgent(WordAgent& agent,std::pair<int, int>& fromPos,std::pai
 			agent.setStatus(DIE);
 		}
 	}else{
-		if(agent.hasActivation()){
+		if(agent.hasActivation() || agent.getLifetime() > 0){
 			agent.antigenWeaken();
 		}
 	}
@@ -292,7 +293,7 @@ bool Simulator::immuneResponse(){
 	while(toBeContinue){
 		traversalCounter ++;
 		systemClockNext();
-		Logger::logger<<StrHead::header +"the round for antigens from  the sentence " + LoggerUtil::sentenceToString(sen) +" is: "+traversalCounter+",ag number is:"+getAgNum()+"\n";
+		Logger::logger<<StrHead::header +"the round for antigens from  the sentence " + LoggerUtil::sentenceToString(sen) +" is: "+traversalCounter+",ag number is:"+getAgNum()+",bag number is:"+getBAgNum()+"\n";
 		toBeContinue = traversal(getSystemClock());
 		if(!toBeContinue){
 			clock_t finish = clock();
@@ -328,7 +329,7 @@ bool Simulator::traversal(long immuneClock){
 			}
 			wordAgentGrid[i].getWordAgent(agentIDs[ii]).setImmuneClock(immuneClock);
 			wordAgentGrid[i].getWordAgent(agentIDs[ii]).runImmune();
-			if(getAgNum() == 0)//如果抗原已消灭
+			if((getAgNum() + getBAgNum()) == 0)//如果抗原已消灭
 			{
 				Logger::logger<<StrHead::header + "Ags are all killed!\n";
 				return false;
@@ -369,8 +370,5 @@ bool Simulator::deleteWordAgent(WordAgent & pWordAgent)
 	return true;
 }
 
-int Simulator::getAgNum()
-{
-        return agNum;
-}
+
 
