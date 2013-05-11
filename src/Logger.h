@@ -6,11 +6,17 @@
 #include <fstream>
 #include <string.h>
 #include <time.h>
+#include <stdlib.h>
+#include <stdio.h>
 #include "Tools.h"
 #include "StrHead.h"
 #include <map.h>
 using namespace std;
-//__FILE__ __LINE__ #include <stdlib.h> #include <stdio.h>
+
+#define TIMESRC   Logger::logger<<((string()+"[" + Tools::timeToStr(time(NULL))+"]"+"["+__FILE__+"("+Tools::appendIntToStr(string(),__LINE__) +")] "));
+#define TIME   Logger::logger<<(string()+"[" + Tools::timeToStr(time(NULL))+"]");
+#define SRC   Logger::logger<<(string()+"["+__FILE__+"("+Tools::appendIntToStr(string(),__LINE__) +")] ");
+
 class Logger
 {
     public:

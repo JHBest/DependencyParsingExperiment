@@ -22,4 +22,5 @@ string LoggerUtil::MUTATE = "[MUTATE] ";
 string LoggerUtil::SELECTED = "[SELECTED] ";
 string LoggerUtil::ABORTED = "[ABORTED] ";
 string LoggerUtil::DIED = "[DIED] ";
+string LoggerUtil::ROUND = "[ROUND] ";
 

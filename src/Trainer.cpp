@@ -106,9 +106,9 @@ void Trainer::reduceWordFreq(){
 
 
 void Trainer::distributeBCells(){
-	Logger::logger<<StrHead::header + "distribute B cells randomly according B cell frequncy" +"\n";
+	TIMESRC Logger::logger<<StrHead::header + "distribute B cells randomly according B cell frequncy" +"\n";
 	int count = BCellAgents.size();
-	Logger::logger<<StrHead::header + "number of B cell type is "+count +"\n";
+	TIMESRC Logger::logger<<StrHead::header + "number of B cell type is "+count +"\n";
 	int bcellcount = 0;
 	for(size_t i = 0; i < BCellAgents.size(); i++)
 	{
@@ -123,8 +123,8 @@ void Trainer::distributeBCells(){
 	}
 
 //	BCells.clear();
-	Logger::logger<<StrHead::header + "number of B cell is "+bcellcount +"\n";
-	Logger::logger<<StrHead::header + "distribution of b cells finished"+"\n";
+	TIMESRC Logger::logger<<StrHead::header + "number of B cell is "+bcellcount +"\n";
+	TIMESRC Logger::logger<<StrHead::header + "distribution of b cells finished"+"\n";
 }
 
 void Trainer::saveBCells(){
@@ -138,12 +138,12 @@ void Trainer::saveBCells(){
 bool Trainer::trainBySentence(const Sentence & sen, const vector<int> & fa)
 {
 	string senStr = LoggerUtil::sentenceToString(sen);
-	Logger::logger<<StrHead::header + "train the model with sentence one by one : "+senStr+"\n";
+	TIMESRC Logger::logger<<StrHead::header + "train the model with sentence one by one : "+senStr+"\n";
 
 
 	injectAntigen(sen, fa);//ע�뿹ԭ
 
-	Logger::logger<<StrHead::header + "after antigen injection, immune response come to start\n";
+	TIMESRC Logger::logger<<StrHead::header + "after antigen injection, immune response come to start\n";
 	simu->getSentenceDependency().setSentenceAndDependency(sen,fa);
 	if(simu->immuneResponse())
 	{
@@ -161,7 +161,7 @@ bool Trainer::trainBySentence(const Sentence & sen, const vector<int> & fa)
  */
 bool Trainer::injectAntigen(const Sentence & sen, const std::vector<int> & fa)
 {
-	Logger::logger<<StrHead::header + "construct antigen and inject to simulator\n";
+	TIMESRC Logger::logger<<StrHead::header + "construct antigen and inject to simulator\n";
 	for(size_t i = 1; i < sen.size(); i++)
 	{
 		int j = fa[i];
@@ -182,6 +182,7 @@ bool Trainer::buildAntigen(const Sentence & sen,int child,const int parent)
 {
 	WordInfo wi(sen[child].first,sen[child].second);
 	WordAgent antigenagent(wi,simu, ANTIGEN);
+	antigenagent.setIndexInSentence(child);
 	vector<int> features;
 	pModel->getFeatureIDVec(sen, parent, child, features);
 	antigenagent.addIdiotopeDependentFeature(features);
@@ -194,7 +195,7 @@ bool Trainer::buildAntigen(const Sentence & sen,int child,const int parent)
 bool Trainer::addAntigenToSimulator()
 {
 	int antigencount = RunParameter::instance.getParameter("ANTIGEN_COUNT").getIntValue();
-	Logger::logger<<StrHead::header + "add antigen to simulator. "+ antigencount +" per antigen\n";
+	TIMESRC Logger::logger<<StrHead::header + "add antigen to simulator. "+ antigencount +" per antigen\n";
 
 	int lifetime = RunParameter::instance.getParameter("ANTIGEN_LIFETIME").getIntValue();
 	if(antigenAgents.size() > 0)
@@ -209,7 +210,7 @@ bool Trainer::addAntigenToSimulator()
 			}
 		}
 	}
-	Logger::logger<<StrHead::header + "inject antigen total number is  "+ simu->getAgNum() +" \n";
+	TIMESRC Logger::logger<<StrHead::header + "inject antigen total number is  "+ simu->getAgNum() +" \n";
 
 	antigenAgents.clear();
 

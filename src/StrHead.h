@@ -15,7 +15,7 @@
 #include <iostream>
 using namespace std;
 
-#define SRC   (StrHead::header+"["+__FILE__+"("+__LINE__+")] ").toSimpleString();
+
 
 class StrHead {
 public:
@@ -60,12 +60,12 @@ public:
 		return newHead;
 
 	}
-	string toString(){
+	string toTimeString(){
 	    string strv = "";
 	    strv = strv + "[" + Tools::timeToStr(time(NULL))+"]" + head;
 		return strv;
 	}
-	string toSimpleString(){
+	string toString(){
 		return head;
 	}
 

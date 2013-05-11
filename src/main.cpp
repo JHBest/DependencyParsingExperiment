@@ -18,22 +18,22 @@ int main()
 
 
 //	srand((unsigned) time(NULL));
-	Logger::logger<<StrHead::header + "train file is:\n";
+	TIMESRC Logger::logger<<StrHead::header + "train file is:\n";
 	string train_file = RunParameter::instance.getParameter("TRAIN_FILE").getStringValue();
-	Logger::logger<<StrHead::header + "train file is: "+train_file+"\n";
+	TIMESRC Logger::logger<<StrHead::header + "train file is: "+train_file+"\n";
 	string test_file = RunParameter::instance.getParameter("TEST_FILE").getStringValue();
-	Logger::logger<<StrHead::header + "test file is: "+test_file+"\n";
+	TIMESRC Logger::logger<<StrHead::header + "test file is: "+test_file+"\n";
 	string result_file = RunParameter::instance.getParameter("RESULT_FILE").getStringValue();
 
 	DependencyPaser dependencyPaser;
 	dependencyPaser.train(train_file.c_str());
-//	dependencyPaser.predict(test_file.c_str(),result_file.c_str());
+	dependencyPaser.predict(test_file.c_str(),result_file.c_str());
 
-	Logger::logger<<StrHead::header + "result file is: "+result_file+"\n";
+	TIMESRC Logger::logger<<StrHead::header + "result file is: "+result_file+"\n";
     return 0;
 }
 
-int main1(){
+int main3(){
 	Predictor pre;
 	pre.predictByGraphs("yjf.txt");
 }
@@ -59,4 +59,13 @@ int main2(){
 	//	cout<< "TEST_FILE="<<RunParameter::instance.getParameter("TEST_FILE").getStringValue()<<endl;
 	//	cout<< "RESULT_FILE="<<RunParameter::instance.getParameter("RESULT_FILE").getStringValue()<<endl;
 
+}
+
+
+int main4(){
+
+	TIMESRC Logger::logger<<StrHead::header + "time and src\n";
+	TIME Logger::logger<<StrHead::header + "only time\n";
+	SRC Logger::logger<<StrHead::header + "only src\n";
+	cout<<"test file is: \n";
 }

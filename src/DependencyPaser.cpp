@@ -40,13 +40,13 @@ bool DependencyPaser::train(const char * file){
 	Logger::logger<<StrHead::header + "Initilizing(Loading) position and weight!" +"\n";
 	//初始化位置和权重
 	initPositionAndWeight();
-	Logger::logger<<StrHead::header + "Initilizing finished!" +"\n";
+	TIMESRC Logger::logger<<StrHead::header + "Initilizing finished!" +"\n";
 
-	Logger::logger<<StrHead::header + "Online learning..." +"\n";
+	TIMESRC Logger::logger<<StrHead::header + "Online learning..." +"\n";
 	trainFromFile(file);//读取依存树库，逐句训练
-	Logger::logger<<StrHead::header + "Online learning finished!" +"\n";
+	TIMESRC Logger::logger<<StrHead::header + "Online learning finished!" +"\n";
 
-	Logger::logger<<StrHead::header + "saving b cells and feature weight" +"\n";
+	TIMESRC Logger::logger<<StrHead::header + "saving b cells and feature weight" +"\n";
 	//保存B细胞的位置信息
 	pTrainer->saveBCells();
 	//保存特征的权重
@@ -115,12 +115,12 @@ void DependencyPaser::initPositionAndWeight(){
  */
 bool DependencyPaser::trainFromFile(const char * file)
 {
-	string line;
 	vector<vector<string> > senes;
 	int learnTimes = RunParameter::instance.getParameter("LEARNTIMES").getIntValue();
 	for(int i = 0; i < learnTimes; i++)//迭代次数
 	{
-		Logger::logger<<StrHead::header +"Learning "+(i+1)+ " times" +"\n";
+		string line;
+		TIMESRC Logger::logger<<StrHead::header +"Learning "+(i+1)+ " times" +"\n";
 		ifstream fin(file);
 		while(getline(fin, line)){
 			if(line == ""){
@@ -159,7 +159,7 @@ bool DependencyPaser::trainFromFile(const char * file)
 
 bool DependencyPaser::predict(const char * testFile, const char * outFile)
 {
-	Logger::logger<<StrHead::header + "Predicting..." +"\n";
+	TIMESRC Logger::logger<<StrHead::header + "Predicting..." +"\n";
 
 	ifstream fin(testFile);
 	ofstream fout(outFile, ios::out|ios::app);
@@ -208,10 +208,10 @@ bool DependencyPaser::predict(const char * testFile, const char * outFile)
 		}
 	}
 	double uas = rightHeaderCount /(double)allWordCount;
-	Logger::logger<<StrHead::header + "unlabeled attachment score:" + uas +"\n";
+	TIMESRC Logger::logger<<StrHead::header + "unlabeled attachment score:" + uas +"\n";
 	fout<<"unlabeled attachment score:"<<uas<<endl;
 	fout.close();
-	Logger::logger<<StrHead::header + "Predicting finished!" +"\n";
+	TIMESRC Logger::logger<<StrHead::header + "Predicting finished!" +"\n";
 	return true;
 }
 

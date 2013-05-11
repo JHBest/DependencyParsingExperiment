@@ -123,7 +123,7 @@ void Simulator::moveAgent(WordAgent& agent,std::pair<int, int>& fromPos,std::pai
 	if(agent.getCategory() == ANTIGEN){
 //		Logger::logger<<StrHead::header+int(&agent) + " moveAgent  lifetime= "+ agent.getLifetime() +" \n";
 		agent.antigenWeaken();
-		if(agent.getLifetime() == 0){
+		if(agent.getLifetime() <= 0){
 			agent.setStatus(DIE);
 		}
 	}else{
@@ -147,8 +147,10 @@ void Simulator::moveAgent(WordAgent& agent,std::pair<int, int>& fromPos,std::pai
 //			Logger::logger<<StrHead::header+int(&agent) +" "+agent.toStringID()+ " from  "+fromIndex+" to "+toIndex +" \n";
 //			}
 		if(toIndex != fromIndex){
+			agent.setPosition(toPos);//移动成功后再设置新位置
 			wordAgentGrid[toIndex].addAgent(agent);
 			wordAgentGrid[fromIndex].removeAgent(agent);
+
 		}
 	}
 }
@@ -215,7 +217,7 @@ void Simulator::selectAfterMutate(WordAgent& wordAgent){
 		}
 	}
 	if(accpetMutate){//接受突变
-		Logger::logger<<StrHead::header+LoggerUtil::SELECTED+wordAgent.toStringID()+" mutation is selected from "+(int)bestPredicts.size()+" mutations\n";
+		TIMESRC Logger::logger<<StrHead::header+LoggerUtil::SELECTED+wordAgent.toStringID()+" mutation is selected from "+(int)bestPredicts.size()+" mutations\n";
 		deltaWeight.clear();
 		int selectedIndex = -1;
 		if(bestPredicts.size() == 1){
@@ -232,21 +234,21 @@ void Simulator::selectAfterMutate(WordAgent& wordAgent){
 				Sentence& sen = getSentenceDependency().getCurrentSentence();
 				vector<int>& predictedParent = getSentenceDependency().getPredictedParent(bestPredicts[i]);
 //				cout<<endl;
-				cout<<"predictedParent ="<<predictedParent.size()<<endl;
-				cout<<"\npredicited parent is:";
-							for(size_t ii= 0;ii < predictedParent.size();ii ++){
-								cout<<predictedParent[ii]<<",";
-							}
-							cout<<endl;
+//				cout<<"predictedParent ="<<predictedParent.size()<<endl;
+//				cout<<"\npredicited parent is:";
+//							for(size_t ii= 0;ii < predictedParent.size();ii ++){
+//								cout<<predictedParent[ii]<<",";
+//							}
+//							cout<<endl;
 				double treescore = model->calTreeScore(sen,predictedParent);
-				cout<<"treescore="<<treescore<<endl;
+//				cout<<"treescore="<<treescore<<endl;
 				getSentenceDependency().setPredictedScore(bestPredicts[i],treescore);
 			}
 			selectedIndex = getSentenceDependency().selectMinScoreDifference();
 		}
-		Logger::logger<<StrHead::header+"selectedIndex="+selectedIndex+" in "+(int)bestPredicts.size()+" mutations\n";
+		TIMESRC Logger::logger<<StrHead::header+"selectedIndex="+selectedIndex+" in "+(int)bestPredicts.size()+" mutations\n";
 		if(selectedIndex >= 0){
-			Logger::logger<<StrHead::header+LoggerUtil::SELECTED+wordAgent.toStringID()+" mutation is selected from index:"+selectedIndex+" mutations\n";
+			TIMESRC Logger::logger<<StrHead::header+LoggerUtil::SELECTED+wordAgent.toStringID()+" mutation is selected from index:"+selectedIndex+" mutations\n";
 			deltaWeight.clear();
 			for(map<int,vector<double> >::iterator it = matchedparatopeFeature.begin();it != matchedparatopeFeature.end();it ++){
 				deltaWeight[it->first] = it->second[selectedIndex];
@@ -255,35 +257,13 @@ void Simulator::selectAfterMutate(WordAgent& wordAgent){
 			model->updateWeightByDelta();
 		}
 	}else{
-		Logger::logger<<StrHead::header+LoggerUtil::ABORTED+wordAgent.toStringID()+" mutation is aborted \n";
+		TIMESRC Logger::logger<<StrHead::header+LoggerUtil::ABORTED+wordAgent.toStringID()+" mutation is aborted \n";
 	}
 }
 
 
 bool Simulator::immuneResponse(){
-	Logger::logger<<StrHead::header+SRC + "begin immune reponse within a sentence\n";
-//	////
-//	vector<string> agentIDs;
-//	for(size_t i = 0; i < wordAgentGrid.size(); i++)//遍历每一个网格
-//	{
-//		agentIDs.clear();
-//		wordAgentGrid[i].getAllAgentIDs(agentIDs);
-////		Logger::logger<<StrHead::header + "grid "+(int)i +" cell count is:"+(int)agentIDs.size()+"\n";
-//		for(size_t ii = 0;ii < agentIDs.size();ii ++)//遍历网格中map里的每一个主体
-//		{
-//			WordAgent& wa = wordAgentGrid[i].getWordAgent(agentIDs[ii]);
-//			if(wa.getCategory() == ANTIGEN){
-//					Logger::logger<<StrHead::header+int(&wa)+" "+wa.toStringID() + " init ag lifetime= "+ wa.getLifetime() +" \n";
-//			}
-//		}
-//	}
-//	//////
-//
-//
-//
-//
-//
-
+	Logger::logger<<StrHead::header+"begin immune reponse within a sentence\n";
 
 	bool toBeContinue = true;
 
@@ -293,18 +273,39 @@ bool Simulator::immuneResponse(){
 	while(toBeContinue){
 		traversalCounter ++;
 		systemClockNext();
-		Logger::logger<<StrHead::header +"the round for antigens from  the sentence " + LoggerUtil::sentenceToString(sen) +" is: "+traversalCounter+",ag number is:"+getAgNum()+",bag number is:"+getBAgNum()+"\n";
+		TIMESRC Logger::logger<<StrHead::header+ LoggerUtil::ROUND+ +"the round is: "+traversalCounter+",ag number is:"+getAgNum()+",bag number is:"+getBAgNum()+", for antigens from  the sentence " + LoggerUtil::sentenceToString(sen) +"\n";
 		toBeContinue = traversal(getSystemClock());
 		if(!toBeContinue){
 			clock_t finish = clock();
 			double totaltime = (double)(finish-start)/CLOCKS_PER_SEC;
-			Logger::logger<<StrHead::header + "wasted seconds: "+ totaltime +"\n";
+			TIMESRC Logger::logger<<StrHead::header + "wasted seconds: "+ totaltime +"\n";
 		}
-//		Logger::logger<<StrHead::header +"the round for antigens from  the sentence " + LoggerUtil::sentenceToString(sen) +" is: "+traversalCounter+" (finishied) continue="+toBeContinue+"\n";
+
+//		printAllAntigen();
 
 	}
 
 	return true;
+}
+
+void Simulator::printAllAntigen(){
+	///输出抗原
+	TIMESRC Logger::logger<<StrHead::header+ LoggerUtil::ROUND+",ag number is:"+getAgNum()+",bag number is:"+getBAgNum() +"\n";
+	vector<string> agentIDs;
+	for(size_t i = 0; i < wordAgentGrid.size(); i++)//遍历每一个网格
+	{
+		agentIDs.clear();
+		wordAgentGrid[i].getAllAgentIDs(agentIDs);
+//		TIMESRC Logger::logger<<StrHead::header + "grid "+(int)i +" cell count is:"+(int)agentIDs.size()+"\n";
+		for(size_t ii = 0;ii < agentIDs.size();ii ++)//遍历网格中map里的每一个主体
+		{
+			if(wordAgentGrid[i].getWordAgent(agentIDs[ii]).getCategory() == ANTIGEN){
+
+				TIMESRC Logger::logger<<StrHead::header+"the grid:"+(int)i+" left ag is "+wordAgentGrid[i].getWordAgent(agentIDs[ii]).toString()+"\n";
+			}
+		}
+	}
+
 }
 
 bool Simulator::traversal(long immuneClock){
@@ -313,13 +314,13 @@ bool Simulator::traversal(long immuneClock){
 	{
 		agentIDs.clear();
 		wordAgentGrid[i].getAllAgentIDs(agentIDs);
-//		Logger::logger<<StrHead::header + "grid "+(int)i +" cell count is:"+(int)agentIDs.size()+"\n";
+//		TIMESRC Logger::logger<<StrHead::header + "grid "+(int)i +" cell count is:"+(int)agentIDs.size()+"\n";
 		for(size_t ii = 0;ii < agentIDs.size();ii ++)//遍历网格中map里的每一个主体
 		{
 			/**
 			 * 免疫机制核心部分,主体根据状态采取的活动
 			 */
-//			Logger::logger<<StrHead::header + agentIDs[ii] +" become in action \n";
+//			TIMESRC Logger::logger<<StrHead::header + agentIDs[ii] +" become in action \n";
 			if(!wordAgentGrid[i].existsWordAgent(agentIDs[ii])){
 				continue;
 			}
@@ -331,7 +332,7 @@ bool Simulator::traversal(long immuneClock){
 			wordAgentGrid[i].getWordAgent(agentIDs[ii]).runImmune();
 			if((getAgNum() + getBAgNum()) == 0)//如果抗原已消灭
 			{
-				Logger::logger<<StrHead::header + "Ags are all killed!\n";
+				TIMESRC Logger::logger<<StrHead::header + "Ags are all killed!\n";
 				return false;
 			}
 		}
@@ -365,7 +366,23 @@ int Simulator::_calcSub(const pair<int, int> & pos) const
 bool Simulator::deleteWordAgent(WordAgent & pWordAgent)
 {
 	int index = _calcSub(pWordAgent.getPosition());
-	wordAgentGrid[index].removeAgent(pWordAgent);
+//	bool exist = wordAgentGrid[index].existsWordAgent(pWordAgent.toStringID());
+//	TIMESRC Logger::logger<<StrHead::header+pWordAgent.toStringID()+" "+exist+" exist in " + pWordAgent.getPosition().first+","+pWordAgent.getPosition().second+"\n";
+//	if(!exist){
+//		vector<string> agentIDs;
+//		wordAgentGrid[index].getAllAgentIDs(agentIDs);
+//		//		TIMESRC Logger::logger<<StrHead::header + "grid "+(int)i +" cell count is:"+(int)agentIDs.size()+"\n";
+//		for(size_t ii = 0;ii < agentIDs.size();ii ++)//遍历网格中map里的每一个主体
+//		{
+//			if(wordAgentGrid[index].getWordAgent(agentIDs[ii]).getCategory() == ANTIGEN){
+//
+//				TIMESRC Logger::logger<<StrHead::header+"this grid ag is "+wordAgentGrid[index].getWordAgent(agentIDs[ii]).toStringID()+"\n";
+//			}
+//		}
+//	}
+
+	bool success = wordAgentGrid[index].removeAgent(pWordAgent);
+//	TIMESRC Logger::logger<<StrHead::header+success+" deleted from " + pWordAgent.getPosition().first+","+pWordAgent.getPosition().second+"\n";
 
 	return true;
 }

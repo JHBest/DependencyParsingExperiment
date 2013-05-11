@@ -45,6 +45,8 @@ private:
 	int status;
 	/*词主体类型、抗原、B细胞*/
 	int category;
+	//仅用于抗原，用以区分同一个词多次出现在句子中的情况，这时视作不同的抗原
+	int indexInSentence;
 public:
 	WordAgent();
 	//add by yangjinfeng
@@ -54,15 +56,25 @@ public:
 		return wordinfo;
 	}
 
+	void setIndexInSentence(int index){
+		indexInSentence = index;
+	}
+	int getIndexInSentence(){
+		return indexInSentence;
+	}
 	void setNum(int num){
 		this->num = num;
 	}
 	int getNum()const{
 		return num;
 	}
+	int getActionSize(){
+		return orders.size();
+	}
 
 	//add by yangjinfeng
 	string toStringID();
+	string toString();
 	string toPosition();
 	//add by yangjinfeng
 	void addIdiotopeDependentFeature(const vector<int> & feature);

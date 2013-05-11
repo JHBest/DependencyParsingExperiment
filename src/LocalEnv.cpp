@@ -24,8 +24,8 @@ void LocalEnv::addAgent(WordAgent& wordAgent){
 	localunit[wordAgent.toStringID()] = wordAgent;
 }
 
-void LocalEnv::removeAgent(WordAgent& wordAgent){
-	localunit.erase(wordAgent.toStringID());
+bool LocalEnv::removeAgent(WordAgent& wordAgent){
+	return localunit.erase(wordAgent.toStringID()) >= 1;
 }
 
 int LocalEnv::getAgentCount(){
@@ -87,10 +87,10 @@ bool LocalEnv::bCellInteraction(WordAgent& bcell){
 	}
 
 	if(maxaffinity > 0){
-//		Logger::logger<<"maxaffinity :当前主体是****"<<bcell.toStringID()<<"  cat="<<bcell.getCategory()<<" addr="<<(int)(&bcell)<<"\n";
+//		TIMESRC Logger::logger<<"maxaffinity :当前主体是****"<<bcell.toStringID()<<"  cat="<<bcell.getCategory()<<" addr="<<(int)(&bcell)<<"\n";
 		vector<int> matchedFeature;
 		if(maxAffinityAgent->getCategory() == BCELL){//wordAgent作为抗原
-			Logger::logger<<StrHead::header+LoggerUtil::ACTIVE_B_RECOGNIZED+bcell.toStringID()+" act as antigen for active level("+bcell.getActiveLevel()+"),and being reconized by" +maxAffinityAgent->toStringID()+"\n";
+			TIMESRC Logger::logger<<StrHead::header+LoggerUtil::ACTIVE_B_RECOGNIZED+bcell.toStringID()+" act as antigen for active level("+bcell.getActiveLevel()+"),and being reconized by" +maxAffinityAgent->toStringID()+"\n";
 
 			maxAffinityAgent->matchFeatureRecptor(bcell,matchedFeature);
 			maxAffinityAgent->setMatchedFeatureRecptor(matchedFeature);
@@ -105,7 +105,7 @@ bool LocalEnv::bCellInteraction(WordAgent& bcell){
 			bcell.setStatus(ACTIVATION_DIE);
 			bcell.mapStatusToBehavior();
 		}else{
-			Logger::logger<<StrHead::header+LoggerUtil::AG_RECOGNIZED+maxAffinityAgent->toStringID()+" is antigen,and being reconized by current agent " +bcell.toStringID()+"\n";
+			TIMESRC Logger::logger<<StrHead::header+LoggerUtil::AG_RECOGNIZED+maxAffinityAgent->toStringID()+" is antigen,and being reconized by current agent " +bcell.toStringID()+"\n";
 //			cout<<bcell.getCategory()<<endl;
 			bcell.matchFeatureRecptor(*maxAffinityAgent,matchedFeature);
 			bcell.setMatchedFeatureRecptor(matchedFeature);
@@ -146,7 +146,7 @@ bool LocalEnv::agInterfaction(WordAgent& ag){
 		}
 	}
 	if(maxaffinity > 0){
-		Logger::logger<<StrHead::header+LoggerUtil::AG_RECOGNIZED+ag.toStringID()+" is antigen,and being reconized by" +maxAffinityAgent->toStringID()+"\n";
+		TIMESRC Logger::logger<<StrHead::header+LoggerUtil::AG_RECOGNIZED+ag.toStringID()+" is antigen,and being reconized by" +maxAffinityAgent->toStringID()+"\n";
 		vector<int> matchedFeature;
 		maxAffinityAgent->matchFeatureRecptor(ag,matchedFeature);
 		maxAffinityAgent->setMatchedFeatureRecptor(matchedFeature);
@@ -172,14 +172,14 @@ bool LocalEnv::agInterfaction(WordAgent& ag){
  * 如果当前主体是抗原，则只能和B细胞交互
  */
 bool LocalEnv::interact(WordAgent& wordAgent){
-//	Logger::logger<<"词主体在局部环境交互"<<"\n";
+//	TIMESRC Logger::logger<<"词主体在局部环境交互"<<"\n";
 	bool interacted = false;
 	if(wordAgent.getCategory() == BCELL){
-//		Logger::logger<<"current agent is b cell\n";
+//		TIMESRC Logger::logger<<"current agent is b cell\n";
 		interacted = bCellInteraction(wordAgent);
 
 	}else if(wordAgent.getCategory() == ANTIGEN){//如果主体是抗原
-//		Logger::logger<<"current agent is antigen\n";
+//		TIMESRC Logger::logger<<"current agent is antigen\n";
 		interacted = agInterfaction(wordAgent);
 	}
 	return interacted;

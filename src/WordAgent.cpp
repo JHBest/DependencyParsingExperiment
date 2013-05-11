@@ -37,6 +37,7 @@ WordAgent::WordAgent(WordInfo& wordinfo,
 	simu = simulator;
 
 	activeLevel = 0;
+	indexInSentence = 0;
 
 	mapStatusToBehavior();
 	immuneClock = 0;
@@ -47,7 +48,23 @@ WordAgent::WordAgent(WordInfo& wordinfo,
 string WordAgent::toStringID(){
 	string id = wordinfo.toString()+"_";
 	id = Tools::appendIntToStr(id,this->category)+"_";
-	return Tools::appendIntToStr(id,this->num);
+	if(getCategory() == ANTIGEN){
+		id = Tools::appendIntToStr(id,this->getIndexInSentence())+"_";
+	}
+	id = Tools::appendIntToStr(id,this->num);
+	return id;
+}
+
+/**
+ * 包括词，词性，类别，序号，状态,行为，位置
+ */
+string WordAgent::toString(){
+	string str = toStringID()+"-";
+	str = Tools::appendIntToStr(str,this->status)+ "-";
+	str = Tools::appendIntToStr(str,getActionSize())+"(";
+	str = Tools::appendIntToStr(str,position.first)+",";
+	str = Tools::appendIntToStr(str,position.second)+")";
+	return str;
 }
 
 string WordAgent::toPosition(){
@@ -82,7 +99,7 @@ int WordAgent::getLifetime(){
 }
 
 void WordAgent::antigenWeaken(){
-//	Logger::logger<<StrHead::header+int(this) + " antigenWeaken\n";
+//	TIMESRC Logger::logger<<StrHead::header+int(this) + " antigenWeaken\n";
 	lifetime --;
 	if(lifetime <= 0){
 		if(category == BCELL){
@@ -124,9 +141,9 @@ void WordAgent::addBehavior(int behavior){
 bool WordAgent::runImmune()
 {
 //	if(getCategory() == ANTIGEN){
-//		Logger::logger<<StrHead::header+int(this)+" "+toStringID() + " ag lifetime= "+ getLifetime() +" \n";
+//		TIMESRC Logger::logger<<StrHead::header+int(this)+" "+toStringID() + " ag lifetime= "+ getLifetime() +" \n";
 //	}
-//	Logger::logger<<StrHead::header + toStringID() +" action size is："+(int)orders.size()+"\n";
+//	TIMESRC Logger::logger<<StrHead::header + toStringID() +" action size is："+(int)orders.size()+"\n";
 	bool hasRun = false;
 	if(orders.size())
 	{
@@ -260,7 +277,7 @@ void    WordAgent::mapStatusToBehavior()
 
 
 bool WordAgent::activationDie(){
-	Logger::logger<<StrHead::header +LoggerUtil::B_ACTIVATION_DIE+ toStringID() +" become activationDie \n";
+	TIMESRC Logger::logger<<StrHead::header +LoggerUtil::B_ACTIVATION_DIE+ toStringID() +" become activationDie \n";
 	setStatus(ACTIVE);
 	mapStatusToBehavior();
 
@@ -269,7 +286,7 @@ bool WordAgent::activationDie(){
 //add by yangjinfeng,随机移动，不考虑密度，如果考虑密度，有可能减慢移动
 bool WordAgent::doMove()
 {
-//	Logger::logger<<StrHead::header + toStringID() +" do move \n";
+//	TIMESRC Logger::logger<<StrHead::header + toStringID() +" do move \n";
 	if(status != ACTIVE)
 	{
 		mapStatusToBehavior();
@@ -286,11 +303,11 @@ bool WordAgent::doMove()
 	int newcol = (position.second + dy[direction] + COL) % COL;
 
 	pair<int, int> oldPos = position;
-	position = make_pair(newrow, newcol);
+	pair<int, int> newPos = make_pair(newrow, newcol);
 
-	simu->moveAgent(*this,oldPos,position);
+	simu->moveAgent(*this,oldPos,newPos);
 
-//	Logger::logger<<StrHead::header + toStringID() +",status="+ ACTIVE+",action="+INTERACTING+"  after move\n";
+//	TIMESRC Logger::logger<<StrHead::header + toStringID() +",status="+ ACTIVE+",action="+INTERACTING+"  after move\n";
 	return true;
 }
 
@@ -300,7 +317,7 @@ bool WordAgent::interact()
 	(1) Antigens and B cells;
 	(2) B cells
 	*/
-//	Logger::logger<<StrHead::header + toStringID() +" do interact \n";
+//	TIMESRC Logger::logger<<StrHead::header + toStringID() +" do interact \n";
 	if(status != ACTIVE)
 	{
 		mapStatusToBehavior();//
@@ -317,7 +334,7 @@ bool WordAgent::interact()
 
 bool WordAgent::die()
 {
-	Logger::logger<<StrHead::header+LoggerUtil::DIED+toStringID()+" is ag and going to dying (removed) \n";
+	TIMESRC Logger::logger<<StrHead::header+LoggerUtil::DIED+toString()+" is ag and going to dying (removed) \n";
 	simu->anAgDie();
 	if(simu->deleteWordAgent(*this))
 	{
@@ -375,17 +392,17 @@ void WordAgent::setMatchedFeatureRecptor(vector<int>& matchedFeature){
 
 void WordAgent::newMutate(){
 
-	Logger::logger<<StrHead::header+LoggerUtil::MUTATE+this->toStringID()+" begin to mutate \n";
+	TIMESRC Logger::logger<<StrHead::header+LoggerUtil::MUTATE+this->toStringID()+" begin to mutate \n";
 	//首先进行预测
 	simu->predictBeforeMutate();
 	double currentPrecision = simu->getSentenceDependency().getCurrentSentencePrecision();
 	double affinity = getCurrentAffinity();
 
-	Logger::logger<<StrHead::header+LoggerUtil::MUTATE+" current sentence precision is:"+currentPrecision+"\n";
+	TIMESRC Logger::logger<<StrHead::header+LoggerUtil::MUTATE+" current sentence precision is:"+currentPrecision+"\n";
 
 	double alpha = 1.0 / (RunParameter::instance.getParameter("BETA").getIntValue() * 1.0);
 	alpha = alpha * exp(-1 * currentPrecision) * exp(-1 * affinity);
-	Logger::logger<<StrHead::header+" the  mutate parameter alpha  is: "+alpha +"\n";
+	TIMESRC Logger::logger<<StrHead::header+" the  mutate parameter alpha  is: "+alpha +"\n";
 	//突变
 	int k = RunParameter::instance.getParameter("K").getIntValue();
 	double mutatePro = RunParameter::instance.getParameter("MUTATEPRO").getDoubleValue();
@@ -400,7 +417,7 @@ void WordAgent::newMutate(){
 			it->second.push_back(mutateDelta);
 		}
 	}
-//	Logger::logger<<StrHead::header+" clone and  mutate "+k+" agents\n";
+//	TIMESRC Logger::logger<<StrHead::header+" clone and  mutate "+k+" agents\n";
 	//后选择
 
 	simu->selectAfterMutate(*this);

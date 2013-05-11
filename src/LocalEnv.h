@@ -27,7 +27,7 @@ public:
 
 	void addAgent(WordAgent& wordAgent);
 
-	void removeAgent(WordAgent& wordAgent);
+	bool removeAgent(WordAgent& wordAgent);
 
 	int getAgentCount();
 

@@ -104,6 +104,7 @@ private:
         void loadBCell();
         int _calcSub(const std::pair<int, int> & pos) const;
         long systemClock;
+        void printAllAntigen();
 
 
 };
