@@ -23,9 +23,9 @@ K=6,int
 #每个抗原的个数
 ANTIGEN_COUNT=5,int
 #抗原最大生命期限
-ANTIGEN_LIFETIME=4,int
+ANTIGEN_LIFETIME=10,int
 #如果突变后的精确度比突变前小，接受突变的概率
-ACCPET_MUTATE_RATE=1,double
+ACCPET_MUTATE_RATE=0.5,double
 #特征保存文件
 FEATURE_FILE=feature.txt,string
 #特征权重保存文件
@@ -33,8 +33,8 @@ WEIGHT_FILE=weight.txt,string
 #B细胞位置保存文件
 BCELL_FILE=bcell.txt,string
 #训练树库文件
-TRAIN_FILE=./data/chi/train-10,string
+TRAIN_FILE=./data/chi/train-200,string
 #测试树库文件
-TEST_FILE=./data/chi/train-10,string
+TEST_FILE=./data/chi/test-100,string
 #预测结果文件
-RESULT_FILE=./result/result,string
+RESULT_FILE=./result/result.txt,string
