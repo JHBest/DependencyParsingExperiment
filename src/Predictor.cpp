@@ -57,7 +57,7 @@ bool Predictor::_decode(
 		for(int q = s; q <= t; q++){
 			double d1 = f[s][q][d][d] + f[q][t][d][1-d];
 			double d2 = f[s][t][d][c];
-			bool b = Tools::doubleEqualByStr(d1,d2);
+			bool b = Tools::doubleEqual(d1,d2);
 //			if(f[s][q][d][d] + f[q][t][d][1-d] == f[s][t][d][c])
 			if(b){
 //				cout<<"f[s][q][d][d] + f[q][t][d][1-d] == f[s][t][d][c]:	"<<f[s][q][d][d]<<",	"<< f[q][t][d][1-d] <<",	"<< f[s][t][d][c]<<endl;
@@ -78,7 +78,7 @@ bool Predictor::_decode(
 		for(int q = s; q < t; q++){
 			double d1 = f[s][t][d][c];
 			double d2 = f[s][q][1][0] + f[q+1][t][0][0] + g[i][j];
-			bool b = Tools::doubleEqualByStr(d1,d2);
+			bool b = Tools::doubleEqual(d1,d2);
 //			if(f[s][t][d][c] == f[s][q][1][0] + f[q+1][t][0][0] + g[i][j])
 			if(b)
 			{

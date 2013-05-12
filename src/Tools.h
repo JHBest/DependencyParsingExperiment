@@ -188,7 +188,8 @@ public:
     }
 
     static bool doubleEqual(double d1,double d2){
-    	return fabs(d1 - d2)  < DBL_EPSILON ;
+//    	return fabs(d1 - d2)  < DBL_EPSILON ;
+    	return fabs((d1 - d2)/d1)< 1e-6;
     }
 
     static bool doubleEqualByStr(double d1,double d2){
