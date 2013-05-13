@@ -2,7 +2,10 @@ CC=g++
 CFLAGS=-c -Wall -g -rdynamic
 LDFLAGS=
 SOURCES=src/main.cpp src/DependencyPaser.cpp src/Environment.cpp src/Simulator.cpp src/WordAgent.cpp \
-		src/Model.cpp src/Predictor.cpp src/Trainer.cpp src/FeatureTemplate.cpp src/Evaluation.cpp src/Test.cpp
+		src/Model.cpp src/Predictor.cpp src/Trainer.cpp src/FeatureTemplate.cpp src/Evaluation.cpp src/Test.cpp \
+		src/LocalEnv.cpp src/logger.cpp src/LoggerUtil.cpp src/ParameterValue.cpp src/PredictResult.cpp \
+		src/RunParameter.cpp src/SentenceDependency.cpp src/StrHead.cpp src/Tools.cpp src/WordInfo.cpp \
+		src/WordSimpleInfor.cpp
 OBJECTS=$(patsubst src/%.cpp, obj/%.o, $(SOURCES))
 EXECUTABLE=bin/test
 
