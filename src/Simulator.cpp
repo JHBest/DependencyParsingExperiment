@@ -150,18 +150,19 @@ void Simulator::moveAgent(WordAgent& agent,std::pair<int, int>& fromPos,std::pai
 			agent.setPosition(toPos);//移动成功后再设置新位置
 			wordAgentGrid[toIndex].addAgent(agent);
 			wordAgentGrid[fromIndex].removeAgent(agent);
-
+			Logger::logger<<StrHead::header+agent.toString()+ " moved from  "+fromIndex+" to "+toIndex +" \n";
+			Logger::logger<<StrHead::header+agent.toString()+" after moved the agent is "+wordAgentGrid[toIndex].getWordAgent(agent.toStringID()).toString() +" \n";
 		}
 	}
 }
 
 void Simulator::predictBeforeMutate(){
-	Logger::logger<<StrHead::header+" predict sentence ("+ LoggerUtil::sentenceToString(getSentenceDependency().getCurrentSentence()) +") before mutate \n";
+	TIMESRC Logger::logger<<StrHead::header+" predict sentence ("+ LoggerUtil::sentenceToString(getSentenceDependency().getCurrentSentence()) +") before mutate \n";
 	std::vector<int> predictedParent;
 	Sentence& sen = getSentenceDependency().getCurrentSentence();
 	predictor->predict(sen,predictedParent);
 	getSentenceDependency().setCurrentPredictedParent(predictedParent);
-	Logger::logger<<StrHead::header+" predict precision is "+getSentenceDependency().getCurrentSentencePrecision()+"\n";
+	TIMESRC Logger::logger<<StrHead::header+" predict precision is "+getSentenceDependency().getCurrentSentencePrecision()+"\n";
 }
 /**
  * 选择过程如下：
@@ -217,7 +218,7 @@ void Simulator::selectAfterMutate(WordAgent& wordAgent){
 		}
 	}
 	if(accpetMutate){//接受突变
-		TIMESRC Logger::logger<<StrHead::header+LoggerUtil::SELECTED+wordAgent.toStringID()+" mutation is selected from "+(int)bestPredicts.size()+" mutations\n";
+//		TIMESRC Logger::logger<<StrHead::header+LoggerUtil::SELECTED+wordAgent.toStringID()+" mutation is selected from "+(int)bestPredicts.size()+" mutations\n";
 		deltaWeight.clear();
 		int selectedIndex = -1;
 		if(bestPredicts.size() == 1){
@@ -246,7 +247,7 @@ void Simulator::selectAfterMutate(WordAgent& wordAgent){
 			}
 			selectedIndex = getSentenceDependency().selectMinScoreDifference();
 		}
-		TIMESRC Logger::logger<<StrHead::header+"selectedIndex="+selectedIndex+" in "+(int)bestPredicts.size()+" mutations\n";
+//		TIMESRC Logger::logger<<StrHead::header+"selectedIndex="+selectedIndex+" in "+(int)bestPredicts.size()+" mutations\n";
 		if(selectedIndex >= 0){
 			TIMESRC Logger::logger<<StrHead::header+LoggerUtil::SELECTED+wordAgent.toStringID()+" mutation is selected from index:"+selectedIndex+" mutations\n";
 			deltaWeight.clear();
@@ -257,7 +258,7 @@ void Simulator::selectAfterMutate(WordAgent& wordAgent){
 			model->updateWeightByDelta();
 		}
 	}else{
-		TIMESRC Logger::logger<<StrHead::header+LoggerUtil::ABORTED+wordAgent.toStringID()+" mutation is aborted \n";
+//		TIMESRC Logger::logger<<StrHead::header+LoggerUtil::ABORTED+wordAgent.toStringID()+" mutation is aborted \n";
 	}
 }
 

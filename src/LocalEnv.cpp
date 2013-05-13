@@ -97,7 +97,7 @@ bool LocalEnv::bCellInteraction(WordAgent& bcell){
 			maxAffinityAgent->setStatus(MATCH);
 			maxAffinityAgent->setCurrentAffinity(maxaffinity);
 			maxAffinityAgent->mapStatusToBehavior();
-			if(bcell.getActiveLevel() - 1 > 0){
+			if(bcell.getActiveLevel() - 1 > 0 && maxAffinityAgent->getActiveLevel() < bcell.getActiveLevel()){
 				maxAffinityAgent->setActiveLevel(bcell.getActiveLevel() - 1);
 			}
 

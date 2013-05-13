@@ -38,6 +38,7 @@ WordAgent::WordAgent(WordInfo& wordinfo,
 
 	activeLevel = 0;
 	indexInSentence = 0;
+	currentAffinity  = 0.0;
 
 	mapStatusToBehavior();
 	immuneClock = 0;
@@ -100,12 +101,14 @@ int WordAgent::getLifetime(){
 
 void WordAgent::antigenWeaken(){
 //	TIMESRC Logger::logger<<StrHead::header+int(this) + " antigenWeaken\n";
-	lifetime --;
-	if(lifetime <= 0){
-		if(category == BCELL){
-			setActiveLevel(0);
-		}else{
-			setStatus(DIE);
+	if(lifetime > 0){
+		lifetime --;
+		if(lifetime <= 0){
+			if(category == BCELL){
+				setActiveLevel(0);
+			}else{
+				setStatus(DIE);
+			}
 		}
 	}
 }
@@ -115,14 +118,17 @@ void WordAgent::setActiveLevel(int al){
 		int lifetime = RunParameter::instance.getParameter("ANTIGEN_LIFETIME").getIntValue();
 		setLifetime(lifetime);
 		if(!hasActivation()){
+			TIMESRC Logger::logger<<StrHead::header+toStringID()+" gained activation level "+ al+"\n";
 			simu->anBAgBorn();
 		}
 	}else{
 		setLifetime(0);
-		simu->anBAgDie();
+//		simu->anBAgDie();
 		setStatus(ACTIVATION_DIE);
 	}
-	this->activeLevel = al;
+	if(al >= 0){
+		this->activeLevel = al;
+	}
 }
 int WordAgent::getActiveLevel(){
 	return activeLevel;
@@ -277,7 +283,9 @@ void    WordAgent::mapStatusToBehavior()
 
 
 bool WordAgent::activationDie(){
-	TIMESRC Logger::logger<<StrHead::header +LoggerUtil::B_ACTIVATION_DIE+ toStringID() +" become activationDie \n";
+	TIMESRC Logger::logger<<StrHead::header +LoggerUtil::B_ACTIVATION_DIE+ toString() +" become activationDie  bag namuber is"+simu->getBAgNum()+"\n";
+	simu->anBAgDie();
+	TIMESRC Logger::logger<<StrHead::header +LoggerUtil::B_ACTIVATION_DIE+ toString() +" after an activationDie,  bag namuber is"+simu->getBAgNum()+"\n";
 	setStatus(ACTIVE);
 	mapStatusToBehavior();
 
@@ -381,9 +389,9 @@ void WordAgent::matchFeatureRecptor(WordAgent& agent,vector<int>& matchedFeature
  */
 void WordAgent::setMatchedFeatureRecptor(vector<int>& matchedFeature){
 	matchedparatopeFeature.clear();
-	cout<<"matched feature:";
+//	cout<<"matched feature:";
 	for(size_t i = 0;i < matchedFeature.size();i ++){
-		cout<<matchedFeature[i]<<",";
+//		cout<<matchedFeature[i]<<",";
 		matchedparatopeFeature[matchedFeature[i]] = vector<double>();
 	}
 	cout<<endl;
@@ -392,13 +400,13 @@ void WordAgent::setMatchedFeatureRecptor(vector<int>& matchedFeature){
 
 void WordAgent::newMutate(){
 
-	TIMESRC Logger::logger<<StrHead::header+LoggerUtil::MUTATE+this->toStringID()+" begin to mutate \n";
+//	TIMESRC Logger::logger<<StrHead::header+LoggerUtil::MUTATE+this->toStringID()+" begin to mutate \n";
 	//首先进行预测
 	simu->predictBeforeMutate();
 	double currentPrecision = simu->getSentenceDependency().getCurrentSentencePrecision();
 	double affinity = getCurrentAffinity();
 
-	TIMESRC Logger::logger<<StrHead::header+LoggerUtil::MUTATE+" current sentence precision is:"+currentPrecision+"\n";
+//	TIMESRC Logger::logger<<StrHead::header+LoggerUtil::MUTATE+" current sentence precision is:"+currentPrecision+"\n";
 
 	double alpha = 1.0 / (RunParameter::instance.getParameter("BETA").getIntValue() * 1.0);
 	alpha = alpha * exp(-1 * currentPrecision) * exp(-1 * affinity);
