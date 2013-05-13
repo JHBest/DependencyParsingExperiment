@@ -1,5 +1,5 @@
 #学习词数，也叫迭代词数
-LEARNTIMES=10,int
+LEARNTIMES=1,int
 #行
 ROWS=5,int
 #列
@@ -19,11 +19,11 @@ BETA=100,int
 #激活值上限
 ACTIVATION_LEVEL=3,int
 #克隆的数量，也就是产生几组突变
-K=6,int
+K=3,int
 #每个抗原的个数
-ANTIGEN_COUNT=5,int
+ANTIGEN_COUNT=3,int
 #抗原最大生命期限
-ANTIGEN_LIFETIME=10,int
+ANTIGEN_LIFETIME=5,int
 #如果突变后的精确度比突变前小，接受突变的概率
 ACCPET_MUTATE_RATE=0.5,double
 #特征保存文件
