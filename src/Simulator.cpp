@@ -119,6 +119,7 @@ bool Simulator::addWordAgent(WordAgent & pWordAgent)
 void Simulator::moveAgent(WordAgent& agent,std::pair<int, int>& fromPos,std::pair<int, int>& toPos){
 	int fromIndex = _calcSub(fromPos);
 	int toIndex = _calcSub(toPos);
+//	Logger::logger<<StrHead::header+agent.toString()+ " moved from  "+fromIndex+" to "+toIndex +" \n";
 //	Logger::logger<<StrHead::header + "agent.getCategory()= "+ agent.getCategory() +" \n";
 	if(agent.getCategory() == ANTIGEN){
 //		Logger::logger<<StrHead::header+int(&agent) + " moveAgent  lifetime= "+ agent.getLifetime() +" \n";
@@ -150,8 +151,8 @@ void Simulator::moveAgent(WordAgent& agent,std::pair<int, int>& fromPos,std::pai
 			agent.setPosition(toPos);//移动成功后再设置新位置
 			wordAgentGrid[toIndex].addAgent(agent);
 			wordAgentGrid[fromIndex].removeAgent(agent);
-			Logger::logger<<StrHead::header+agent.toString()+ " moved from  "+fromIndex+" to "+toIndex +" \n";
-			Logger::logger<<StrHead::header+agent.toString()+" after moved the agent is "+wordAgentGrid[toIndex].getWordAgent(agent.toStringID()).toString() +" \n";
+
+//			Logger::logger<<StrHead::header+agent.toString()+" after moved the agent is "+wordAgentGrid[toIndex].getWordAgent(agent.toStringID()).toString() +" \n";
 		}
 	}
 }

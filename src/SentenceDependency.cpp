@@ -10,7 +10,9 @@
 
 SentenceDependency::SentenceDependency() {
 	// TODO Auto-generated constructor stub
-
+	realScore = 0;
+	currerntPrecision = 0;
+	maxPredictedPrecision = 0;
 }
 
 SentenceDependency::~SentenceDependency() {

@@ -12,6 +12,7 @@
 WordInfo::WordInfo() {
 	// TODO Auto-generated constructor stub
 	freq = 1;
+	num = 0;
 }
 
 WordInfo::~WordInfo() {

@@ -39,6 +39,7 @@ WordAgent::WordAgent(WordInfo& wordinfo,
 	activeLevel = 0;
 	indexInSentence = 0;
 	currentAffinity  = 0.0;
+	lifetime = 0;
 
 	mapStatusToBehavior();
 	immuneClock = 0;
@@ -57,14 +58,16 @@ string WordAgent::toStringID(){
 }
 
 /**
- * 包括词，词性，类别，序号，状态,行为，位置
+ * 包括词，词性，类别，序号，状态,行为，位置,激活值，生命期
  */
 string WordAgent::toString(){
 	string str = toStringID()+"-";
 	str = Tools::appendIntToStr(str,this->status)+ "-";
 	str = Tools::appendIntToStr(str,getActionSize())+"(";
 	str = Tools::appendIntToStr(str,position.first)+",";
-	str = Tools::appendIntToStr(str,position.second)+")";
+	str = Tools::appendIntToStr(str,position.second)+")-";
+	str = Tools::appendIntToStr(str,activeLevel)+"-";
+	str = Tools::appendIntToStr(str,lifetime);
 	return str;
 }
 
@@ -118,7 +121,7 @@ void WordAgent::setActiveLevel(int al){
 		int lifetime = RunParameter::instance.getParameter("ANTIGEN_LIFETIME").getIntValue();
 		setLifetime(lifetime);
 		if(!hasActivation()){
-			TIMESRC Logger::logger<<StrHead::header+toStringID()+" gained activation level "+ al+"\n";
+//			TIMESRC Logger::logger<<StrHead::header+toStringID()+" gained activation level "+ al+"\n";
 			simu->anBAgBorn();
 		}
 	}else{
@@ -283,9 +286,9 @@ void    WordAgent::mapStatusToBehavior()
 
 
 bool WordAgent::activationDie(){
-	TIMESRC Logger::logger<<StrHead::header +LoggerUtil::B_ACTIVATION_DIE+ toString() +" become activationDie  bag namuber is"+simu->getBAgNum()+"\n";
+	TIMESRC Logger::logger<<StrHead::header +LoggerUtil::B_ACTIVATION_DIE+ toStringID() +" become activationDie  bag namuber is"+simu->getBAgNum()+"\n";
 	simu->anBAgDie();
-	TIMESRC Logger::logger<<StrHead::header +LoggerUtil::B_ACTIVATION_DIE+ toString() +" after an activationDie,  bag namuber is"+simu->getBAgNum()+"\n";
+//	TIMESRC Logger::logger<<StrHead::header +LoggerUtil::B_ACTIVATION_DIE+ toString() +" after an activationDie,  bag namuber is"+simu->getBAgNum()+"\n";
 	setStatus(ACTIVE);
 	mapStatusToBehavior();
 
