@@ -158,7 +158,7 @@ void Simulator::moveAgent(WordAgent& agent,std::pair<int, int>& fromPos,std::pai
 }
 
 void Simulator::predictBeforeMutate(){
-	TIMESRC Logger::logger<<StrHead::header+" predict sentence ("+ LoggerUtil::sentenceToString(getSentenceDependency().getCurrentSentence()) +") before mutate \n";
+//	TIMESRC Logger::logger<<StrHead::header+" predict sentence ("+ LoggerUtil::sentenceToString(getSentenceDependency().getCurrentSentence()) +") before mutate \n";
 	std::vector<int> predictedParent;
 	Sentence& sen = getSentenceDependency().getCurrentSentence();
 	predictor->predict(sen,predictedParent);

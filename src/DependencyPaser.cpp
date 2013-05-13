@@ -122,8 +122,10 @@ bool DependencyPaser::trainFromFile(const char * file)
 		string line;
 		TIMESRC Logger::logger<<StrHead::header +"Learning "+(i+1)+ " times" +"\n";
 		ifstream fin(file);
+		int sentencNum = 0;
 		while(getline(fin, line)){
 			if(line == ""){
+				sentencNum ++;
 				vector<int> father;
 				Sentence sen;
 				sen.push_back(make_pair("ROOT", "ORG"));
@@ -134,6 +136,7 @@ bool DependencyPaser::trainFromFile(const char * file)
 				}
 
 				//Öð¾äÑµÁ·
+				TIMESRC Logger::logger<<StrHead::header +"The  "+(i+1)+ " learning times and the "+ sentencNum +" sentence\n";
 				pTrainer->trainBySentence(sen,  father);
 
 				senes.clear();

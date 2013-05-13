@@ -107,7 +107,7 @@ void WordAgent::antigenWeaken(){
 	if(lifetime > 0){
 		lifetime --;
 		if(lifetime <= 0){
-			if(category == BCELL){
+			if(category == BCELL && getActiveLevel() == 0){
 				setActiveLevel(0);
 			}else{
 				setStatus(DIE);
