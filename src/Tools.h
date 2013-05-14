@@ -8,15 +8,19 @@
 #ifndef TOOLS_H_
 #define TOOLS_H_
 #include <string>
+#include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <time.h>
 #include <io.h>
 #include <fstream>
 #include <sstream>
-#include <iomanip.h>
+#include <iomanip>
 #include <vector>
 #include <math.h>
 #include <float.h>
+//#include <sys/stat.h>
+//#include <sys/types.h>
 using namespace std;
 
 class Tools {
@@ -26,8 +30,9 @@ public:
 
 
 	static string appendIntToStr(string str,int intvalue){
-	    char intstr[20];
-	    itoa(intvalue,intstr,10);
+//	    char intstr[20];
+//	    itoa(intvalue,intstr,10);
+		string intstr = my_itoa(intvalue);
 	    return str + intstr;
 
 	}
@@ -198,6 +203,15 @@ public:
     	string str1,str2;
     	ss>>str1>>str2;
     	return str1 == str2;
+    }
+
+
+    static string my_itoa(int intvalue){
+    	stringstream ss;
+    	ss<<intvalue;
+    	string str;
+    	ss>>str;
+    	return str;
     }
 
 };

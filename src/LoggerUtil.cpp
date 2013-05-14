@@ -23,4 +23,4 @@ string LoggerUtil::SELECTED = "[SELECTED] ";
 string LoggerUtil::ABORTED = "[ABORTED] ";
 string LoggerUtil::DIED = "[DIED] ";
 string LoggerUtil::ROUND = "[ROUND] ";
-
+string LoggerUtil::SENTENCENO="[SENTENCENO] ";

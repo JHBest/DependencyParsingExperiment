@@ -14,14 +14,15 @@ Model::~Model()
 {
 }
 /**
- * ç‰¹å¾æ–‡ä»¶å­˜å‚¨æ ¼å¼ä¸ºï¼šæ¯è¡Œä¸ºä¸€ä¸ªç‰¹å¾ï¼Œç‰¹å¾å­—ç¬¦ä¸²+\t+ç‰¹å¾ç¼–å·
- * ç‰¹å¾æƒé‡æ–‡ä»¶å­˜å‚¨æ ¼å¼ä¸º:æƒé‡1\tæƒé‡2\tæƒé‡3\tâ€¦â€¦ï¼Œ
- * 						é¡ºåºä¸ºç‰¹å¾ç¼–å·çš„é¡ºåº
- * 						æ‰€æœ‰ç‰¹å¾æƒé‡å ä¸€è¡Œï¼Œä¸åŒè¡Œçš„ç‰¹å¾æƒé‡å¯¹åº”äºä¸åŒçš„å­¦ä¹ çš„ç»“æœ
+ * ÌØÕ÷ÎÄ¼ş´æ´¢¸ñÊ½Îª£ºÃ¿ĞĞÎªÒ»¸öÌØÕ÷£¬ÌØÕ÷×Ö·û´®+\t+ÌØÕ÷±àºÅ
+ * ÌØÕ÷È¨ÖØÎÄ¼ş´æ´¢¸ñÊ½Îª:È¨ÖØ1\tÈ¨ÖØ2\tÈ¨ÖØ3\t¡­¡­£¬
+ * 						Ë³ĞòÎªÌØÕ÷±àºÅµÄË³Ğò
+ * 						ËùÓĞÌØÕ÷È¨ÖØÕ¼Ò»ĞĞ£¬²»Í¬ĞĞµÄÌØÕ÷È¨ÖØ¶ÔÓ¦ÓÚ²»Í¬µÄÑ§Ï°µÄ½á¹û
  */
 void Model::loadFeatureAndWeight(){
+	//¶ÁÈ¡ÌØÕ÷
 	string featureFile = RunParameter::instance.getParameter("FEATURE_FILE").getStringValue();
-	if(Tools::fileExists(featureFile.c_str())){//å¦‚æœç‰¹å¾æ–‡ä»¶å­˜åœ¨ï¼Œåˆ™ç‰¹å¾æƒé‡æ–‡ä»¶ä¹Ÿå­˜åœ¨
+	if(Tools::fileExists(featureFile.c_str())){//Èç¹ûÌØÕ÷ÎÄ¼ş´æÔÚ£¬ÔòÌØÕ÷È¨ÖØÎÄ¼şÒ²´æÔÚ
 		ifstream fin(featureFile.c_str());
 		string line;
 		while(getline(fin, line)){
@@ -34,6 +35,7 @@ void Model::loadFeatureAndWeight(){
 		}
 		fin.close();
 	}
+	//¼ÓÔØÌØÕ÷È¨ÖØ£¬¶ÁÈ¡×îºóÒ»ĞĞµÄÈ¨ÖØ
 	string weightFile = RunParameter::instance.getParameter("WEIGHT_FILE").getStringValue();
 	if(Tools::fileExists(weightFile.c_str())){
 		ifstream fin(weightFile.c_str());
@@ -53,7 +55,7 @@ void Model::loadFeatureAndWeight(){
 
 void Model::saveFeature(){
 	string featureFile = RunParameter::instance.getParameter("FEATURE_FILE").getStringValue();
-	if(!Tools::fileExists(featureFile.c_str())){//å¦‚æœç‰¹å¾æ–‡ä»¶å­˜åœ¨ï¼Œåˆ™ç‰¹å¾æƒé‡æ–‡ä»¶ä¹Ÿå­˜åœ¨
+	if(!Tools::fileExists(featureFile.c_str())){//Èç¹ûÌØÕ÷ÎÄ¼ş´æÔÚ£¬ÔòÌØÕ÷È¨ÖØÎÄ¼şÒ²´æÔÚ
 		ofstream fout(featureFile.c_str(),ios::out);
 		for(map<string,int>::iterator it = fMap.begin();it != fMap.end();it ++){
 			fout<<it->first<<"\t"<<it->second<<endl;
@@ -75,7 +77,7 @@ void Model::saveWeight(){
 
 
 
-//yangjinfeng åˆå§‹åŒ–ç‰¹å¾æƒé‡ï¼Œæœ‰å¾…ä¿®æ”¹
+//yangjinfeng ³õÊ¼»¯ÌØÕ÷È¨ÖØ£¬ÓĞ´ıĞŞ¸Ä
 int Model::initFeatureWeight()
 {
 	if(fWeight.size() == 0){
@@ -85,6 +87,7 @@ int Model::initFeatureWeight()
 		{
 			fWeight[i] = alpha * Tools::normalRand2();
 		}
+		saveWeight();//³õÊ¼»¯ÌØÕ÷È¨ÖØ±£´æÎªµÚÒ»ĞĞ
 	}
 	return (int)fWeight.size();
 }
@@ -145,7 +148,7 @@ double Model::wordPairWeight(const Sentence & sen,int p, int c)
 	return sumFeatureWeight(featVec);
 }
 /**
- * æŠ½å–ä¾å­˜å¯¹çš„ç‰¹å¾ï¼Œå¹¶æŠŠç‰¹å¾æ·»åŠ åˆ°fMapé‡Œ
+ * ³éÈ¡ÒÀ´æ¶ÔµÄÌØÕ÷£¬²¢°ÑÌØÕ÷Ìí¼Óµ½fMapÀï
  * yangjinfeng
  */
 bool Model::getFeatureIDVec(const Sentence & sen, int p, int c,
@@ -188,7 +191,7 @@ inline int Model::_getFeatureID(const string & feat)
 }
 
 /**
- * ç»™æ¯ä¸€ä¸ªç‰¹å¾ç”Ÿæˆä¸€ä¸ªç¼–å·ï¼Œæ‰€æœ‰ç‰¹å¾éƒ½å­˜æ”¾åœ¨fMapé‡Œï¼Œå¹¶è¿”å›ç‰¹å¾çš„ç¼–å·
+ * ¸øÃ¿Ò»¸öÌØÕ÷Éú³ÉÒ»¸ö±àºÅ£¬ËùÓĞÌØÕ÷¶¼´æ·ÅÔÚfMapÀï£¬²¢·µ»ØÌØÕ÷µÄ±àºÅ
  * yangjinfeng
  */
 int Model::addFeature(const string & feat)

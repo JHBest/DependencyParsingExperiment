@@ -24,6 +24,7 @@ public:
 	static string ABORTED;
 	static string DIED;
 	static string ROUND;
+	static string SENTENCENO;
 
 	static string sentenceToString(const Sentence& sen){
 		string result;

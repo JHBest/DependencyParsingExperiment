@@ -97,7 +97,7 @@ bool DependencyPaser::initBCell(const char * file)
 		}
 
 	}
-	pTrainer->outputNetwork();
+//	pTrainer->outputNetwork();
 
 	pTrainer->reduceWordFreq();//´ÊÆµËõ¼õ
 	return true;
@@ -136,7 +136,7 @@ bool DependencyPaser::trainFromFile(const char * file)
 				}
 
 				//Öð¾äÑµÁ·
-				TIMESRC Logger::logger<<StrHead::header +"The  "+(i+1)+ " learning times and the "+ sentencNum +" sentence\n";
+				TIMESRC Logger::logger<<StrHead::header + LoggerUtil::SENTENCENO +"The  "+(i+1)+ " learning times and the "+ sentencNum +" sentence\n";
 				pTrainer->trainBySentence(sen,  father);
 
 				senes.clear();

@@ -4,13 +4,13 @@
 #include <iostream>
 #include <ostream>
 #include <fstream>
-#include <string.h>
+#include <string>
 #include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include "Tools.h"
 #include "StrHead.h"
-#include <map.h>
+#include <map>
 using namespace std;
 
 #define TIMESRC   Logger::logger<<((string()+"[" + Tools::timeToStr(time(NULL))+"]"+"["+__FILE__+"("+Tools::appendIntToStr(string(),__LINE__) +")] "));

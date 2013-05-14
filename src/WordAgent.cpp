@@ -107,9 +107,9 @@ void WordAgent::antigenWeaken(){
 	if(lifetime > 0){
 		lifetime --;
 		if(lifetime <= 0){
-			if(category == BCELL && getActiveLevel() == 0){
+			if(category == BCELL && getActiveLevel() > 0){
 				setActiveLevel(0);
-			}else{
+			}else if(category == ANTIGEN){
 				setStatus(DIE);
 			}
 		}
@@ -345,7 +345,7 @@ bool WordAgent::interact()
 
 bool WordAgent::die()
 {
-	TIMESRC Logger::logger<<StrHead::header+LoggerUtil::DIED+toString()+" is ag and going to dying (removed) \n";
+	TIMESRC Logger::logger<<StrHead::header+LoggerUtil::DIED+toStringID()+" is ag and going to dying (removed) \n";
 	simu->anAgDie();
 	if(simu->deleteWordAgent(*this))
 	{

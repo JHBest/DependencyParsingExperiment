@@ -6,7 +6,7 @@
 #include <vector>
 #include <queue>
 #include <set>
-#include <pair.h>
+//#include <pair.h>
 #include <time.h>
 
 #include "Environment.hpp"
@@ -95,7 +95,7 @@ public:
 	//add by yangjinfeng
 	void setActiveLevel(int activelevel);
 	//add by yangjinfeng
-	int WordAgent::getActiveLevel();
+	int getActiveLevel();
 	//add by yangjinfeng
 	bool hasActivation();
 	//add by yangjinfeng
