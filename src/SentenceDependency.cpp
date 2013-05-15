@@ -73,6 +73,11 @@ void SentenceDependency::setPredictedScore(int index,double score){
 	predictedResults[index].setScore(score);
 }
 
+void SentenceDependency::setRealScore(int index,double score){
+	predictedResults[index].setRealScore(score);
+}
+
+
 vector<int>& SentenceDependency::getPredictedParent(int index){
 	return predictedResults[index].getPredictedParent();
 }
@@ -81,7 +86,7 @@ int SentenceDependency::selectMinScoreDifference(){
 	double mindiff = 0;
 	int result = -1;
 	for(size_t i = 0;i < predictedResults.size();i ++){
-		double diff = fabs(predictedResults[i].getScore() - getRealScore());
+		double diff = fabs(predictedResults[i].getScore() - predictedResults[i].getRealScore());
 		if(i == 0){
 			mindiff = diff;
 			result = i;
@@ -98,8 +103,6 @@ int SentenceDependency::selectMinScoreDifference(){
 void SentenceDependency::reset(){
 	currenSentence.clear();
 	realParent.clear();
-	//突变后，正确依存树的值
-	realScore = 0;
 	//突变前的预测结果
 	currentPredictedParent.clear();
 	//突变前预测结果的精确度
@@ -114,7 +117,6 @@ void SentenceDependency::reset(){
 
 void SentenceDependency::resetForNextMutate(){
 	maxPredictedPrecision = 0;
-	realScore = 0;
 	currerntPrecision = 0;
 	currentPredictedParent.clear();
 	predictedResults.clear();

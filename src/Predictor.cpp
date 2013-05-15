@@ -39,9 +39,37 @@ bool Predictor::buildGraph(Sentence & sen,
 	return true;
 }
 
+bool Predictor::buildGraph2(Sentence & sen,
+			std::vector<std::vector<double> > & graph)
+{
+//	cout<<"begin buildGraph"<<endl;
+	graph.clear();
+	int n = sen.size();
+	//cout<<"n "<<n<<endl;
+	graph.resize(n, vector<double>(n, 0));
+	//double sum  = 0.0;
+	for(int i = 0; i < n; i++){
+		for(int j = 0; j < n; j++){
+			if(j == i) continue;
+			//start = clock();
+			graph[i][j] = pModel->wordPairWeight2(sen, i, j);
+		}
+	}
+//	cout<<"end buildGraph"<<endl;
+	return true;
+}
+
+int Predictor::getPredictableCount(){
+	return pModel->getWeightsSize();
+}
+void Predictor::setPredictableIndex(int index){
+	pModel->setWeightIndex(index);
+}
 
 
-
+void Predictor::loadAllPredictable(){
+	pModel->loadAllWeights();
+}
 
 
 
@@ -142,6 +170,16 @@ double Predictor::predict(Sentence & sen, std::vector<int> & fa)
 //	cout<<endl;//////////////////////////////////////////////////////////////
 
 	return result;
+
+}
+
+double Predictor::predict2(Sentence & sen, std::vector<int> & fa){
+		vector<vector<double> > graph;
+		buildGraph2(sen, graph);
+
+		double result = _eisner(graph, fa);
+
+		return result;
 
 }
 

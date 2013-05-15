@@ -25,6 +25,10 @@ public:
 	bool train(const char * file);
 
 	bool predict(const char * testFile, const char * outFile);
+
+	bool predictOnAllWeights(const char * testFile, const char * outFile);
+
+
 private:
 	//add by yangjinfeng
 	bool initBCell(const char * file);

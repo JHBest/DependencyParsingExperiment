@@ -218,6 +218,73 @@ bool DependencyPaser::predict(const char * testFile, const char * outFile)
 	return true;
 }
 
+bool DependencyPaser::predictOnAllWeights(const char * testFile, const char * outFile){
+	TIMESRC Logger::logger<<StrHead::header + "Predicting..." +"\n";
+
+	ofstream fout(outFile, ios::out|ios::app);
+
+
+	pPredictor->loadAllPredictable();
+	int weightCount = pPredictor->getPredictableCount();
+	for(int i = 0;i < weightCount;i ++){
+
+		pPredictor->setPredictableIndex(i);
+
+		ifstream fin(testFile);
+		vector<vector<string> > senes;
+		string line;
+		int senNum = 0;
+		int rightHeaderCount = 0;
+		int allWordCount = 0;
+		double sum  = 0.0;
+		while(getline(fin, line)){
+			if(line == ""){
+				vector<int> predictedFather;
+				Sentence sen;
+				sen.push_back(make_pair("ROOT", "ORG"));
+				for(size_t i = 0; i < senes.size(); i++){
+					sen.push_back(make_pair(senes[i][1], senes[i][3]));
+				}
+				cout<<LoggerUtil::sentenceToString(sen)<<endl;
+				predictedFather.resize(sen.size());
+				pPredictor->predict2(sen,predictedFather);
+				int rightFather = 0;
+				for(size_t i = 0; i < senes.size(); i++){
+					if(predictedFather[i+1] == atoi(senes[i][6].c_str())){
+						rightFather++;
+					}
+				}
+				rightHeaderCount = rightHeaderCount + rightFather;
+				allWordCount = allWordCount + senes.size();
+				double acc = (double)rightFather/(double)senes.size();
+				sum += acc;
+				senNum++;
+
+				fout<<senNum<<","<<senes.size()<<","<<rightFather<<","<<acc<<endl;
+
+				senes.clear();
+
+			}
+			else{
+				vector<string> item;
+				string tmp;
+				istringstream sin(line);
+				while(sin >> tmp){
+					item.push_back(tmp);
+				}
+				senes.push_back(item);
+			}
+		}
+		double uas = rightHeaderCount /(double)allWordCount;
+		TIMESRC Logger::logger<<StrHead::header + "unlabeled attachment score:" + uas +"\n";
+		fout<<"unlabeled attachment score:"<<uas<<endl;
+		fout<<endl;
+	}
+	fout.close();
+	TIMESRC Logger::logger<<StrHead::header + "Predicting finished!" +"\n";
+	return true;
+}
+
 
 
 

@@ -192,7 +192,7 @@ void Simulator::selectAfterMutate(WordAgent& wordAgent){
 //			cout<<deltaWeight[it->first]<<",";
 		}
 //		cout<<endl;////////////////////
-
+		//针对每组突变进行预测
 		model->setDeltaWeight(deltaWeight);
 		Sentence& sen = getSentenceDependency().getCurrentSentence();
 		predictor->predict(sen,predictedParent);
@@ -201,11 +201,11 @@ void Simulator::selectAfterMutate(WordAgent& wordAgent){
 //			cout<<predictedParent[i]<<",";
 //		}
 //		cout<<endl;//////////////////////////////////////////////////////////////
-		getSentenceDependency().addPredictedResult(predictedParent);
+		getSentenceDependency().addPredictedResult(predictedParent);//暂时保存每组预测结果
 	}
 
 	vector<int> bestPredicts;
-	getSentenceDependency().selectBestPredicts(bestPredicts);
+	getSentenceDependency().selectBestPredicts(bestPredicts);//根据正确的依存边数进行选择
 	double maxPrecision = getSentenceDependency().getMaxPredictedPrecision();
 
 	bool accpetMutate = false;
@@ -243,8 +243,11 @@ void Simulator::selectAfterMutate(WordAgent& wordAgent){
 //							}
 //							cout<<endl;
 				double treescore = model->calTreeScore(sen,predictedParent);
+				double realtreescore = model->calTreeScore(sen,getSentenceDependency().getRealParent());
+
 //				cout<<"treescore="<<treescore<<endl;
 				getSentenceDependency().setPredictedScore(bestPredicts[i],treescore);
+				getSentenceDependency().setRealScore(bestPredicts[i],realtreescore);
 			}
 			selectedIndex = getSentenceDependency().selectMinScoreDifference();
 		}

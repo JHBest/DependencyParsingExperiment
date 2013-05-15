@@ -25,6 +25,10 @@ public:
 		return currenSentence;
 	}
 
+	vector<int>& getRealParent(){
+		return realParent;
+	}
+
 	vector<PredictedResult>& getPredictedResults(){
 		return predictedResults;
 	}
@@ -48,7 +52,11 @@ public:
     }
 
     void setPredictedScore(int index,double score);
+
+    void setRealScore(int index,double score);
+
     vector<int>& getPredictedParent(int index);
+
     double getMaxPredictedPrecision() const
     {
         return maxPredictedPrecision;
@@ -64,8 +72,6 @@ public:
 private:
 	Sentence currenSentence;
 	vector<int> realParent;
-	//突变后，正确依存树的值
-	double realScore;
 	//突变前的预测结果
 	vector<int> currentPredictedParent;
 	//突变前预测结果的精确度

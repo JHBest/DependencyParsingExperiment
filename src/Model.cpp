@@ -7,8 +7,8 @@ using namespace std;
 
 Model::Model()
 {
-
-        loadFeatureAndWeight();
+	weightIndex = 0;
+	loadWeight();
 }
 Model::~Model()
 {
@@ -19,7 +19,7 @@ Model::~Model()
  * 						顺序为特征编号的顺序
  * 						所有特征权重占一行，不同行的特征权重对应于不同的学习的结果
  */
-void Model::loadFeatureAndWeight(){
+void Model::loadFeature(){
 	//读取特征
 	string featureFile = RunParameter::instance.getParameter("FEATURE_FILE").getStringValue();
 	if(Tools::fileExists(featureFile.c_str())){//如果特征文件存在，则特征权重文件也存在
@@ -35,6 +35,11 @@ void Model::loadFeatureAndWeight(){
 		}
 		fin.close();
 	}
+
+}
+
+void Model::loadWeight(){
+	loadFeature();
 	//加载特征权重，读取最后一行的权重
 	string weightFile = RunParameter::instance.getParameter("WEIGHT_FILE").getStringValue();
 	if(Tools::fileExists(weightFile.c_str())){
@@ -51,6 +56,26 @@ void Model::loadFeatureAndWeight(){
 			fWeight.push_back(atof(value.c_str()));
 		}
 	}
+}
+
+void Model::loadAllWeights(){
+	loadFeature();
+	string weightFile = RunParameter::instance.getParameter("WEIGHT_FILE").getStringValue();
+	if(Tools::fileExists(weightFile.c_str())){
+		ifstream fin(weightFile.c_str());
+		string line;
+		while(getline(fin, line)){
+			istringstream sin(line);
+			string value;
+			vector<double> weight;
+			while(sin >> value){
+				weight.push_back(atof(value.c_str()));
+			}
+			fWeights.push_back(weight);
+		}
+		fin.close();
+	}
+
 }
 
 void Model::saveFeature(){
@@ -147,6 +172,16 @@ double Model::wordPairWeight(const Sentence & sen,int p, int c)
 
 	return sumFeatureWeight(featVec);
 }
+
+//modified by yangjinfeng
+double Model::wordPairWeight2(const Sentence & sen,int p, int c)
+{
+	vector<string> featVec;
+
+	ft.abstractFeature(sen,p, c,featVec);
+
+	return sumFeatureWeight2(featVec);
+}
 /**
  * 抽取依存对的特征，并把特征添加到fMap里
  * yangjinfeng
@@ -176,6 +211,21 @@ double Model::sumFeatureWeight(const vector<string> & featVec)
 
 		if(fid == -1) continue;
 		sum += fWeight[fid] + deltaWeight[fid];
+	}
+	return sum;
+}
+
+double Model::sumFeatureWeight2(const vector<string> & featVec)
+{
+	double sum = 0.0;
+
+
+	int fid = 0;
+	for(size_t i = 0; i < featVec.size(); i++){
+		fid = _getFeatureID(featVec[i]);
+
+		if(fid == -1) continue;
+		sum += fWeights[weightIndex][fid] + deltaWeight[fid];
 	}
 	return sum;
 }

@@ -15,6 +15,16 @@ class PredictedResult {
 public:
 	PredictedResult();
 	virtual ~PredictedResult();
+    double getRealScore() const
+    {
+        return realScore;
+    }
+
+    void setRealScore(double realScore)
+    {
+        this->realScore = realScore;
+    }
+
     double getPrecision() const
     {
         return precision;
@@ -45,11 +55,21 @@ public:
         this->score = score;
     }
 
+
+
 private:
 	vector<int> predictedParent;
 	double precision;
 	//预测的依存树的值
 	double score;
+
+	/**
+	 * 正确依存树的值
+	 * 基于最大生成树算法生成的最大生成树的值是最大的， 但是该生成树不一定是正确的依存树，原因在于权重不一定正确
+	 * 所以，如果我们假定权重近似正确的话，最大生成树的值应该很接近正确的依存树，那么树的值应该很接近，
+	 * 基于此我们选择和正确依存树的值最接近的那个棵最大生成树
+	 */
+	double realScore;
 
 
 

@@ -21,6 +21,8 @@ private:
 	map<std::string, int> fMap;
 	//yangjinfeng 特征编号作为vector下标的值就是特征的权重
 	std::vector<double> fWeight;
+
+	vector<vector<double> > fWeights;//所有特征的权重
 	//add by yangjinfeng
 	map<int,double> deltaWeight;
 
@@ -38,6 +40,12 @@ public:
 
 	double wordPairWeight(const Sentence & sen,int p, int c);
 	double sumFeatureWeight(const std::vector<std::string> & featVec);
+	//以下两个仅用于批量预测
+	double wordPairWeight2(const Sentence & sen,int p, int c);
+	double sumFeatureWeight2(const std::vector<std::string> & featVec);
+
+
+
 	bool getFeatureIDVec(const Sentence & sen, int p, int c,
 			std::vector<int> & featIDVec);
 	int addFeature(const std::string & feat);
@@ -48,11 +56,21 @@ public:
 
 	double calTreeScore(const Sentence & sen,const vector<int> parent);
 
+	void loadAllWeights();
+	int getWeightsSize(){
+		return fWeights.size();
+	}
+	void setWeightIndex(int index){
+		weightIndex = index;
+	}
+
 private:
 	inline int _getFeatureID(const std::string & feat);
 
 	//add by yangjinfeng
-	void loadFeatureAndWeight();
+	void loadFeature();
+	void loadWeight();
+	int weightIndex;
 };
 
 #endif

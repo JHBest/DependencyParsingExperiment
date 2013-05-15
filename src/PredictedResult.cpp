@@ -11,6 +11,7 @@ PredictedResult::PredictedResult() {
 	// TODO Auto-generated constructor stub
 	precision = 0;
 	score = 0;
+	realScore= 0;
 
 }
 

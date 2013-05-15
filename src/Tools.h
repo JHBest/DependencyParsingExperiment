@@ -91,6 +91,7 @@ public:
 
 	static bool createDir(const char* dirname){
 	    int code = mkdir(dirname);
+//	    int code = mkdir(dirname,S_IRWXU);
 	    return code == 0;
 	}
 

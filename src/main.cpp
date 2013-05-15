@@ -16,7 +16,6 @@ using namespace std;
 int main()
 {
 
-
 //	srand((unsigned) time(NULL));
 	TIMESRC Logger::logger<<StrHead::header + "train file is:\n";
 	string train_file = RunParameter::instance.getParameter("TRAIN_FILE").getStringValue();
@@ -25,9 +24,16 @@ int main()
 	TIMESRC Logger::logger<<StrHead::header + "test file is: "+test_file+"\n";
 	string result_file = RunParameter::instance.getParameter("RESULT_FILE").getStringValue();
 
+	string runmode = RunParameter::instance.getParameter("RUN_MODE").getStringValue();
 	DependencyPaser dependencyPaser;
-	dependencyPaser.train(train_file.c_str());
-	dependencyPaser.predict(test_file.c_str(),result_file.c_str());
+	if(runmode == "train"){
+		dependencyPaser.train(train_file.c_str());
+	}else if(runmode == "train_test"){
+		dependencyPaser.train(train_file.c_str());
+		dependencyPaser.predict(test_file.c_str(),result_file.c_str());
+	}else if(runmode == "test"){
+		dependencyPaser.predictOnAllWeights(test_file.c_str(),result_file.c_str());
+	}
 
 	TIMESRC Logger::logger<<StrHead::header + "result file is: "+result_file+"\n";
     return 0;
