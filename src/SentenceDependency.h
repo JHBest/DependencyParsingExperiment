@@ -41,15 +41,6 @@ public:
 
 	int selectMinScoreDifference();
 
-    double getRealScore() const
-    {
-        return realScore;
-    }
-
-    void setRealScore(double realScore)
-    {
-        this->realScore = realScore;
-    }
 
     void setPredictedScore(int index,double score);
 
