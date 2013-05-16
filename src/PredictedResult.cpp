@@ -12,6 +12,7 @@ PredictedResult::PredictedResult() {
 	precision = 0;
 	score = 0;
 	realScore= 0;
+	deltaIndex = -1;
 
 }
 

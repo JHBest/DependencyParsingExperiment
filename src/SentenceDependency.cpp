@@ -45,11 +45,12 @@ double SentenceDependency::calPrecision(const vector<int>& predicted){
 /**
  * 同时计算一下精确度
  */
-void SentenceDependency::addPredictedResult(const vector<int>& predict){
+void SentenceDependency::addPredictedResult(const vector<int>& predict,int deltaIndex){
 	PredictedResult result;
 	result.setPredictedParent(predict);
 	double precision = calPrecision(predict);
 	result.setPrecision(precision);
+	result.setDeltaIndex(deltaIndex);
 	predictedResults.push_back(result);
 }
 

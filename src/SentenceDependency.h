@@ -33,7 +33,7 @@ public:
 		return predictedResults;
 	}
 
-	void addPredictedResult(const vector<int>& predict);
+	void addPredictedResult(const vector<int>& predict,int deltaIndex);
 	/**
 	 * 选择最好的预测，也就是精度最高的预测
 	 */
@@ -56,6 +56,10 @@ public:
     void setMaxPredictedPrecision(double maxPredictedPrecision)
     {
         this->maxPredictedPrecision = maxPredictedPrecision;
+    }
+
+    int getPredictedResultDeltaIndex(int index){
+    	return predictedResults[index].getDeltaIndex();
     }
 
     void reset();

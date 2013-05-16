@@ -15,6 +15,16 @@ class PredictedResult {
 public:
 	PredictedResult();
 	virtual ~PredictedResult();
+    int getDeltaIndex() const
+    {
+        return deltaIndex;
+    }
+
+    void setDeltaIndex(int deltaIndex)
+    {
+        this->deltaIndex = deltaIndex;
+    }
+
     double getRealScore() const
     {
         return realScore;
@@ -71,6 +81,7 @@ private:
 	 */
 	double realScore;
 
+	int deltaIndex;
 
 
 };

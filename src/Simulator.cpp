@@ -187,9 +187,17 @@ void Simulator::selectAfterMutate(WordAgent& wordAgent){
 		deltaWeight.clear();
 		predictedParent.clear();
 //		cout<<"\n the "<<i<<" mutate delta is:";/////////////
+		bool zeroDelta = true;
 		for(map<int,vector<double> >::iterator it = matchedparatopeFeature.begin();it != matchedparatopeFeature.end();it ++){
-			deltaWeight[it->first] = it->second[i];
+			double delta = it->second[i];
+			if(delta > 0){
+				zeroDelta = false;
+			}
+			deltaWeight[it->first] = delta;
 //			cout<<deltaWeight[it->first]<<",";
+		}
+		if(zeroDelta){
+			continue;
 		}
 //		cout<<endl;////////////////////
 		//针对每组突变进行预测
@@ -201,7 +209,7 @@ void Simulator::selectAfterMutate(WordAgent& wordAgent){
 //			cout<<predictedParent[i]<<",";
 //		}
 //		cout<<endl;//////////////////////////////////////////////////////////////
-		getSentenceDependency().addPredictedResult(predictedParent);//暂时保存每组预测结果
+		getSentenceDependency().addPredictedResult(predictedParent,i);//暂时保存每组预测结果和增量突变的下标
 	}
 
 	vector<int> bestPredicts;
@@ -228,24 +236,15 @@ void Simulator::selectAfterMutate(WordAgent& wordAgent){
 			for(size_t i = 0;i < bestPredicts.size();i ++){
 				deltaWeight.clear();
 				for(map<int,vector<double> >::iterator it = matchedparatopeFeature.begin();it != matchedparatopeFeature.end();it ++){
-					deltaWeight[it->first] = it->second[bestPredicts[i]];
+					deltaWeight[it->first] = it->second[getSentenceDependency().getPredictedResultDeltaIndex(bestPredicts[i])];
 				}
 				model->setDeltaWeight(deltaWeight);
-//				cout<<"deltaWeight="<<deltaWeight.size()<<endl;
 //				下面计算预测树的值
 				Sentence& sen = getSentenceDependency().getCurrentSentence();
 				vector<int>& predictedParent = getSentenceDependency().getPredictedParent(bestPredicts[i]);
-//				cout<<endl;
-//				cout<<"predictedParent ="<<predictedParent.size()<<endl;
-//				cout<<"\npredicited parent is:";
-//							for(size_t ii= 0;ii < predictedParent.size();ii ++){
-//								cout<<predictedParent[ii]<<",";
-//							}
-//							cout<<endl;
 				double treescore = model->calTreeScore(sen,predictedParent);
 				double realtreescore = model->calTreeScore(sen,getSentenceDependency().getRealParent());
 
-//				cout<<"treescore="<<treescore<<endl;
 				getSentenceDependency().setPredictedScore(bestPredicts[i],treescore);
 				getSentenceDependency().setRealScore(bestPredicts[i],realtreescore);
 			}
@@ -256,7 +255,7 @@ void Simulator::selectAfterMutate(WordAgent& wordAgent){
 			TIMESRC Logger::logger<<StrHead::header+LoggerUtil::SELECTED+wordAgent.toStringID()+" mutation is selected from index:"+selectedIndex+" mutations\n";
 			deltaWeight.clear();
 			for(map<int,vector<double> >::iterator it = matchedparatopeFeature.begin();it != matchedparatopeFeature.end();it ++){
-				deltaWeight[it->first] = it->second[selectedIndex];
+				deltaWeight[it->first] = it->second[getSentenceDependency().getPredictedResultDeltaIndex(selectedIndex)];
 			}
 			model->setDeltaWeight(deltaWeight);
 			model->updateWeightByDelta();

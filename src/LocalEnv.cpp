@@ -76,7 +76,7 @@ bool LocalEnv::bCellInteraction(WordAgent& bcell){
 			if(bcell.hasActivation()){//有激活值，才可以和B细胞反应
 				//如果agent是wordAgent的父节点
 				if(bcell.getWordInfo().hasParent(agent->getWordInfo())){
-					double aff = agent->calAffinity(bcell);//wordAgent作为抗原，agent作为B细胞
+					double aff = agent->calAffinity(bcell);//bcell作为抗原，agent作为B细胞
 					if(aff > maxaffinity){
 						maxaffinity = aff;
 						maxAffinityAgent = agent;//此时maxAffinityAgent是B细胞
@@ -142,7 +142,6 @@ bool LocalEnv::agInterfaction(WordAgent& ag){
 					maxAffinityAgent = agent;
 				}
 			}
-
 		}
 	}
 	if(maxaffinity > 0){

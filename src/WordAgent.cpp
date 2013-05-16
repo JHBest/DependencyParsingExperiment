@@ -397,7 +397,7 @@ void WordAgent::setMatchedFeatureRecptor(vector<int>& matchedFeature){
 //		cout<<matchedFeature[i]<<",";
 		matchedparatopeFeature[matchedFeature[i]] = vector<double>();
 	}
-	cout<<endl;
+//	cout<<endl;
 }
 
 
