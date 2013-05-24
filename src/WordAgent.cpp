@@ -286,7 +286,7 @@ void    WordAgent::mapStatusToBehavior()
 
 
 bool WordAgent::activationDie(){
-	TIMESRC Logger::logger<<StrHead::header +LoggerUtil::B_ACTIVATION_DIE+ toStringID() +" become activationDie  bag namuber is"+simu->getBAgNum()+"\n";
+	//TIMESRC Logger::logger<<StrHead::header +LoggerUtil::B_ACTIVATION_DIE+ toStringID() +" become activationDie  bag namuber is"+simu->getBAgNum()+"\n";
 	simu->anBAgDie();
 //	TIMESRC Logger::logger<<StrHead::header +LoggerUtil::B_ACTIVATION_DIE+ toString() +" after an activationDie,  bag namuber is"+simu->getBAgNum()+"\n";
 	setStatus(ACTIVE);
@@ -345,7 +345,7 @@ bool WordAgent::interact()
 
 bool WordAgent::die()
 {
-	TIMESRC Logger::logger<<StrHead::header+LoggerUtil::DIED+toStringID()+" is ag and going to dying (removed) \n";
+	//TIMESRC Logger::logger<<StrHead::header+LoggerUtil::DIED+toStringID()+" is ag and going to dying (removed) \n";
 	simu->anAgDie();
 	if(simu->deleteWordAgent(*this))
 	{
