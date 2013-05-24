@@ -107,10 +107,18 @@ int Model::initFeatureWeight()
 {
 	if(fWeight.size() == 0){
 		fWeight.resize((int)fMap.size());
-		double alpha = 1.0 / (RunParameter::instance.getParameter("BETA").getIntValue() * 1.0);
-		for(size_t i = 0; i < fWeight.size(); i++)
-		{
-			fWeight[i] = alpha * Tools::normalRand2();
+		int initzero = RunParameter::instance.getParameter("INIT_ZERO").getIntValue();
+		if(initzero == 1){
+			for(size_t i = 0; i < fWeight.size(); i++)
+			{
+				fWeight[i] = 0.0;
+			}
+		}else{
+			double alpha = 1.0 / (RunParameter::instance.getParameter("BETA").getIntValue() * 1.0);
+			for(size_t i = 0; i < fWeight.size(); i++)
+			{
+				fWeight[i] = alpha * Tools::normalRand2();
+			}
 		}
 		saveWeight();//初始化特征权重保存为第一行
 	}
