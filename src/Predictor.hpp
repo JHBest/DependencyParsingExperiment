@@ -8,7 +8,7 @@ class Predictor{
 private:
 	Model * pModel;
 private:
-	static const int maxLen = 128;//linux 256
+	static const int maxLen = 256;//linux 256
 public:
 	Predictor();
 	Predictor(Model * pm);
