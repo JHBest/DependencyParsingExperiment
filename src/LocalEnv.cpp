@@ -111,7 +111,10 @@ bool LocalEnv::bCellInteraction(WordAgent& bcell){
 			bcell.setMatchedFeatureRecptor(matchedFeature);
 			bcell.setCurrentAffinity(maxaffinity);
 			bcell.setStatus(MATCH);
-			bcell.setActiveLevel(RunParameter::instance.getParameter("ACTIVATION_LEVEL").getIntValue());
+			int initLevel = RunParameter::instance.getParameter("ACTIVATION_LEVEL").getIntValue();
+			if(initLevel > 0){
+				bcell.setActiveLevel(initLevel);
+			}
 			bcell.mapStatusToBehavior();
 
 			maxAffinityAgent->setStatus(DIE);
@@ -151,7 +154,10 @@ bool LocalEnv::agInterfaction(WordAgent& ag){
 		maxAffinityAgent->setMatchedFeatureRecptor(matchedFeature);
 		maxAffinityAgent->setCurrentAffinity(maxaffinity);
 		maxAffinityAgent->setStatus(MATCH);
-		maxAffinityAgent->setActiveLevel(RunParameter::instance.getParameter("ACTIVATION_LEVEL").getIntValue());
+		int initLevel = RunParameter::instance.getParameter("ACTIVATION_LEVEL").getIntValue();
+		if(initLevel > 0){
+			maxAffinityAgent->setActiveLevel(initLevel);
+		}
 		maxAffinityAgent->mapStatusToBehavior();
 
 		ag.setStatus(DIE);
