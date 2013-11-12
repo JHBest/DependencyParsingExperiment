@@ -27,6 +27,9 @@ bool Predictor::buildGraph(Sentence & sen,
 	int n = sen.size();
 	//cout<<"n "<<n<<endl;
 	graph.resize(n, vector<double>(n, 0));
+	/* 两两组合成parent-child，然后根据特征模板抽取特征，抽取出的特征正好相当于两个词主体匹配时共有的属性，
+	 * 然后计算亲和度或者结合强度，得到一个有向图，最后利用最大生成树算法生成预测的依存结构
+	 */
 	//double sum  = 0.0;
 	for(int i = 0; i < n; i++){
 		for(int j = 0; j < n; j++){
@@ -48,6 +51,9 @@ bool Predictor::buildGraph2(Sentence & sen,
 	//cout<<"n "<<n<<endl;
 	graph.resize(n, vector<double>(n, 0));
 	//double sum  = 0.0;
+	/* 两两组合成parent-child，然后根据特征模板抽取特征，抽取出的特征正好相当于两个词主体匹配时共有的属性，
+	 * 然后计算亲和度或者结合强度，得到一个有向图，最后利用最大生成树算法生成预测的依存结构
+	 */
 	for(int i = 0; i < n; i++){
 		for(int j = 0; j < n; j++){
 			if(j == i) continue;

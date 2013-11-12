@@ -57,6 +57,19 @@ bool DependencyPaser::train(const char * file){
 }
 
 /**
+ * output words and their properties
+ */
+bool DependencyPaser::outputWord(const char * file){
+	Logger::logger<<StrHead::header + "Initilizing B cell and B cell Network..." +"\n";
+		//初始化B细胞，包括抽取特征、构造网络，构建词主体
+	initBCell(file);
+
+	pTrainer->outputWordandProperties();
+
+	return true;
+}
+
+/**
  * 从训练树库里读取依存树，构建B细胞词
  * add by yangjinfeng
  */

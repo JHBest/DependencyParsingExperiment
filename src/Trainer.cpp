@@ -42,6 +42,28 @@ bool Trainer::initBCells(const Sentence & sen, const vector<int> & fa)
 	return true;
 }
 
+void Trainer::outputWordandProperties(){
+	string bcellpropfile = RunParameter::instance.getParameter("BCELL_PROP_FILE").getStringValue();
+	ofstream fout(bcellpropfile.c_str(), ios::out);
+	for(size_t i = 0;i < BCellAgents.size();i ++){
+		fout<<BCellAgents[i].toStringID()<<";";
+		set<int>::iterator it = BCellAgents[i].getIdiotopeDependentFeature().begin();
+		for(;it != BCellAgents[i].getIdiotopeDependentFeature().end();it ++){
+			fout<<(*it)<<",";
+		}
+		fout<<";";
+
+		set<int>::iterator it2 = BCellAgents[i].getParatopeParentFeature().begin();
+		for(;it2 != BCellAgents[i].getParatopeParentFeature().end();it2 ++){
+					fout<<(*it2)<<",";
+		}
+		fout<<endl;
+
+	}
+	fout.close();
+
+}
+
 
 //构建词主体
 /**add by yangjinfeng

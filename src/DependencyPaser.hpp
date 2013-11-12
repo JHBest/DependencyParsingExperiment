@@ -28,6 +28,8 @@ public:
 
 	bool predictOnAllWeights(const char * testFile, const char * outFile);
 
+	bool outputWord(const char * file);
+
 
 private:
 	//add by yangjinfeng

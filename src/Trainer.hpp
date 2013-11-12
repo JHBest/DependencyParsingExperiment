@@ -52,6 +52,8 @@ public:
 
 	void outputNetwork();
 
+	void outputWordandProperties();
+
 
 
 private:

@@ -33,6 +33,8 @@ int main()
 		dependencyPaser.predict(test_file.c_str(),result_file.c_str());
 	}else if(runmode == "test"){
 		dependencyPaser.predictOnAllWeights(test_file.c_str(),result_file.c_str());
+	}else if(runmode == "word"){
+		dependencyPaser.outputWord(train_file.c_str());
 	}
 
 	TIMESRC Logger::logger<<StrHead::header + "result file is: "+result_file+"\n";

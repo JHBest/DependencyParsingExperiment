@@ -43,7 +43,7 @@ WordAgent::WordAgent(WordInfo& wordinfo,
 
 	mapStatusToBehavior();
 	immuneClock = 0;
-
+	num=0;
 }
 
 
