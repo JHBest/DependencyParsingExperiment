@@ -125,7 +125,7 @@ string FeatureTemplate::_prePos(int pos)
 	_initHeader(res, pos);
 	res += "PP:";
 	pos--;
-	if(pos < 0) res += " ";
+	if(pos < 0) res += "YJF";
 	else res += (*pSen)[pos].second;
 	return res;
 }
@@ -136,7 +136,7 @@ string FeatureTemplate::_nextPos(int pos)
 	_initHeader(res, pos);
 	res += "NP:";
 	pos++;
-	if(pos >= (int)(*pSen).size()) res += " ";
+	if(pos >= (int)(*pSen).size()) res += "YJF";
 	else res += (*pSen)[pos].second;
 	return res;
 }

@@ -257,6 +257,7 @@ int Model::addFeature(const string & feat)
 	if(fMap.find(feat) == fMap.end()){
 		int id = fMap.size();
 		fMap[feat] = id;
+//		cout<<feat<<","<<id<<endl;
 	}
 
 	return fMap[feat];
