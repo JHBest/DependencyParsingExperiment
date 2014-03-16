@@ -406,18 +406,22 @@ void WordAgent::newMutate(){
 //	TIMESRC Logger::logger<<StrHead::header+LoggerUtil::MUTATE+this->toStringID()+" begin to mutate \n";
 	//首先进行预测
 	simu->predictBeforeMutate();
-	double currentPrecision = simu->getSentenceDependency().getCurrentSentencePrecision();
+//	double currentPrecision = simu->getSentenceDependency().getCurrentSentencePrecision();
+	double currentFitness = simu->getSentenceDependency().getCurrentFitness();
 	double affinity = getCurrentAffinity();
 
 //	TIMESRC Logger::logger<<StrHead::header+LoggerUtil::MUTATE+" current sentence precision is:"+currentPrecision+"\n";
 
 	double alpha = 1.0 / (RunParameter::instance.getParameter("BETA").getIntValue() * 1.0);
-	alpha = alpha * exp(-1 * currentPrecision) * exp(-1 * affinity);
+	alpha = alpha * exp(-1 * currentFitness) * exp(-1 * affinity);
 	TIMESRC Logger::logger<<StrHead::header+" the  mutate parameter alpha  is: "+alpha +"\n";
 	//突变
-	int k = RunParameter::instance.getParameter("K").getIntValue();
+	int k = RunParameter::instance.getParameter("K").getIntValue();  //K不再是克隆的个数，而是K个候选的突变。
 	double mutatePro = RunParameter::instance.getParameter("MUTATEPRO").getDoubleValue();
-	for(int i = 0;i < k;i ++){
+	int i = 0;
+	map<int,double> mutatedValue;
+	while(i < k){
+		mutatedValue.clear();
 		for(map<int,vector<double> >::iterator it = matchedparatopeFeature.begin();it != matchedparatopeFeature.end();it ++){
 			double mutateDelta = 0;
 			if(Tools::uniformRand() < mutatePro){//如果符合突变的几率
@@ -425,7 +429,16 @@ void WordAgent::newMutate(){
 				double finalalpha = alpha *  exp(-1 * weight);
 				mutateDelta = finalalpha * Tools::normalRand2();
 			}
-			it->second.push_back(mutateDelta);
+			mutatedValue[it->first] = mutateDelta;
+//			it->second.push_back(mutateDelta);
+		}
+		bool success = simu->predictAfterMutate(mutatedValue,i);
+		if(success){
+			i ++;
+			for(map<int,double>::iterator it = mutatedValue.begin();it != mutatedValue.end();it ++){
+				matchedparatopeFeature[it->first].push_back(it->second);//保存有效突变的值
+			}
+
 		}
 	}
 //	TIMESRC Logger::logger<<StrHead::header+" clone and  mutate "+k+" agents\n";

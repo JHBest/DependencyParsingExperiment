@@ -34,34 +34,38 @@ public:
 		return predictedResults;
 	}
 
-	void addPredictedResult(const vector<int>& predict,int deltaIndex);
+	double getPredictedFitness(int index){
+		return predictedResults[index].getFitness();
+	}
+
+	bool addPredictedResult(const vector<int>& predict,int deltaIndex);
 	/**
 	 * 选择最好的预测，也就是精度最高的预测
 	 */
-	void selectBestPredicts(vector<int> & indexs);
+	int selectBestPredict();
 
-	int selectMinScoreDifference();
+//	int selectMinScoreDifference();
+//
+//
+//    void setPredictedScore(int index,double score);
+//
+//    void setRealScore(int index,double score);
+//
+//    vector<int>& getPredictedParent(int index);
 
+//    double getMaxPredictedPrecision() const
+//    {
+//        return maxPredictedPrecision;
+//    }
+//
+//    void setMaxPredictedPrecision(double maxPredictedPrecision)
+//    {
+//        this->maxPredictedPrecision = maxPredictedPrecision;
+//    }
 
-    void setPredictedScore(int index,double score);
-
-    void setRealScore(int index,double score);
-
-    vector<int>& getPredictedParent(int index);
-
-    double getMaxPredictedPrecision() const
-    {
-        return maxPredictedPrecision;
-    }
-
-    void setMaxPredictedPrecision(double maxPredictedPrecision)
-    {
-        this->maxPredictedPrecision = maxPredictedPrecision;
-    }
-
-    int getPredictedResultDeltaIndex(int index){
-    	return predictedResults[index].getDeltaIndex();
-    }
+//    int getPredictedResultDeltaIndex(int index){
+//    	return predictedResults[index].getDeltaIndex();
+//    }
 
     void reset();
 
@@ -90,7 +94,7 @@ private:
 	double currentFitness;
 
 	//突变后最大的预测精度
-	double maxPredictedPrecision;
+//	double maxPredictedPrecision;
 
 	//多个突变的结果
 	vector<PredictedResult> predictedResults;

@@ -166,6 +166,15 @@ void Simulator::predictBeforeMutate(){
 	getSentenceDependency().setCurrentPredictedParent(predictedParent);
 	TIMESRC Logger::logger<<StrHead::header+" predict precision is "+getSentenceDependency().getCurrentSentencePrecision()+"\n";
 }
+
+bool Simulator::predictAfterMutate(map<int,double>& mutatedValue,int kth){
+	model->setDeltaWeight(mutatedValue);
+	Sentence& sen = getSentenceDependency().getCurrentSentence();
+	std::vector<int> predictedParent;
+	predictor->predict(sen,predictedParent);
+	return getSentenceDependency().addPredictedResult(predictedParent,kth);//暂时保存每组预测结果和增量突变的下标
+}
+
 /**
  * 选择过程如下：
  * 对每一个突变产生的增量，预测出一个最大生成树，并计算准确率，选择准确率最大的生成树
@@ -175,51 +184,20 @@ void Simulator::predictBeforeMutate(){
  * 如果准确率最大的生成树不止一个，则分别计算生成树的值，并和标准依存树的值相减，选择绝对值最小的那个生成树
  * 对应的突变就是要选择的突变。
  * 把选择的突变更新到特征的权重上
+ *
+ * 以上注释作废
+ *
+ * 只需选择fitness最大的突变，并和突变前的fitness值比较
+ *
  */
 void Simulator::selectAfterMutate(WordAgent& wordAgent){
 
-	map<int,vector<double> >& matchedparatopeFeature = wordAgent.getMatchedparatopeFeature();
-	//后选择
-	map<int,double> deltaWeight;
-	std::vector<int> predictedParent;
-
-	int k = RunParameter::instance.getParameter("K").getIntValue();
-	for(int i = 0;i < k;i ++){
-		deltaWeight.clear();
-		predictedParent.clear();
-//		cout<<"\n the "<<i<<" mutate delta is:";/////////////
-		bool zeroDelta = true;
-		for(map<int,vector<double> >::iterator it = matchedparatopeFeature.begin();it != matchedparatopeFeature.end();it ++){
-			double delta = it->second[i];
-			if(delta > 0){
-				zeroDelta = false;
-			}
-			deltaWeight[it->first] = delta;
-//			cout<<deltaWeight[it->first]<<",";
-		}
-		if(zeroDelta){
-			continue;
-		}
-//		cout<<endl;////////////////////
-		//针对每组突变进行预测
-		model->setDeltaWeight(deltaWeight);
-		Sentence& sen = getSentenceDependency().getCurrentSentence();
-		predictor->predict(sen,predictedParent);
-//		cout<<"predicited parent is:";/////////////////////////////////////////////
-//		for(size_t i= 0;i < predictedParent.size();i ++){
-//			cout<<predictedParent[i]<<",";
-//		}
-//		cout<<endl;//////////////////////////////////////////////////////////////
-		getSentenceDependency().addPredictedResult(predictedParent,i);//暂时保存每组预测结果和增量突变的下标
-	}
-
-	vector<int> bestPredicts;
-	getSentenceDependency().selectBestPredicts(bestPredicts);//根据正确的依存边数进行选择
-	double maxPrecision = getSentenceDependency().getMaxPredictedPrecision();
+	int maxFitIndex = getSentenceDependency().selectBestPredict();
+	double maxFitness = getSentenceDependency().getPredictedFitness(maxFitIndex);
 
 	bool accpetMutate = false;
-	double currentPrecision = getSentenceDependency().getCurrentSentencePrecision();
-	if(maxPrecision > currentPrecision){
+	double currentFitness = getSentenceDependency().getCurrentFitness();
+	if(maxFitness > currentFitness){
 		accpetMutate = true;
 	}else{
 		double acceptrate = RunParameter::instance.getParameter("ACCPET_MUTATE_RATE").getDoubleValue();
@@ -228,40 +206,17 @@ void Simulator::selectAfterMutate(WordAgent& wordAgent){
 		}
 	}
 	if(accpetMutate){//接受突变
-//		TIMESRC Logger::logger<<StrHead::header+LoggerUtil::SELECTED+wordAgent.toStringID()+" mutation is selected from "+(int)bestPredicts.size()+" mutations\n";
-		deltaWeight.clear();
-		int selectedIndex = -1;
-		if(bestPredicts.size() == 1){
-			selectedIndex = bestPredicts[0];
-		}else if(bestPredicts.size() > 1){
-			for(size_t i = 0;i < bestPredicts.size();i ++){
-				deltaWeight.clear();
-				for(map<int,vector<double> >::iterator it = matchedparatopeFeature.begin();it != matchedparatopeFeature.end();it ++){
-					deltaWeight[it->first] = it->second[getSentenceDependency().getPredictedResultDeltaIndex(bestPredicts[i])];
-				}
-				model->setDeltaWeight(deltaWeight);
-//				下面计算预测树的值
-				Sentence& sen = getSentenceDependency().getCurrentSentence();
-				vector<int>& predictedParent = getSentenceDependency().getPredictedParent(bestPredicts[i]);
-				double treescore = model->calTreeScore(sen,predictedParent);
-				double realtreescore = model->calTreeScore(sen,getSentenceDependency().getRealParent());
-
-				getSentenceDependency().setPredictedScore(bestPredicts[i],treescore);
-				getSentenceDependency().setRealScore(bestPredicts[i],realtreescore);
-			}
-			selectedIndex = getSentenceDependency().selectMinScoreDifference();
+		TIMESRC Logger::logger<<StrHead::header+LoggerUtil::SELECTED+wordAgent.toStringID()+" mutation is selected from index:"+maxFitIndex+" mutations\n";
+		map<int,double> deltaWeight;
+		map<int,vector<double> >& matchedparatopeFeature = wordAgent.getMatchedparatopeFeature();
+		for(map<int,vector<double> >::iterator it = matchedparatopeFeature.begin();it != matchedparatopeFeature.end();it ++){
+			deltaWeight[it->first] = it->second[maxFitIndex];
 		}
-//		TIMESRC Logger::logger<<StrHead::header+"selectedIndex="+selectedIndex+" in "+(int)bestPredicts.size()+" mutations\n";
-		if(selectedIndex >= 0){
-			TIMESRC Logger::logger<<StrHead::header+LoggerUtil::SELECTED+wordAgent.toStringID()+" mutation is selected from index:"+selectedIndex+" mutations\n";
-			deltaWeight.clear();
-			for(map<int,vector<double> >::iterator it = matchedparatopeFeature.begin();it != matchedparatopeFeature.end();it ++){
-				deltaWeight[it->first] = it->second[getSentenceDependency().getPredictedResultDeltaIndex(selectedIndex)];
-			}
-			model->setDeltaWeight(deltaWeight);
-			model->updateWeightByDelta();
-		}
-	}else{
+		model->setDeltaWeight(deltaWeight);
+		model->updateWeightByDelta();
+		//		}
+	}
+	else{
 //		TIMESRC Logger::logger<<StrHead::header+LoggerUtil::ABORTED+wordAgent.toStringID()+" mutation is aborted \n";
 	}
 }

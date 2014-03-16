@@ -12,8 +12,7 @@
 //修改wordagent的适合度函数
 SentenceDependency::SentenceDependency() {
 	// TODO Auto-generated constructor stub
-	currerntPrecision = 0;
-	maxPredictedPrecision = 0;
+	reset();
 }
 
 SentenceDependency::~SentenceDependency() {
@@ -26,6 +25,7 @@ void SentenceDependency::setSentenceAndDependency(const Sentence& sen,const vect
 	this->realParent = parent;
 }
 void SentenceDependency::setCurrentPredictedParent(vector<int>& parent){
+	//清空上一次的临时记录
 	resetForNextMutate();
 	this->currentPredictedParent = parent;
 	//同时计算边的准确率
@@ -56,80 +56,57 @@ double SentenceDependency::calPrecision(const vector<int>& predicted){
 }
 
 /**
- * 同时计算一下精确度
+ * 同时计算一下精确度,树的值，并且判断一下realtreescore >= treescore && treescore >= oldscore
  */
-void SentenceDependency::addPredictedResult(const vector<int>& predict,int deltaIndex){
+bool SentenceDependency::addPredictedResult(const vector<int>& predict,int deltaIndex){
 	PredictedResult result;
 	result.setPredictedParent(predict);
 	double precision = calPrecision(predict);
 	result.setPrecision(precision);
 	result.setDeltaIndex(deltaIndex);
-	predictedResults.push_back(result);
+
+	//计算标准树的值和预测前依存树的值
+	double treescore = model->calTreeScore(this->currenSentence,predict);
+	double realtreescore = model->calTreeScore(this->currenSentence,this->realParent);
+	double oldscore = model->calTreeScore(this->currenSentence,this->currentPredictedParent);
+
+	result.setRealScore(realtreescore);
+	result.setScore(treescore);
+
+	if(realtreescore >= treescore && treescore >= oldscore){
+		predictedResults.push_back(result);
+		return true;
+	}else{
+		return false;
+	}
+
 }
 
-void SentenceDependency::selectBestPredicts(vector<int> & indexs){
-	double maxPrecision = 0;
+int SentenceDependency::selectBestPredict(){
+	double maxFitness = 0;
+	int maxIndex = 0;
 	for(size_t i = 0;i < predictedResults.size();i ++){
-		PredictedResult& pr = predictedResults[i];
-		if(pr.getPrecision() > maxPrecision){
-			maxPrecision = pr.getPrecision();
-			indexs.clear();
-			indexs.push_back(i);
-		}else if(pr.getPrecision() == maxPrecision){
-			indexs.push_back(i);
+		double fitness =  predictedResults[i].getFitness();
+		if(fitness > maxFitness){
+			maxFitness = fitness;
+			maxIndex = i;
 		}
 	}
-	maxPredictedPrecision = maxPrecision;
-}
-
-void SentenceDependency::setPredictedScore(int index,double score){
-	predictedResults[index].setScore(score);
-}
-
-void SentenceDependency::setRealScore(int index,double score){
-	predictedResults[index].setRealScore(score);
-}
-
-
-vector<int>& SentenceDependency::getPredictedParent(int index){
-	return predictedResults[index].getPredictedParent();
-}
-
-int SentenceDependency::selectMinScoreDifference(){
-	double mindiff = 0;
-	int result = -1;
-	for(size_t i = 0;i < predictedResults.size();i ++){
-		double diff = fabs(predictedResults[i].getScore() - predictedResults[i].getRealScore());
-		if(i == 0){
-			mindiff = diff;
-			result = i;
-		}
-		if(diff < mindiff){
-			mindiff = diff;
-			result = i;
-		}
-	}
-	return result;
-
+	return maxIndex;
 }
 
 void SentenceDependency::reset(){
 	currenSentence.clear();
 	realParent.clear();
-	//突变前的预测结果
-	currentPredictedParent.clear();
-	//突变前预测结果的精确度
-	currerntPrecision = 0;
-	//突变后最大的预测精度
-	maxPredictedPrecision = 0;
 
-	//多个突变的结果
-	predictedResults.clear();
+	resetForNextMutate();
+
 
 }
 
 void SentenceDependency::resetForNextMutate(){
-	maxPredictedPrecision = 0;
+
+	currentFitness = 0;
 	currerntPrecision = 0;
 	currentPredictedParent.clear();
 	predictedResults.clear();
