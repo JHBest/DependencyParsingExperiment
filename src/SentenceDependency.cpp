@@ -8,6 +8,8 @@
 #include "SentenceDependency.h"
 #include <math.h>
 
+
+//修改wordagent的适合度函数
 SentenceDependency::SentenceDependency() {
 	// TODO Auto-generated constructor stub
 	currerntPrecision = 0;
