@@ -64,13 +64,30 @@ public:
 
     void reset();
 
+    void setCurrentFitness(double currentFitness){
+    	this->currentFitness = currentFitness;
+    }
+
+    double getCurrentFitness(){
+    	return this->currentFitness;
+    }
+
+    void setModel(Model * model){
+    	this->model = model;
+    }
+
 private:
+    Model * model;
+
 	Sentence currenSentence;
 	vector<int> realParent;
 	//突变前的预测结果
 	vector<int> currentPredictedParent;
 	//突变前预测结果的精确度
 	double currerntPrecision;
+	//适合度值=预测依存树精确度  * （预测依存树的值/标准依存树的值），也就是UAS* (score(T')/socre(T))
+	double currentFitness;
+
 	//突变后最大的预测精度
 	double maxPredictedPrecision;
 

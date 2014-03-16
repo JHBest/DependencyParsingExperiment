@@ -65,6 +65,15 @@ public:
         this->score = score;
     }
 
+    //适合度值
+    double getFitness(){
+    	if(realScore > 0){
+    		return precision * (score / realScore);
+    	}else{
+    		return 0;
+    	}
+    }
+
 
 
 private:
@@ -80,6 +89,10 @@ private:
 	 * 基于此我们选择和正确依存树的值最接近的那个棵最大生成树
 	 */
 	double realScore;
+
+	//突变前的依存树基于突变后的权重的树值
+	double oldScore;
+
 
 	int deltaIndex;
 

@@ -23,6 +23,7 @@ Simulator::Simulator(Predictor * predictor,Model * model)
 	bAgNum = 0;
 	this-> predictor = predictor;
 	this->model = model;
+	sentenceDependency.setModel(model);
 	systemClock = 0;
 	loadBCell();
 
