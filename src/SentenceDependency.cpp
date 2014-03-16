@@ -32,8 +32,8 @@ void SentenceDependency::setCurrentPredictedParent(vector<int>& parent){
 	currerntPrecision = calPrecision(parent);
 
 	//计算标准树的值和预测前依存树的值
-	double treescore = model->calTreeScore(sen,predictedParent);
-	double realtreescore = model->calTreeScore(sen,getSentenceDependency().getRealParent());
+	double treescore = model->calTreeScore(this->currenSentence,parent);
+	double realtreescore = model->calTreeScore(this->currenSentence,this->realParent);
 
 	double lostrate = 0;
 	if(realtreescore > 0){

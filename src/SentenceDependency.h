@@ -10,6 +10,7 @@
 #include "Sentence.hpp"
 #include <vector>
 #include "PredictedResult.h"
+#include "Model.hpp"
 using namespace std;
 
 class SentenceDependency {
