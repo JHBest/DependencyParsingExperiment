@@ -167,6 +167,10 @@ void Simulator::predictBeforeMutate(){
 	TIMESRC Logger::logger<<StrHead::header+" predict precision is "+getSentenceDependency().getCurrentSentencePrecision()+"\n";
 }
 
+/**
+ * 基于当前突变的增量，首先预测依存树，然后分别计算标准依存树的值s1，预测依存树的值s2，突变前预测依存树的值s3，这三者要满足的条件是
+ * s1 > s2 > s3
+ */
 bool Simulator::predictAfterMutate(map<int,double>& mutatedValue,int kth){
 	model->setDeltaWeight(mutatedValue);
 	Sentence& sen = getSentenceDependency().getCurrentSentence();

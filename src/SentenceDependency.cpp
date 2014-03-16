@@ -7,6 +7,8 @@
 
 #include "SentenceDependency.h"
 #include <math.h>
+#include "StrHead.h"
+#include "Logger.h"
 
 
 //修改wordagent的适合度函数
@@ -91,6 +93,9 @@ int SentenceDependency::selectBestPredict(){
 			maxFitness = fitness;
 			maxIndex = i;
 		}
+	}
+	if(maxIndex != predictedResults[maxIndex].getDeltaIndex()){
+		TIMESRC Logger::logger<<StrHead::header+" delta index is error\n";
 	}
 	return maxIndex;
 }
