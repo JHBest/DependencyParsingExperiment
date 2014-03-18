@@ -403,12 +403,15 @@ void WordAgent::setMatchedFeatureRecptor(vector<int>& matchedFeature){
 
 void WordAgent::newMutate(){
 
-//	TIMESRC Logger::logger<<StrHead::header+LoggerUtil::MUTATE+this->toStringID()+" begin to mutate \n";
+	TIMESRC Logger::logger<<StrHead::header+LoggerUtil::MUTATE+this->toStringID()+" begin to mutate \n";
 	//首先进行预测
 	simu->predictBeforeMutate();
 //	double currentPrecision = simu->getSentenceDependency().getCurrentSentencePrecision();
 	double currentFitness = simu->getSentenceDependency().getCurrentFitness();
 	double affinity = getCurrentAffinity();
+	if(1-currentFitness < 0.001){
+		return;
+	}
 
 //	TIMESRC Logger::logger<<StrHead::header+LoggerUtil::MUTATE+" current sentence precision is:"+currentPrecision+"\n";
 
@@ -420,6 +423,8 @@ void WordAgent::newMutate(){
 	double mutatePro = RunParameter::instance.getParameter("MUTATEPRO").getDoubleValue();
 	int i = 0;
 	map<int,double> mutatedValue;
+	int max_mutation_count = RunParameter::instance.getParameter("MAX_MUTATION_COUNT").getIntValue();
+	int mutation_count = 0;
 	while(i < k){
 		mutatedValue.clear();
 		for(map<int,vector<double> >::iterator it = matchedparatopeFeature.begin();it != matchedparatopeFeature.end();it ++){
@@ -440,11 +445,17 @@ void WordAgent::newMutate(){
 			}
 
 		}
+		mutation_count ++;
+		if(mutation_count >= max_mutation_count){
+			break;
+		}
 	}
 //	TIMESRC Logger::logger<<StrHead::header+" clone and  mutate "+k+" agents\n";
 	//后选择
+	if(simu->getSentenceDependency().getPredictCount()>0){
+		simu->selectAfterMutate(*this);
+	}
 
-	simu->selectAfterMutate(*this);
 
 	matchedparatopeFeature.clear();
 

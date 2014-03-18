@@ -12,15 +12,15 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
-#include <io.h>
+#include <io.h> //windows
 #include <fstream>
 #include <sstream>
 #include <iomanip>
 #include <vector>
 #include <math.h>
 #include <float.h>
-//#include <sys/stat.h>
-//#include <sys/types.h>
+//#include <sys/stat.h>  //linux
+//#include <sys/types.h>	//linux
 using namespace std;
 
 class Tools {
@@ -90,8 +90,8 @@ public:
 
 
 	static bool createDir(const char* dirname){
-	    int code = mkdir(dirname);
-//	    int code = mkdir(dirname,S_IRWXU);
+	    int code = mkdir(dirname);  //windows
+//	    int code = mkdir(dirname,S_IRWXU); //linux
 	    return code == 0;
 	}
 
@@ -195,7 +195,8 @@ public:
 
     static bool doubleEqual(double d1,double d2){
 //    	return fabs(d1 - d2)  < DBL_EPSILON ;
-    	return fabs((d1 - d2)/d1)< 1e-6;
+//    	return fabs((d1 - d2)/d1)< 1e-6;
+    	return fabs(d1 - d2)  < 1e-9;
     }
 
     static bool doubleEqualByStr(double d1,double d2){

@@ -44,6 +44,8 @@ public:
 	 */
 	int selectBestPredict();
 
+	int getPredictCount();
+
 //	int selectMinScoreDifference();
 //
 //

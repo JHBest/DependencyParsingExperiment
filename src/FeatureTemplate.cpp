@@ -15,6 +15,7 @@ bool FeatureTemplate::abstractFeature(const Sentence & sen,
 	pSen = &sen;
 	p = parent;
 	c = child;
+//	cout<<"p="<<p<<",c="<<c<<endl;
 	return _abstractFeature(featVec);
 }
 

@@ -60,7 +60,7 @@ public:
 	//在突变前预测一下
 	void predictBeforeMutate();
 	//突变后预测生成树
-	bool Simulator::predictAfterMutate(map<int,double>& mutatedValue,int kth);
+	bool predictAfterMutate(map<int,double>& mutatedValue,int kth);
 
 	void selectAfterMutate(WordAgent& wordAgent);
 
