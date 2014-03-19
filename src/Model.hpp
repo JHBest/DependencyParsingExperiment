@@ -64,6 +64,10 @@ public:
 		weightIndex = index;
 	}
 
+	void clearDeltaWeight(){
+		deltaWeight.clear();
+	}
+
 private:
 	inline int _getFeatureID(const std::string & feat);
 
