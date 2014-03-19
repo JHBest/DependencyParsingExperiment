@@ -119,6 +119,7 @@ void WordAgent::antigenWeaken(){
 void WordAgent::setActiveLevel(int al){
 	if(al > 0){
 		int lifetime = RunParameter::instance.getParameter("ANTIGEN_LIFETIME").getIntValue();
+		TIMESRC Logger::logger<<StrHead::header+toStringID()+" gained activation level "+ al+"and lifetime="+lifetime+"\n";
 		setLifetime(lifetime);
 		if(!hasActivation()){
 //			TIMESRC Logger::logger<<StrHead::header+toStringID()+" gained activation level "+ al+"\n";
@@ -288,7 +289,7 @@ void    WordAgent::mapStatusToBehavior()
 bool WordAgent::activationDie(){
 	//TIMESRC Logger::logger<<StrHead::header +LoggerUtil::B_ACTIVATION_DIE+ toStringID() +" become activationDie  bag namuber is"+simu->getBAgNum()+"\n";
 	simu->anBAgDie();
-//	TIMESRC Logger::logger<<StrHead::header +LoggerUtil::B_ACTIVATION_DIE+ toString() +" after an activationDie,  bag namuber is"+simu->getBAgNum()+"\n";
+	TIMESRC Logger::logger<<StrHead::header +LoggerUtil::B_ACTIVATION_DIE+ toString() +" after an activationDie,  bag namuber is"+simu->getBAgNum()+"\n";
 	setStatus(ACTIVE);
 	mapStatusToBehavior();
 
@@ -298,6 +299,11 @@ bool WordAgent::activationDie(){
 bool WordAgent::doMove()
 {
 //	TIMESRC Logger::logger<<StrHead::header + toStringID() +" do move \n";
+	//输出激活的B细胞的acitve level和liftime
+	if(category == BCELL && getActiveLevel() > 0){
+		TIMESRC Logger::logger<<StrHead::header +"move active level = "+getActiveLevel()+" and lifetime="+getLifetime()+"\n";
+	}
+
 	if(status != ACTIVE)
 	{
 		mapStatusToBehavior();
@@ -409,53 +415,52 @@ void WordAgent::newMutate(){
 //	double currentPrecision = simu->getSentenceDependency().getCurrentSentencePrecision();
 	double currentFitness = simu->getSentenceDependency().getCurrentFitness();
 	double affinity = getCurrentAffinity();
-	if(1-currentFitness < 0.001){
-		return;
-	}
+	if(1-currentFitness > 0.001){//如果当前句子的UAS精度比较高的时候，不发生突变
 
-//	TIMESRC Logger::logger<<StrHead::header+LoggerUtil::MUTATE+" current sentence precision is:"+currentPrecision+"\n";
+		//	TIMESRC Logger::logger<<StrHead::header+LoggerUtil::MUTATE+" current sentence precision is:"+currentPrecision+"\n";
 
-	double alpha = 1.0 / (RunParameter::instance.getParameter("BETA").getIntValue() * 1.0);
-	alpha = alpha * exp(-1 * currentFitness) * exp(-1 * affinity);
-	TIMESRC Logger::logger<<StrHead::header+" the  mutate parameter alpha  is: "+alpha +"\n";
-	//突变
-	int k = RunParameter::instance.getParameter("K").getIntValue();  //K不再是克隆的个数，而是K个候选的突变。
-	double mutatePro = RunParameter::instance.getParameter("MUTATEPRO").getDoubleValue();
-	int i = 0;
-	map<int,double> mutatedValue;
-	int max_mutation_count = RunParameter::instance.getParameter("MAX_MUTATION_COUNT").getIntValue();
-	int mutation_count = 0;
-	while(i < k){
-		mutatedValue.clear();
-		for(map<int,vector<double> >::iterator it = matchedparatopeFeature.begin();it != matchedparatopeFeature.end();it ++){
-			double mutateDelta = 0;
-			if(Tools::uniformRand() < mutatePro){//如果符合突变的几率
-				double weight = simu->model->getSingleFeatureWeight(it->first);
-				double finalalpha = alpha *  exp(-1 * weight);
-				mutateDelta = finalalpha * Tools::normalRand2();
+		double alpha = 1.0 / (RunParameter::instance.getParameter("BETA").getIntValue() * 1.0);
+		alpha = alpha * exp(-1 * currentFitness) * exp(-1 * affinity);
+		TIMESRC Logger::logger<<StrHead::header+" the  mutate parameter alpha  is: "+alpha +"\n";
+		//突变
+		int k = RunParameter::instance.getParameter("K").getIntValue();  //K不再是克隆的个数，而是K个候选的突变。
+		double mutatePro = RunParameter::instance.getParameter("MUTATEPRO").getDoubleValue();
+		int i = 0;
+		map<int,double> mutatedValue;
+		int max_mutation_count = RunParameter::instance.getParameter("MAX_MUTATION_COUNT").getIntValue();
+		int mutation_count = 0;
+		while(i < k){
+			mutatedValue.clear();
+			for(map<int,vector<double> >::iterator it = matchedparatopeFeature.begin();it != matchedparatopeFeature.end();it ++){
+				double mutateDelta = 0;
+				if(Tools::uniformRand() < mutatePro){//如果符合突变的几率
+					double weight = simu->model->getSingleFeatureWeight(it->first);
+					double finalalpha = alpha *  exp(-1 * weight);
+					mutateDelta = finalalpha * Tools::normalRand2();
+				}
+				mutatedValue[it->first] = mutateDelta;
+				//			it->second.push_back(mutateDelta);
 			}
-			mutatedValue[it->first] = mutateDelta;
-//			it->second.push_back(mutateDelta);
-		}
-		bool success = simu->predictAfterMutate(mutatedValue,i);
-		if(success){
-			i ++;
-			for(map<int,double>::iterator it = mutatedValue.begin();it != mutatedValue.end();it ++){
-				matchedparatopeFeature[it->first].push_back(it->second);//保存有效突变的值
+			bool success = simu->predictAfterMutate(mutatedValue,i);
+			if(success){
+				i ++;
+				for(map<int,double>::iterator it = mutatedValue.begin();it != mutatedValue.end();it ++){
+					matchedparatopeFeature[it->first].push_back(it->second);//保存有效突变的值
+				}
+
 			}
-
+			mutation_count ++;
+			if(mutation_count >= max_mutation_count){//最多尝试突变的次数是max_mutation_count
+				break;
+			}
+			//		TIMESRC Logger::logger<<StrHead::header+"mutation_count="+mutation_count+", max_mutation_count="+max_mutation_count+"\n";
 		}
-		mutation_count ++;
-		if(mutation_count >= max_mutation_count){
-			break;
+		//	TIMESRC Logger::logger<<StrHead::header+" clone and  mutate "+k+" agents\n";
+		//后选择
+		if(simu->getSentenceDependency().getPredictCount()>0){
+			simu->selectAfterMutate(*this);
 		}
 	}
-//	TIMESRC Logger::logger<<StrHead::header+" clone and  mutate "+k+" agents\n";
-	//后选择
-	if(simu->getSentenceDependency().getPredictCount()>0){
-		simu->selectAfterMutate(*this);
-	}
-
 
 	matchedparatopeFeature.clear();
 

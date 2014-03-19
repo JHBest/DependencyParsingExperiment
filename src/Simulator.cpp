@@ -295,6 +295,7 @@ bool Simulator::traversal(long immuneClock){
 			}
 			wordAgentGrid[i].getWordAgent(agentIDs[ii]).setImmuneClock(immuneClock);
 			wordAgentGrid[i].getWordAgent(agentIDs[ii]).runImmune();
+//			TIMESRC Logger::logger<<StrHead::header +  "getAgNum() + getBAgNum() = "+(getAgNum() + getBAgNum())+"\n";
 			if((getAgNum() + getBAgNum()) == 0)//如果抗原已消灭
 			{
 				TIMESRC Logger::logger<<StrHead::header + "Ags are all killed!\n";
