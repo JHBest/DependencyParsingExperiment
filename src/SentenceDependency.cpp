@@ -67,13 +67,13 @@ bool SentenceDependency::addPredictedResult(const vector<int>& predict,int delta
 	result.setPrecision(precision);
 	result.setDeltaIndex(deltaIndex);
 
-	TIMESRC Logger::logger<<StrHead::header+" after mutate predict precision is "+precision+"\n";
+//	TIMESRC Logger::logger<<StrHead::header+" after mutate predict precision is "+precision+"\n";
 
 	//计算标准树的值和预测前依存树的值
 	double treescore = model->calTreeScore(this->currenSentence,predict);
 	double realtreescore = model->calTreeScore(this->currenSentence,this->realParent);
 	double oldscore = model->calTreeScore(this->currenSentence,this->currentPredictedParent);
-	TIMESRC Logger::logger<<StrHead::header+"after mutate realtreescore="+realtreescore+", treescore=" + treescore +",oldscore=" + oldscore+"\n";
+//	TIMESRC Logger::logger<<StrHead::header+"after mutate realtreescore="+realtreescore+", treescore=" + treescore +",oldscore=" + oldscore+"\n";
 
 	result.setRealScore(realtreescore);
 	result.setScore(treescore);

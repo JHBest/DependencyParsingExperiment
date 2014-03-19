@@ -119,7 +119,7 @@ void WordAgent::antigenWeaken(){
 void WordAgent::setActiveLevel(int al){
 	if(al > 0){
 		int lifetime = RunParameter::instance.getParameter("ANTIGEN_LIFETIME").getIntValue();
-		TIMESRC Logger::logger<<StrHead::header+toStringID()+" gained activation level "+ al+"and lifetime="+lifetime+"\n";
+//		TIMESRC Logger::logger<<StrHead::header+toStringID()+" gained activation level "+ al+"and lifetime="+lifetime+"\n";
 		setLifetime(lifetime);
 		if(!hasActivation()){
 //			TIMESRC Logger::logger<<StrHead::header+toStringID()+" gained activation level "+ al+"\n";
@@ -289,7 +289,7 @@ void    WordAgent::mapStatusToBehavior()
 bool WordAgent::activationDie(){
 	//TIMESRC Logger::logger<<StrHead::header +LoggerUtil::B_ACTIVATION_DIE+ toStringID() +" become activationDie  bag namuber is"+simu->getBAgNum()+"\n";
 	simu->anBAgDie();
-	TIMESRC Logger::logger<<StrHead::header +LoggerUtil::B_ACTIVATION_DIE+ toString() +" after an activationDie,  bag namuber is"+simu->getBAgNum()+"\n";
+//	TIMESRC Logger::logger<<StrHead::header +LoggerUtil::B_ACTIVATION_DIE+ toString() +" after an activationDie,  bag namuber is"+simu->getBAgNum()+"\n";
 	setStatus(ACTIVE);
 	mapStatusToBehavior();
 
@@ -300,9 +300,9 @@ bool WordAgent::doMove()
 {
 //	TIMESRC Logger::logger<<StrHead::header + toStringID() +" do move \n";
 	//输出激活的B细胞的acitve level和liftime
-	if(category == BCELL && getActiveLevel() > 0){
-		TIMESRC Logger::logger<<StrHead::header +"move active level = "+getActiveLevel()+" and lifetime="+getLifetime()+"\n";
-	}
+//	if(category == BCELL && getActiveLevel() > 0){
+//		TIMESRC Logger::logger<<StrHead::header +"move active level = "+getActiveLevel()+" and lifetime="+getLifetime()+"\n";
+//	}
 
 	if(status != ACTIVE)
 	{
