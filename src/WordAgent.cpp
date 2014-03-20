@@ -407,6 +407,7 @@ void WordAgent::setMatchedFeatureRecptor(vector<int>& matchedFeature){
 }
 
 
+
 void WordAgent::newMutate(){
 
 	TIMESRC Logger::logger<<StrHead::header+LoggerUtil::MUTATE+this->toStringID()+" begin to mutate \n";

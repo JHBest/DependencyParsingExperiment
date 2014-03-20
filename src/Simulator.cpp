@@ -173,6 +173,7 @@ void Simulator::predictBeforeMutate(){
  * s1 > s2 > s3
  */
 bool Simulator::predictAfterMutate(map<int,double>& mutatedValue,int kth){
+	model->clearDeltaWeight();
 	model->setDeltaWeight(mutatedValue);
 	Sentence& sen = getSentenceDependency().getCurrentSentence();
 	std::vector<int> predictedParent;

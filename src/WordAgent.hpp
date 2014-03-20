@@ -158,6 +158,8 @@ private:
 
 	//add by yangjinfeng
 	void newMutate();
+	//deprecate
+	void newMutate2();
 	/*mapping status to behaviors*/
 	void    _mapStatusToBehavior();
 	long immuneClock;

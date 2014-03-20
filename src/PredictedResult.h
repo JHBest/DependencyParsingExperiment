@@ -67,8 +67,13 @@ public:
 
     //ÊÊºÏ¶ÈÖµ
     double getFitness(){
-    	if(realScore > 0){
-    		return precision * (score / realScore);
+//    	if(realScore > 0){
+//    		return precision * (score / realScore);
+//    	}else{
+//    		return 0;
+//    	}
+    	if(score > 0){
+    		return precision * (realScore / score);
     	}else{
     		return 0;
     	}

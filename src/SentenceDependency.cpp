@@ -38,8 +38,9 @@ void SentenceDependency::setCurrentPredictedParent(vector<int>& parent){
 	double realtreescore = model->calTreeScore(this->currenSentence,this->realParent);
 
 	double lostrate = 0;
-	if(realtreescore > 0){
-		lostrate = treescore / realtreescore;
+	if(treescore > 0){
+//		lostrate = treescore / realtreescore;
+		lostrate = realtreescore/treescore;
 	}
 	//计算当前适合度值
 	setCurrentFitness(currerntPrecision * lostrate);
@@ -73,12 +74,14 @@ bool SentenceDependency::addPredictedResult(const vector<int>& predict,int delta
 	double treescore = model->calTreeScore(this->currenSentence,predict);
 	double realtreescore = model->calTreeScore(this->currenSentence,this->realParent);
 	double oldscore = model->calTreeScore(this->currenSentence,this->currentPredictedParent);
-//	TIMESRC Logger::logger<<StrHead::header+"after mutate realtreescore="+realtreescore+", treescore=" + treescore +",oldscore=" + oldscore+"\n";
+	TIMESRC Logger::logger<<StrHead::header+"after mutate realtreescore="+realtreescore+", treescore=" + treescore +",oldscore=" + oldscore+"\n";
 
 	result.setRealScore(realtreescore);
 	result.setScore(treescore);
 
-	if(realtreescore >= treescore && treescore >= oldscore){
+//	if(realtreescore >= treescore && treescore >= oldscore){//
+//	if(treescore - oldscore >= treescore - realtreescore){//更靠近正确的树
+	if(treescore >= oldscore && treescore >= realtreescore){//
 		TIMESRC Logger::logger<<StrHead::header+"predictedPrecision="+precision+"\n";
 		TIMESRC Logger::logger<<StrHead::header+"realtreescore="+realtreescore+", treescore=" + treescore +",oldscore=" + oldscore+"\n";
 		predictedResults.push_back(result);
