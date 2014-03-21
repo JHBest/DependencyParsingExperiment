@@ -23,7 +23,12 @@ ACTIVATION_LEVEL=3,int
 #克隆的数量，也就是产生几组突变
 K=3,int
 #尝试突变的最大次数
-MAX_MUTATION_COUNT=20,int
+MAX_MUTATION_COUNT=2,int
+#突变方式
+#1,产生的随机数是正数，每一位的突变与原来的权重相关
+#2,产生的随机数有正有负，每一位的突变与原来的权重相关
+#3,产生的随机数有正有负，每一位的突变无关，也就是说每一位的突变增量相同
+MUTATE_METHOD=3,int
 #每个抗原的个数
 ANTIGEN_COUNT=3,int
 #抗原最大生命期限
