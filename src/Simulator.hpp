@@ -11,6 +11,7 @@
 #include "LocalEnv.h"
 #include "Model.hpp"
 #include "SentenceDependency.h"
+#include "Mutation.h"
 
 class Environment;
 class Evaluation;
@@ -42,6 +43,9 @@ public:
     Predictor * predictor;
     //add by yangjinfeng
     Model * model;
+
+    Mutation mutation;
+
     //modified by yangjinfeng
 	Simulator(Predictor * predictor,Model * model);
 	std::pair<int, int> getRandomPosition();

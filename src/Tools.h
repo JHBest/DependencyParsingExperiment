@@ -189,6 +189,18 @@ public:
     	return result;
     }
 
+    static double normalRand3(){
+    	double result = 0;
+    	while(true){
+    		result = normalRand();
+    		if(fabs(result) < 1){
+    			break;
+    		}
+    	}
+    	return result;
+    }
+
+
     static double uniformRand(){
 	    return (rand()%1000)/1000.0;
     }

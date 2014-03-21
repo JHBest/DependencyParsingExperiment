@@ -432,19 +432,22 @@ void WordAgent::newMutate(){
 		int mutation_count = 0;
 		while(i < k){
 			mutatedValue.clear();
-			for(map<int,vector<double> >::iterator it = matchedparatopeFeature.begin();it != matchedparatopeFeature.end();it ++){
-				double mutateDelta = 0;
-				if(Tools::uniformRand() < mutatePro){//如果符合突变的几率
-					double weight = simu->model->getSingleFeatureWeight(it->first);
-					double finalalpha = alpha *  exp(-1 * weight);
-					mutateDelta = finalalpha * Tools::normalRand2();
-				}
-				mutatedValue[it->first] = mutateDelta;
-				//			it->second.push_back(mutateDelta);
-			}
+//			for(map<int,vector<double> >::iterator it = matchedparatopeFeature.begin();it != matchedparatopeFeature.end();it ++){
+//				double mutateDelta = 0;
+//				if(Tools::uniformRand() < mutatePro){//如果符合突变的几率
+//					double weight = simu->model->getSingleFeatureWeight(it->first);
+//					double finalalpha = alpha *  exp(-1 * weight);
+//					mutateDelta = finalalpha * Tools::normalRand2();
+//				}
+//				mutatedValue[it->first] = mutateDelta;
+//				//			it->second.push_back(mutateDelta);
+//			}
+			simu->mutation.hypermutate(matchedparatopeFeature,mutatedValue,alpha);
+
 			bool success = simu->predictAfterMutate(mutatedValue,i);
 			if(success){
 				i ++;
+				cout<<"\n";
 				for(map<int,double>::iterator it = mutatedValue.begin();it != mutatedValue.end();it ++){
 					matchedparatopeFeature[it->first].push_back(it->second);//保存有效突变的值
 				}

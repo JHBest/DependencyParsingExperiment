@@ -8,6 +8,8 @@
 #include "Logger.h"
 #include "RunParameter.h"
 #include "LoggerUtil.h"
+#include "Mutation.h"
+
 
 using namespace std;
 
@@ -24,6 +26,7 @@ Simulator::Simulator(Predictor * predictor,Model * model)
 	this-> predictor = predictor;
 	this->model = model;
 	sentenceDependency.setModel(model);
+	mutation.setModel(model);
 	systemClock = 0;
 	loadBCell();
 
