@@ -62,6 +62,10 @@ double SentenceDependency::calPrecision(const vector<int>& predicted){
  * 同时计算一下精确度,树的值，并且判断一下realtreescore >= treescore && treescore >= oldscore
  */
 bool SentenceDependency::addPredictedResult(const vector<int>& predict,int deltaIndex){
+	bool legal = validatePredictedTree(predict);
+	if(!legal){
+		return false;
+	}
 	PredictedResult result;
 	result.setPredictedParent(predict);
 	double precision = calPrecision(predict);
@@ -90,6 +94,17 @@ bool SentenceDependency::addPredictedResult(const vector<int>& predict,int delta
 		return false;
 	}
 
+}
+/**
+ * 第0个是ROOT的父节点，父节点为-1，其他节点的父节点必须>=0
+ */
+bool SentenceDependency::validatePredictedTree(const vector<int>& predict){
+	for(size_t i = 1;i < predict.size();i ++){
+		if(predict[i] < 0){
+			return false;
+		}
+	}
+	return true;
 }
 
 int SentenceDependency::getPredictCount(){

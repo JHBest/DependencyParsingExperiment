@@ -83,6 +83,8 @@ public:
     	this->model = model;
     }
 
+    bool validatePredictedTree(const vector<int>& predict);
+
 private:
     Model * model;
 
