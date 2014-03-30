@@ -28,7 +28,10 @@ MAX_MUTATION_COUNT=2,int
 #1,产生的随机数是正数，每一位的突变与原来的权重相关
 #2,产生的随机数有正有负，每一位的突变与原来的权重相关
 #3,产生的随机数有正有负，每一位的突变无关，也就是说每一位的突变增量相同
-MUTATE_METHOD=3,int
+MUTATE_METHOD=2,int
+#1,每一棵树的UAS值
+#2,每一棵树的UAS值乘以score(tree)的比值
+FITNESS_METHOD=1,int
 #每个抗原的个数
 ANTIGEN_COUNT=3,int
 #抗原最大生命期限
