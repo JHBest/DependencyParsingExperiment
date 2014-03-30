@@ -29,21 +29,18 @@ void SentenceDependency::setSentenceAndDependency(const Sentence& sen,const vect
 void SentenceDependency::setCurrentPredictedParent(vector<int>& parent){
 	//清空上一次的临时记录
 	resetForNextMutate();
-	this->currentPredictedParent = parent;
-	//同时计算边的准确率
-	currerntPrecision = calPrecision(parent);
+	currentPredictedResult.setPredictedParent(parent);
+	double precision = calPrecision(parent);
+	currentPredictedResult.setPrecision(precision);
 
 	//计算标准树的值和预测前依存树的值
 	double treescore = model->calTreeScore(this->currenSentence,parent);
 	double realtreescore = model->calTreeScore(this->currenSentence,this->realParent);
 
-	double lostrate = 0;
-	if(treescore > 0){
-//		lostrate = treescore / realtreescore;
-		lostrate = realtreescore/treescore;
-	}
-	//计算当前适合度值
-	setCurrentFitness(currerntPrecision * lostrate);
+
+	currentPredictedResult.setRealScore(realtreescore);
+	currentPredictedResult.setScore(treescore);
+
 }
 
 double SentenceDependency::calPrecision(const vector<int>& predicted){
@@ -77,7 +74,7 @@ bool SentenceDependency::addPredictedResult(const vector<int>& predict,int delta
 	//计算标准树的值和预测前依存树的值
 	double treescore = model->calTreeScore(this->currenSentence,predict);
 	double realtreescore = model->calTreeScore(this->currenSentence,this->realParent);
-	double oldscore = model->calTreeScore(this->currenSentence,this->currentPredictedParent);
+	double oldscore = model->calTreeScore(this->currenSentence,this->currentPredictedResult.getPredictedParent());
 	TIMESRC Logger::logger<<StrHead::header+"after mutate realtreescore="+realtreescore+", treescore=" + treescore +",oldscore=" + oldscore+"\n";
 
 	result.setRealScore(realtreescore);
@@ -137,10 +134,10 @@ void SentenceDependency::reset(){
 }
 
 void SentenceDependency::resetForNextMutate(){
-
-	currentFitness = 0;
-	currerntPrecision = 0;
-	currentPredictedParent.clear();
+	currentPredictedResult.reset();
+//	currentFitness = 0;
+//	currerntPrecision = 0;
+//	currentPredictedParent.clear();
 	predictedResults.clear();
 }
 

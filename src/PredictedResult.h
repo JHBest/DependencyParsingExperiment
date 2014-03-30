@@ -9,6 +9,7 @@
 #define PREDICTEDRESULT_H_
 #include <string>
 #include <vector>
+#include "RunParameter.h"
 using namespace std;
 
 class PredictedResult {
@@ -67,16 +68,30 @@ public:
 
     //ÊÊºÏ¶ÈÖµ
     double getFitness(){
-//    	if(realScore > 0){
-//    		return precision * (score / realScore);
-//    	}else{
-//    		return 0;
-//    	}
-    	if(score > 0){
-    		return precision * (realScore / score);
+    	//    	if(realScore > 0){
+    	//    		return precision * (score / realScore);
+    	//    	}else{
+    	//    		return 0;
+    	//    	}
+    	int fitnessMethod = RunParameter::instance.getParameter("FITNESS_METHOD").getIntValue();
+    	if(fitnessMethod == 1){
+    		return precision;
     	}else{
-    		return 0;
+    		if(score > 0){
+    			return precision * (realScore / score);
+    		}else{
+    			return 0;
+    		}
     	}
+    }
+
+    void reset(){
+    	predictedParent.clear();
+    	precision = 0.0;
+    	score = 0.0;
+    	realScore = 0.0;
+    	oldScore = 0.0;
+    	deltaIndex = -1;
     }
 
 

@@ -412,9 +412,9 @@ void WordAgent::newMutate(){
 
 	TIMESRC Logger::logger<<StrHead::header+LoggerUtil::MUTATE+this->toStringID()+" begin to mutate \n";
 	//首先进行预测
-	simu->predictBeforeMutate();
+	simu->predictBeforeMutate();//这一步的预测可以省掉，但改动比较麻烦。
 //	double currentPrecision = simu->getSentenceDependency().getCurrentSentencePrecision();
-	double currentFitness = simu->getSentenceDependency().getCurrentFitness();
+	double currentFitness = simu->getSentenceDependency().getCurrentPredictedResult().getFitness();
 	double affinity = getCurrentAffinity();
 	if(1-currentFitness > 0.001){//如果当前句子的UAS精度比较高的时候，不发生突变
 
@@ -425,7 +425,7 @@ void WordAgent::newMutate(){
 		TIMESRC Logger::logger<<StrHead::header+" the  mutate parameter alpha  is: "+alpha +"\n";
 		//突变
 		int k = RunParameter::instance.getParameter("K").getIntValue();  //K不再是克隆的个数，而是K个候选的突变。
-		double mutatePro = RunParameter::instance.getParameter("MUTATEPRO").getDoubleValue();
+//		double mutatePro = RunParameter::instance.getParameter("MUTATEPRO").getDoubleValue();
 		int i = 0;
 		map<int,double> mutatedValue;
 		int max_mutation_count = RunParameter::instance.getParameter("MAX_MUTATION_COUNT").getIntValue();
@@ -444,7 +444,7 @@ void WordAgent::newMutate(){
 //			}
 			simu->mutation.hypermutate(matchedparatopeFeature,mutatedValue,alpha);
 
-			bool success = simu->predictAfterMutate(mutatedValue,i);
+			bool success = simu->predictAfterMutate(mutatedValue,i);//如果预测的结果不是一棵树的话，也就是其他的词的父节点也是-1，突变作废，这样会造成多余的预测
 			if(success){
 				i ++;
 				cout<<"\n";

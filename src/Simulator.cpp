@@ -168,7 +168,7 @@ void Simulator::predictBeforeMutate(){
 	Sentence& sen = getSentenceDependency().getCurrentSentence();
 	predictor->predict(sen,predictedParent);
 	getSentenceDependency().setCurrentPredictedParent(predictedParent);
-	TIMESRC Logger::logger<<StrHead::header+" before mutate predict precision is "+getSentenceDependency().getCurrentSentencePrecision()+"\n";
+	TIMESRC Logger::logger<<StrHead::header+" before mutate predict precision is "+getSentenceDependency().getCurrentPredictedResult().getPrecision()+"\n";
 }
 
 /**
@@ -205,7 +205,7 @@ void Simulator::selectAfterMutate(WordAgent& wordAgent){
 	double maxFitness = getSentenceDependency().getPredictedFitness(maxFitIndex);
 
 	bool accpetMutate = false;
-	double currentFitness = getSentenceDependency().getCurrentFitness();
+	double currentFitness = getSentenceDependency().getCurrentPredictedResult().getFitness();
 	TIMESRC Logger::logger<<StrHead::header+" currentFitness="+currentFitness+" maxFitness = "+maxFitness+"\n";
 	if(maxFitness >= currentFitness){
 		accpetMutate = true;
