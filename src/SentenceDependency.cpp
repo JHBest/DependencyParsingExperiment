@@ -26,8 +26,12 @@ void SentenceDependency::setSentenceAndDependency(const Sentence& sen,const vect
 	this->currenSentence = sen;
 	this->realParent = parent;
 }
-void SentenceDependency::setCurrentPredictedParent(vector<int>& parent){
+bool SentenceDependency::setCurrentPredictedParent(vector<int>& parent){
 	//清空上一次的临时记录
+	bool legal = validatePredictedTree(parent);
+	if(!legal){
+		return false;
+	}
 	resetForNextMutate();
 	currentPredictedResult.setPredictedParent(parent);
 	double precision = calPrecision(parent);
@@ -40,6 +44,7 @@ void SentenceDependency::setCurrentPredictedParent(vector<int>& parent){
 
 	currentPredictedResult.setRealScore(realtreescore);
 	currentPredictedResult.setScore(treescore);
+	return true;
 
 }
 

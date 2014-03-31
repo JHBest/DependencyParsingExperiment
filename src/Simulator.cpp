@@ -161,14 +161,17 @@ void Simulator::moveAgent(WordAgent& agent,std::pair<int, int>& fromPos,std::pai
 	}
 }
 
-void Simulator::predictBeforeMutate(){
+bool Simulator::predictBeforeMutate(){
 //	TIMESRC Logger::logger<<StrHead::header+" predict sentence ("+ LoggerUtil::sentenceToString(getSentenceDependency().getCurrentSentence()) +") before mutate \n";
 	model->clearDeltaWeight();//删除之前的突变
 	std::vector<int> predictedParent;
 	Sentence& sen = getSentenceDependency().getCurrentSentence();
 	predictor->predict(sen,predictedParent);
-	getSentenceDependency().setCurrentPredictedParent(predictedParent);
-	TIMESRC Logger::logger<<StrHead::header+" before mutate predict precision is "+getSentenceDependency().getCurrentPredictedResult().getPrecision()+"\n";
+	bool result = getSentenceDependency().setCurrentPredictedParent(predictedParent);
+	if(result){
+		TIMESRC Logger::logger<<StrHead::header+" before mutate predict precision is "+getSentenceDependency().getCurrentPredictedResult().getPrecision()+"\n";
+	}
+	return result;
 }
 
 /**

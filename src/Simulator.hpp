@@ -62,7 +62,7 @@ public:
 		return sentenceDependency;
 	}
 	//在突变前预测一下
-	void predictBeforeMutate();
+	bool predictBeforeMutate();
 	//突变后预测生成树
 	bool predictAfterMutate(map<int,double>& mutatedValue,int kth);
 
