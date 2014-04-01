@@ -133,20 +133,37 @@ double Predictor::_eisner(vector<vector<double> > & graph,vector<int> & father)
 	int n = graph.size();
 	assert(n < maxLen);
 	double f[maxLen][maxLen][2][2];
-	memset(f, 0, sizeof(f));
-	for(int k = 1; k < n; k++){
-		for(int s = 0; s < n - k; s++){
-			int t = s + k;
-			for(int q = s; q < t; q++){
-				f[s][t][0][1] = max(f[s][t][0][1], f[s][q][1][0] + f[q+1][t][0][0] + graph[t][s]);
-				f[s][t][1][1] = max(f[s][t][1][1], f[s][q][1][0] + f[q+1][t][0][0] + graph[s][t]);
-			}
-			for(int q = s; q <= t; q++){
-				f[s][t][0][0] = max(f[s][t][0][0], f[s][q][0][0] + f[q][t][0][1]);
-				f[s][t][1][0] = max(f[s][t][1][0], f[s][q][1][1] + f[q][t][1][0]);
-			}
-		}
-	}
+
+//	memset(f, 0, sizeof(f));
+
+        for (int s = 0; s < n; s ++)
+            for (int t = 0; t < n; t ++)
+                for (int d = 0; d <=1; d ++)
+                    for (int c = 0; c <= 1; c ++)
+                        f[s][t][d][c] = -999999999.9;
+ 
+
+        for (int s = 0; s < n; s ++)
+            for (int d = 0; d <=1; d ++)
+                for (int c = 0; c <= 1; c ++)
+                    f[s][s][d][c] = 0.0;
+
+
+        for(int k = 1; k < n; k++){
+        	for(int s = 0; s < n - k; s++){
+        		int t = s + k;
+        		for(int q = s; q < t; q++){
+        			f[s][t][0][1] = max(f[s][t][0][1], f[s][q][1][0] + f[q+1][t][0][0] + graph[t][s]);
+        			f[s][t][1][1] = max(f[s][t][1][1], f[s][q][1][0] + f[q+1][t][0][0] + graph[s][t]);
+        		}
+        		for(int q = s; q < t; q++){
+        			f[s][t][0][0] = max(f[s][t][0][0], f[s][q][0][0] + f[q][t][0][1]);
+        		}
+        		for (int q = s+1; q <=t; q++) {
+        			f[s][t][1][0] = max(f[s][t][1][0], f[s][q][1][1] + f[q][t][1][0]);
+        		}
+        	}
+        }
 	father.resize(n, -1);
 	_decode(f, 0, n - 1, 1, 0, graph, father);
 //	cout<<"end _eisner"<<endl;

@@ -93,6 +93,9 @@ bool SentenceDependency::addPredictedResult(const vector<int>& predict,int delta
 		predictedResults.push_back(result);
 		return true;
 	}else{
+		TIMESRC Logger::logger<<StrHead::header+"error predictedPrecision="+precision+"\n";
+		TIMESRC Logger::logger<<StrHead::header+"error realtreescore="+realtreescore+", treescore=" + treescore +",oldscore=" + oldscore+"\n";
+		TIMESRC Logger::logger<<StrHead::header+"yyy1="+((realtreescore - treescore)*1000000.0)+" yyy2="+((oldscore - treescore)*1000000.0)+"\n";
 		return false;
 	}
 
@@ -101,11 +104,11 @@ bool SentenceDependency::addPredictedResult(const vector<int>& predict,int delta
  * 第0个是ROOT的父节点，父节点为-1，其他节点的父节点必须>=0
  */
 bool SentenceDependency::validatePredictedTree(const vector<int>& predict){
-	for(size_t i = 1;i < predict.size();i ++){
-		if(predict[i] < 0){
-			return false;
-		}
-	}
+//	for(size_t i = 1;i < predict.size();i ++){
+//		if(predict[i] < 0){
+//			return false;
+//		}
+//	}
 	return true;
 }
 
