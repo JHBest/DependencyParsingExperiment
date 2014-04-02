@@ -448,7 +448,7 @@ void WordAgent::newMutate(){
 				bool success = simu->predictAfterMutate(mutatedValue,i);//如果预测的结果不是一棵树的话，也就是其他的词的父节点也是-1，突变作废，这样会造成多余的预测
 				if(success){
 					i ++;
-					cout<<"\n";
+//					cout<<"\n";
 					for(map<int,double>::iterator it = mutatedValue.begin();it != mutatedValue.end();it ++){
 						matchedparatopeFeature[it->first].push_back(it->second);//保存有效突变的值
 					}
