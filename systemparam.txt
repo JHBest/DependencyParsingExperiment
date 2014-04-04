@@ -6,6 +6,8 @@ ROWS=5,int
 COLS=5,int
 #预测时需要初始化数组的最大长度，根据不同系统设置
 MAX_LENGTH=128,int
+#是否适应性突变，如果是，MUTATEPRO的值作为初始值,1表示是，0表示否
+ADAPTIVE_MUTATION=1
 #突变频率阈值
 MUTATEPRO=0.5,double
 #最大词频率
