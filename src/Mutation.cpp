@@ -20,23 +20,28 @@ Mutation::Mutation() {
 
 
 
-void Mutation::hypermutate(map<int,vector<double> > & matchedparatopeFeature, map<int,double> & mutatedValue,double alpha){
+void Mutation::hypermutate(map<int,vector<double> > & matchedparatopeFeature, map<int,double> & mutatedValue,double alpha,double currentFitness){
 	int mutateMethod = RunParameter::instance.getParameter("MUTATE_METHOD").getIntValue();
+	double mutatePro = RunParameter::instance.getParameter("MUTATEPRO").getDoubleValue();
+	int adaptive = RunParameter::instance.getParameter("ADAPTIVE_MUTATION").getIntValue();
+	if(adaptive == 1){
+		mutatePro = mutatePro * exp(-1 * currentFitness);
+	}
 	if(mutateMethod == 1){
-		mutate1(matchedparatopeFeature,mutatedValue,alpha);
+		mutate1(matchedparatopeFeature,mutatedValue,alpha,mutatePro);
 	}else if(mutateMethod == 2){
-		mutate2(matchedparatopeFeature,mutatedValue,alpha);
+		mutate2(matchedparatopeFeature,mutatedValue,alpha,mutatePro);
 	}else if(mutateMethod == 3){
-		mutate3(matchedparatopeFeature,mutatedValue,alpha);
+		mutate3(matchedparatopeFeature,mutatedValue,alpha,mutatePro);
 	}
 }
 
 /**
  * 产生的随机数是正数，每一位的突变与原来的权重相关
  */
-void Mutation::mutate1(map<int,vector<double> > & matchedparatopeFeature, map<int,double> & mutatedValue,double alpha){
+void Mutation::mutate1(map<int,vector<double> > & matchedparatopeFeature, map<int,double> & mutatedValue,double alpha,double mutatePro){
 	mutatedValue.clear();
-	double mutatePro = RunParameter::instance.getParameter("MUTATEPRO").getDoubleValue();
+//	double mutatePro = RunParameter::instance.getParameter("MUTATEPRO").getDoubleValue();
 	for(map<int,vector<double> >::iterator it = matchedparatopeFeature.begin();it != matchedparatopeFeature.end();it ++){
 		double mutateDelta = 0;
 		if(Tools::uniformRand() < mutatePro){//如果符合突变的几率
@@ -51,9 +56,9 @@ void Mutation::mutate1(map<int,vector<double> > & matchedparatopeFeature, map<in
 /**
  * 产生的随机数有正有负，每一位的突变与原来的权重相关
  */
-void Mutation::mutate2(map<int,vector<double> > & matchedparatopeFeature, map<int,double> & mutatedValue,double alpha){
+void Mutation::mutate2(map<int,vector<double> > & matchedparatopeFeature, map<int,double> & mutatedValue,double alpha,double mutatePro){
 	mutatedValue.clear();
-	double mutatePro = RunParameter::instance.getParameter("MUTATEPRO").getDoubleValue();
+//	double mutatePro = RunParameter::instance.getParameter("MUTATEPRO").getDoubleValue();
 	for(map<int,vector<double> >::iterator it = matchedparatopeFeature.begin();it != matchedparatopeFeature.end();it ++){
 		double mutateDelta = 0;
 		if(Tools::uniformRand() < mutatePro){//如果符合突变的几率
@@ -68,9 +73,9 @@ void Mutation::mutate2(map<int,vector<double> > & matchedparatopeFeature, map<in
 /**
  * 产生的随机数有正有负，每一位的突变无关，也就是说每一位的突变增量相同
  */
-void Mutation::mutate3(map<int,vector<double> > & matchedparatopeFeature, map<int,double> & mutatedValue,double alpha){
+void Mutation::mutate3(map<int,vector<double> > & matchedparatopeFeature, map<int,double> & mutatedValue,double alpha,double mutatePro){
 	mutatedValue.clear();
-	double mutatePro = RunParameter::instance.getParameter("MUTATEPRO").getDoubleValue();
+//	double mutatePro = RunParameter::instance.getParameter("MUTATEPRO").getDoubleValue();
 	double	mutateDelta = Tools::normalRand3() * alpha;
 	for(map<int,vector<double> >::iterator it = matchedparatopeFeature.begin();it != matchedparatopeFeature.end();it ++){
 		int flag = 0;

@@ -443,7 +443,7 @@ void WordAgent::newMutate(){
 				//				mutatedValue[it->first] = mutateDelta;
 				//				//			it->second.push_back(mutateDelta);
 				//			}
-				simu->mutation.hypermutate(matchedparatopeFeature,mutatedValue,alpha);
+				simu->mutation.hypermutate(matchedparatopeFeature,mutatedValue,alpha,currentFitness);
 
 				bool success = simu->predictAfterMutate(mutatedValue,i);//如果预测的结果不是一棵树的话，也就是其他的词的父节点也是-1，突变作废，这样会造成多余的预测
 				if(success){
