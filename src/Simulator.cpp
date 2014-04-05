@@ -164,6 +164,12 @@ void Simulator::moveAgent(WordAgent& agent,std::pair<int, int>& fromPos,std::pai
 bool Simulator::predictBeforeMutate(){
 //	TIMESRC Logger::logger<<StrHead::header+" predict sentence ("+ LoggerUtil::sentenceToString(getSentenceDependency().getCurrentSentence()) +") before mutate \n";
 	model->clearDeltaWeight();//删除之前的突变
+	/////如果当前预测树存在的话，就不预测，节省点时间
+	getSentenceDependency().getPredictedResults().clear();
+	if(getSentenceDependency().getCurrentPredictedResult().getPredictedParent().size() > 0){
+		return true;
+	}
+	/////
 	std::vector<int> predictedParent;
 	Sentence& sen = getSentenceDependency().getCurrentSentence();
 	predictor->predict(sen,predictedParent);
@@ -227,11 +233,14 @@ void Simulator::selectAfterMutate(WordAgent& wordAgent){
 		}
 		model->setDeltaWeight(deltaWeight);
 		model->updateWeightByDelta();
+		//////把保留的依存树作为当前的预测依存树
+		getSentenceDependency().setAsCurrentPrediction(maxFitIndex);
 		//		}
 	}
 	else{
 //		TIMESRC Logger::logger<<StrHead::header+LoggerUtil::ABORTED+wordAgent.toStringID()+" mutation is aborted \n";
 	}
+	getSentenceDependency().getPredictedResults().clear();
 }
 
 

@@ -19,6 +19,9 @@ public:
 	virtual ~SentenceDependency();
 	void setSentenceAndDependency(const Sentence& sen,const vector<int>& parent);
 	bool setCurrentPredictedParent(vector<int>& parent);
+
+	void setAsCurrentPrediction(int index);
+
 	Sentence& getCurrentSentence(){
 		return currenSentence;
 	}

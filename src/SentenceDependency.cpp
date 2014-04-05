@@ -60,6 +60,10 @@ double SentenceDependency::calPrecision(const vector<int>& predicted){
 	return accuracy / (double)(predicted.size() - 1);
 }
 
+void SentenceDependency::setAsCurrentPrediction(int index){
+	setCurrentPredictedParent(predictedResults[index].getPredictedParent());
+}
+
 /**
  * 同时计算一下精确度,树的值，并且判断一下realtreescore >= treescore && treescore >= oldscore
  */
