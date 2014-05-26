@@ -48,6 +48,7 @@ public:
 	int selectBestPredict();
 
 	int getPredictCount();
+	int printPredictParent();
 
 //	int selectMinScoreDifference();
 //

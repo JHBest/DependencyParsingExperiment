@@ -209,12 +209,14 @@ bool Simulator::predictAfterMutate(map<int,double>& mutatedValue,int kth){
  *
  */
 void Simulator::selectAfterMutate(WordAgent& wordAgent){
-
+	TIMESRC Logger::logger<<StrHead::header+" selectAfterMutate\n";
 	int maxFitIndex = getSentenceDependency().selectBestPredict();
+	cout<<"maxFitIndex="<<maxFitIndex<<endl;
 	double maxFitness = getSentenceDependency().getPredictedFitness(maxFitIndex);
 
 	bool accpetMutate = false;
 	double currentFitness = getSentenceDependency().getCurrentPredictedResult().getFitness();
+	cout<<" currentFitness="<<currentFitness<<" maxFitness = "<<maxFitness<<"\n";
 	TIMESRC Logger::logger<<StrHead::header+" currentFitness="+currentFitness+" maxFitness = "+maxFitness+"\n";
 	if(maxFitness >= currentFitness){
 		accpetMutate = true;

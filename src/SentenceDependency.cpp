@@ -32,7 +32,9 @@ bool SentenceDependency::setCurrentPredictedParent(vector<int>& parent){
 	if(!legal){
 		return false;
 	}
-	resetForNextMutate();
+//	resetForNextMutate();
+	currentPredictedResult.reset();//重置当前的预测结果
+
 	currentPredictedResult.setPredictedParent(parent);
 	double precision = calPrecision(parent);
 	currentPredictedResult.setPrecision(precision);
@@ -44,6 +46,9 @@ bool SentenceDependency::setCurrentPredictedParent(vector<int>& parent){
 
 	currentPredictedResult.setRealScore(realtreescore);
 	currentPredictedResult.setScore(treescore);
+
+	predictedResults.clear();//清空该次所有的预测结果
+
 	return true;
 
 }
@@ -61,6 +66,8 @@ double SentenceDependency::calPrecision(const vector<int>& predicted){
 }
 
 void SentenceDependency::setAsCurrentPrediction(int index){
+//	printPredictParent();
+
 	setCurrentPredictedParent(predictedResults[index].getPredictedParent());
 }
 
@@ -118,6 +125,16 @@ bool SentenceDependency::validatePredictedTree(const vector<int>& predict){
 
 int SentenceDependency::getPredictCount(){
 	return predictedResults.size();
+}
+
+int SentenceDependency::printPredictParent(){
+	for(size_t i = 0;i < predictedResults.size();i ++){
+		vector<int> parents = predictedResults[i].getPredictedParent();
+		for(size_t j = 0;j < parents.size();j ++){
+			cout<<parents[j]<<",";
+		}
+		cout<<endl;
+	}
 }
 
 int SentenceDependency::selectBestPredict(){
