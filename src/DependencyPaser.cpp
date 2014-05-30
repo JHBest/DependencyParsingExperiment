@@ -183,8 +183,10 @@ bool DependencyPaser::predict(const char * testFile, const char * outFile)
 	vector<vector<string> > senes;
 
 	int senNum = 0;
-	int rightHeaderCount = 0;
-	int allWordCount = 0;
+	int rightHeaderCount = 0;//不包括标点符号
+	int allWordCount = 0;//
+	int rightHeaderCount_all = 0;//包括标点符号
+	int allWordCount_all = 0;//
 	double sum  = 0.0;
 	while(getline(fin, line)){
 		if(line == ""){
@@ -198,18 +200,35 @@ bool DependencyPaser::predict(const char * testFile, const char * outFile)
 			predictedFather.resize(sen.size());
 			pPredictor->predict(sen,predictedFather);
 			int rightFather = 0;
+			int sencount = 0;
+			int rightFather_all = 0;
 			for(size_t i = 0; i < senes.size(); i++){
+				//				if(predictedFather[i+1] == atoi(senes[i][6].c_str())){
+				//					rightFather++;
+				//				}
 				if(predictedFather[i+1] == atoi(senes[i][6].c_str())){
-					rightFather++;
+					rightFather_all ++;
+				}
+				if(senes[i][3] == "PU"){
+					continue;
+				}
+				sencount ++;
+				if(predictedFather[i+1] == atoi(senes[i][6].c_str())){
+					rightFather ++;
 				}
 			}
 			rightHeaderCount = rightHeaderCount + rightFather;
-			allWordCount = allWordCount + senes.size();
-			double acc = (double)rightFather/(double)senes.size();
-			sum += acc;
+			allWordCount = allWordCount + sencount;
+
+			rightHeaderCount_all = rightHeaderCount_all + rightFather_all;
+			allWordCount_all = allWordCount_all + senes.size();
+
+			double acc = (double)rightFather/(double)sencount;
+			double acc_all = (double)rightFather_all/(double)senes.size();
+//				sum += acc;
 			senNum++;
 
-			fout<<senNum<<","<<senes.size()<<","<<rightFather<<","<<acc<<endl;
+			fout<<senNum<<","<<sencount<<","<<rightFather<<","<<acc<<";"<<senes.size()<<","<<rightFather_all<<","<<acc_all<<endl;
 			senes.clear();
 
 		}
@@ -224,8 +243,11 @@ bool DependencyPaser::predict(const char * testFile, const char * outFile)
 		}
 	}
 	double uas = rightHeaderCount /(double)allWordCount;
+	double uas_all = rightHeaderCount_all /(double)allWordCount_all;
+
 	TIMESRC Logger::logger<<StrHead::header + "unlabeled attachment score:" + uas +"\n";
-	fout<<"unlabeled attachment score:"<<uas<<endl;
+//	fout<<"unlabeled attachment score:"<<uas<<endl;
+	fout<<"unlabeled attachment score:"<<uas<<","<<uas_all<<endl;
 	fout.close();
 	TIMESRC Logger::logger<<StrHead::header + "Predicting finished!" +"\n";
 	return true;
@@ -247,8 +269,10 @@ bool DependencyPaser::predictOnAllWeights(const char * testFile, const char * ou
 		vector<vector<string> > senes;
 		string line;
 		int senNum = 0;
-		int rightHeaderCount = 0;
-		int allWordCount = 0;
+		int rightHeaderCount = 0;//不包括标点符号
+		int allWordCount = 0;//
+		int rightHeaderCount_all = 0;//包括标点符号
+		int allWordCount_all = 0;//
 		double sum  = 0.0;
 		while(getline(fin, line)){
 			if(line == ""){
@@ -262,18 +286,32 @@ bool DependencyPaser::predictOnAllWeights(const char * testFile, const char * ou
 				predictedFather.resize(sen.size());
 				pPredictor->predict2(sen,predictedFather);
 				int rightFather = 0;
+				int sencount = 0;
+				int rightFather_all = 0;
 				for(size_t i = 0; i < senes.size(); i++){
 					if(predictedFather[i+1] == atoi(senes[i][6].c_str())){
-						rightFather++;
+						rightFather_all ++;
+					}
+					if(senes[i][3] == "PU"){
+						continue;
+					}
+					sencount ++;
+					if(predictedFather[i+1] == atoi(senes[i][6].c_str())){
+						rightFather ++;
 					}
 				}
 				rightHeaderCount = rightHeaderCount + rightFather;
-				allWordCount = allWordCount + senes.size();
-				double acc = (double)rightFather/(double)senes.size();
-				sum += acc;
+				allWordCount = allWordCount + sencount;
+
+				rightHeaderCount_all = rightHeaderCount_all + rightFather_all;
+				allWordCount_all = allWordCount_all + senes.size();
+
+				double acc = (double)rightFather/(double)sencount;
+				double acc_all = (double)rightFather_all/(double)senes.size();
+//				sum += acc;
 				senNum++;
 
-				fout<<senNum<<","<<senes.size()<<","<<rightFather<<","<<acc<<endl;
+				fout<<senNum<<","<<sencount<<","<<rightFather<<","<<acc<<";"<<senes.size()<<","<<rightFather_all<<","<<acc_all<<endl;
 
 				senes.clear();
 
@@ -289,9 +327,10 @@ bool DependencyPaser::predictOnAllWeights(const char * testFile, const char * ou
 			}
 		}
 		double uas = rightHeaderCount /(double)allWordCount;
+		double uas_all = rightHeaderCount_all /(double)allWordCount_all;
 		TIMESRC Logger::logger<<StrHead::header + "unlabeled attachment score:" + uas +"\n";
-		fout<<"unlabeled attachment score:"<<uas<<endl;
-		fout<<endl;
+		fout<<"unlabeled attachment score:"<<uas<<","<<uas_all<<endl;
+//		fout<<endl;
 	}
 	fout.close();
 	TIMESRC Logger::logger<<StrHead::header + "Predicting finished!" +"\n";
